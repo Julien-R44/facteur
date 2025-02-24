@@ -22,15 +22,6 @@ export function defineProvider<Options, Message, Response>(
   })
 }
 
-export const telegramProvider = defineProvider<{ token: string }, any, any>(
-  'telegram',
-  (options) => ({
-    send(data) {
-      console.log('Sending telegram message', data, options)
-    },
-  }),
-)
-
 class FacteurOptions<Providers extends FacteurProviderFactory> {
   logger: Logger = noopLogger()
   emitter: Emitter = new EventEmitter()
