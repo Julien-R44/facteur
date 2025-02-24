@@ -1,0 +1,4 @@
+**/node_modules
+**/build
+**/database.sqlite
+.todo.md

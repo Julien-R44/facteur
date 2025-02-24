@@ -1,0 +1,21 @@
+{
+  "name": "@facteurjs/monorepo",
+  "type": "module",
+  "packageManager": "pnpm@10.4.1",
+  "description": "",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "license": "ISC",
+  "keywords": [],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bullmq": "^5.41.3",
+    "ioredis": "^5.5.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "better-sqlite3": "^11.8.1",
+    "kysely": "^0.27.5"
+  }
+}

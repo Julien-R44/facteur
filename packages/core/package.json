@@ -1,0 +1,20 @@
+{
+  "name": "@facteurjs/core",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Core package for facteur",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "license": "ISC",
+  "keywords": [],
+  "exports": {
+    ".": "./build/index.mjs",
+    "./types": "./build/types.mjs"
+  },
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub"
+  },
+  "dependencies": {
+    "@julr/utils": "^1.8.0"
+  }
+}

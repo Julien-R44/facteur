@@ -1,0 +1,22 @@
+{
+  "name": "@facteurjs/slack",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Slack notification provider for facteur",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "license": "ISC",
+  "keywords": [],
+  "main": "index.js",
+  "scripts": {
+    "build": "unbuild",
+    "stub": "unbuild --stub"
+  },
+  "dependencies": {
+    "@slack/types": "^2.14.0",
+    "slack-block-builder": "^2.8.0"
+  },
+  "devDependencies": {
+    "@facteurjs/core": "workspace:*",
+    "@slack/webhook": "^7.0.4"
+  }
+}
