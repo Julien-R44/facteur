@@ -93,6 +93,6 @@ class Facteur<Providers extends FacteurProviderFactory> {
   }
 }
 
-export function createfacteur<T extends FacteurProviderFactory>(config: FacteurConfiguration<T>) {
+export function createFacteur<T extends FacteurProviderFactory>(config: FacteurConfiguration<T>) {
   return new Facteur(config)
 }
