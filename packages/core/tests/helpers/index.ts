@@ -2,9 +2,14 @@ import { AssertionError } from 'node:assert'
 
 import type { Provider } from '../../src/types.js'
 
-class TestProvider implements Provider<any, any, any, any> {
+class TestProvider<T extends string> implements Provider<any, any, any, any> {
+  name: T
   #sent: Array<{ notifiable: any; message: any }> = []
   #queued: Array<{ notifiable: any; message: any }> = []
+
+  constructor(name: T) {
+    this.name = name
+  }
 
   send(options: { notifiable: any; message: any }) {
     this.#sent.push(options)
@@ -57,8 +62,5 @@ class TestProvider implements Provider<any, any, any, any> {
 
 // @ts-expect-error osef
 export function testProvider<T extends string>(options: { name: T } = { name: 'test' }) {
-  return {
-    name: options.name,
-    provider: new TestProvider(),
-  }
+  return new TestProvider(options.name)
 }

@@ -1,23 +1,22 @@
 import { invoke } from '@julr/utils/functions'
-import type { FacteurProviderFactory, Provider } from '@facteurjs/core/types'
+import type { Provider } from '@facteurjs/core/types'
 
 import type { DiscordMessage } from './message.js'
 import type { DiscordOptions, DiscordResponse, DiscordTargets } from './types.js'
 
-export function discordWebhookProvider<Options extends DiscordOptions<any>>(
-  options: Options,
-): FacteurProviderFactory {
-  return { name: 'discord' as const, provider: new DiscordProvider(options) }
+export function discordWebhookProvider<Options extends DiscordOptions<any>>(options: Options) {
+  return new DiscordProvider(options)
 }
 
-type DiscordProviderTypes = Provider<
+type DiscordProviderInterface = Provider<
   DiscordOptions<any>,
   DiscordMessage,
   DiscordResponse,
   DiscordTargets<any>
 >
 
-class DiscordProvider implements DiscordProviderTypes {
+class DiscordProvider implements DiscordProviderInterface {
+  name = 'discord' as const
   #webhooksUrls: Map<string, URL> = new Map()
 
   #buildWebhookEntry(key: string, endpoint: string) {

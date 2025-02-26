@@ -1,8 +1,8 @@
 import { DiscordMessage } from '@facteurjs/discord'
 import { DatabaseMessage } from '@facteurjs/database'
 
-import { facteur } from './facteur.js'
-import type { User } from './facteur.js'
+import { facteur } from '../init/facteur.js'
+import type { User } from '../init/facteur.js'
 
 export interface BackupStartedMessageParams {
   backupName: string

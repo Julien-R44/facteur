@@ -13,6 +13,7 @@
     "build": "pnpm run -r build",
     "lint": "eslint .",
     "stub": "pnpm -r --parallel run stub",
+    "test": "FORCE_COLOR=1 pnpm -r --parallel run test",
     "checks": "pnpm lint && pnpm typecheck"
   },
   "dependencies": {

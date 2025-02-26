@@ -17,8 +17,8 @@ test.group('Message', () => {
 
     await msg.send({ name: 'John' }, { message: 'Hello' })
 
-    provider.provider.assertSentCount(1)
-    provider2.provider.assertNoneSent()
+    provider.assertSentCount(1)
+    provider2.assertNoneSent()
   })
 
   test('throw if provider returned from via does not exist', async ({ assert }) => {
@@ -50,7 +50,7 @@ test.group('Message', () => {
 
     await msg.send({ name: 'John' }, { message: 'Hello' })
 
-    provider.provider.assertSentCount(1)
-    provider2.provider.assertSentCount(1)
+    provider.assertSentCount(1)
+    provider2.assertSentCount(1)
   })
 })

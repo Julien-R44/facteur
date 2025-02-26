@@ -1,5 +1,4 @@
 import { defineProvider } from '@facteurjs/core'
-import { IncomingWebhook } from '@slack/webhook'
 import { Modal, Blocks, Elements, Bits, setIfTruthy } from 'slack-block-builder'
 
 import type { SlackOptions } from './types.js'

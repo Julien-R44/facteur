@@ -1,8 +1,6 @@
 import { Queue, Worker } from 'bullmq'
 import type { Cluster, ClusterOptions, Redis, RedisOptions } from 'ioredis'
 
-import type { Message } from '../../packages/core/src/types.js'
-
 export type ConnectionOptions = RedisOptions | ClusterOptions | Redis | Cluster
 
 export interface BullQueueAdapterOptions {
@@ -40,7 +38,7 @@ export class BullQueueAdapter {
   }
 
   startQueueProcessor() {
-    const worker = new Worker(
+    new Worker(
       'foo',
       async (job) => {
         console.log(job.data)
