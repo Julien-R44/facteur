@@ -19,6 +19,10 @@
     "@types/node": "^22.13.4"
   },
   "devDependencies": {
+    "@japa/assert": "^4.0.1",
+    "@japa/expect-type": "^2.0.3",
+    "@japa/file-system": "^2.3.2",
+    "@japa/runner": "^4.2.0",
     "@julr/tooling-configs": "^4.0.0",
     "@poppinss/utils": "^6.9.2",
     "eslint": "^9.20.1",

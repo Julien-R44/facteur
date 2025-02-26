@@ -21,6 +21,18 @@ importers:
         specifier: ^22.13.4
         version: 22.13.4
     devDependencies:
+      '@japa/assert':
+        specifier: ^4.0.1
+        version: 4.0.1(@japa/runner@4.2.0)
+      '@japa/expect-type':
+        specifier: ^2.0.3
+        version: 2.0.3(@japa/runner@4.2.0)
+      '@japa/file-system':
+        specifier: ^2.3.2
+        version: 2.3.2(@japa/assert@4.0.1(@japa/runner@4.2.0))(@japa/runner@4.2.0)
+      '@japa/runner':
+        specifier: ^4.2.0
+        version: 4.2.0
       '@julr/tooling-configs':
         specifier: ^4.0.0
         version: 4.0.0(eslint@9.20.1(jiti@2.4.2))(prettier@3.5.1)(typescript@5.7.3)
@@ -654,6 +666,19 @@ packages:
   '@japa/errors-printer@4.1.2':
     resolution: {integrity: sha512-exl/r07ssJhEEsMdFT2sXgP1sV7Tp3mZvYUEDMXZ8YjWZPHTFLLcA7o9q9FJSSB1ITrEIbx2SWTB+2fFUaZ3NA==}
     engines: {node: '>=18.16.0'}
+
+  '@japa/expect-type@2.0.3':
+    resolution: {integrity: sha512-enwJxA6ovpkUCT1ge/855RMj70yHqP5sxM3sPEPdp9EwaO1zR4EHer9Avo42Cc8DlTUOcM3KyNCxXwRGSVnamQ==}
+    engines: {node: '>=18.16.0'}
+    peerDependencies:
+      '@japa/runner': ^3.1.2 || ^4.0.0
+
+  '@japa/file-system@2.3.2':
+    resolution: {integrity: sha512-BY1M2NJkZze8zqLI8mpMHu5HuFQLe+xyspBHHyC1pXYvEWlgILoYZ8kkKwxLwo7yVW6VVkDb72pBbjHBTTXv1g==}
+    engines: {node: '>=18.16.0'}
+    peerDependencies:
+      '@japa/assert': ^2.0.0 || ^3.0.0 || ^4.0.0
+      '@japa/runner': ^3.0.0 || ^4.0.0
 
   '@japa/plugin-adonisjs@4.0.0':
     resolution: {integrity: sha512-M2LUtHhKr4KgBfX73tDHNCD1IOmcXp9dvC+AinmRxsggIFnarsClcfjT/sXc3uNzjZW7Lk31LvcH76AxJHBmJQ==}
@@ -2025,6 +2050,10 @@ packages:
   expand-template@2.0.3:
     resolution: {integrity: sha512-XYfuKMvj4O35f/pOXLObndIRvyQ+/+6AhODh+OKWj9S9498pHHn/IMszH+gt0fBCRWMNfk1ZSp5x3AifmnI2vg==}
     engines: {node: '>=6'}
+
+  expect-type@1.1.0:
+    resolution: {integrity: sha512-bFi65yM+xZgk+u/KRIpekdSYkTB5W1pEf0Lt8Q8Msh7b+eQ7LXVtIB1Bkm4fvclDEL1b2CZkMhv2mOeF8tMdkA==}
+    engines: {node: '>=12.0.0'}
 
   fast-copy@3.0.2:
     resolution: {integrity: sha512-dl0O9Vhju8IrcLndv2eU4ldt1ftXMqqfgN4H1cpmGV7P6jeB9FwpN9a2c8DPGE1Ys88rNUJVYDHq73CGAGOPfQ==}
@@ -4338,6 +4367,20 @@ snapshots:
       supports-color: 10.0.0
       youch: 4.1.0-beta.5
 
+  '@japa/expect-type@2.0.3(@japa/runner@4.2.0)':
+    dependencies:
+      '@japa/runner': 4.2.0
+      expect-type: 1.1.0
+
+  '@japa/file-system@2.3.2(@japa/assert@4.0.1(@japa/runner@4.2.0))(@japa/runner@4.2.0)':
+    dependencies:
+      '@japa/assert': 4.0.1(@japa/runner@4.2.0)
+      '@japa/runner': 4.2.0
+      '@paralleldrive/cuid2': 2.2.2
+      '@poppinss/macroable': 1.0.4
+      readdirp: 4.1.2
+      slash: 5.1.0
+
   '@japa/plugin-adonisjs@4.0.0(@adonisjs/core@6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3)))(@japa/runner@4.2.0)':
     dependencies:
       '@adonisjs/core': 6.17.2(@adonisjs/assembler@7.8.2(typescript@5.7.3))
@@ -5834,6 +5877,8 @@ snapshots:
       yoctocolors: 2.1.1
 
   expand-template@2.0.3: {}
+
+  expect-type@1.1.0: {}
 
   fast-copy@3.0.2: {}
 

@@ -5,7 +5,5 @@ export default defineBuildConfig({
   outDir: 'build',
   clean: true,
   declaration: true,
-  rollup: {
-    emitCJS: false,
-  },
+  rollup: { emitCJS: false },
 })

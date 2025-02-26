@@ -4,7 +4,7 @@ import type { Arrayable, Awaitable } from '@julr/utils/types'
 
 export interface FacteurProviderFactory {
   name: string
-  provider: Provider<any, any, any>
+  provider: Provider<any, any, any, any>
 }
 
 export interface QueueItemOptions {
@@ -24,13 +24,15 @@ export interface FacteurConfiguration<Providers extends FacteurProviderFactory> 
   queueAdapter?: QueueAdapter
 }
 
-export interface Provider<Notifiable, Message, Response> {
-  send: (options: { notifiable: Notifiable; message: Message }) => Awaitable<Response>
+// TODO must be added to eslint default config
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface Provider<_Options, Message, Response, _Targets> {
+  send: (options: { notifiable: any; message: Message }) => Awaitable<Response>
 }
 
 export type CreateMessageParams<Notifiable, Providers extends FacteurProviderFactory, Params> = {
   name: string
-  via: (notifiable: Notifiable) => Arrayable<Providers['name']>
+  via?: (notifiable: Notifiable) => Arrayable<Providers['name']>
 } & ProvidersToFunctions<Providers, Notifiable, Params>
 
 export type ProvidersToFunctions<Providers extends FacteurProviderFactory, Notifiable, Params> = {
@@ -51,11 +53,15 @@ export interface Emitter {
   emit: (event: string, ...values: any[]) => void
 }
 
-// export type Message<T> = {
-//   via(notifiable: any): Arrayable<string>
-// } & ProvidersToFunctions<any, any, any>
-
 export type ToProviderParams<Params> = {
   notifiable: any
   params: Params
+}
+
+export type ProvidersToTargets<Providers extends FacteurProviderFactory> = {
+  [K in Providers['name']]?: Extract<Providers, { name: K }> extends { provider: infer P }
+    ? P extends Provider<any, any, any, infer T>
+      ? T
+      : never
+    : never
 }

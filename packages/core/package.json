@@ -12,7 +12,9 @@
   },
   "scripts": {
     "build": "unbuild",
-    "stub": "unbuild --stub"
+    "stub": "unbuild --stub",
+    "test": "tsx tests/index.ts",
+    "quick:test": "tsx tests/index.ts"
   },
   "dependencies": {
     "@julr/utils": "catalog:",
