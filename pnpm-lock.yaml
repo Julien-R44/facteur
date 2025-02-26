@@ -131,12 +131,27 @@ importers:
 
   playgrounds/vanilla:
     dependencies:
+      '@facteurjs/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@facteurjs/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@facteurjs/discord':
+        specifier: workspace:*
+        version: link:../../packages/discord
+      '@facteurjs/slack':
+        specifier: workspace:*
+        version: link:../../packages/slack
       bullmq:
         specifier: ^5.41.3
         version: 5.41.3
       ioredis:
         specifier: ^5.5.0
         version: 5.5.0
+      pino:
+        specifier: ^9.6.0
+        version: 9.6.0
     devDependencies:
       '@types/better-sqlite3':
         specifier: ^7.6.12
@@ -147,6 +162,9 @@ importers:
       kysely:
         specifier: ^0.27.5
         version: 0.27.5
+      pino-pretty:
+        specifier: ^13.0.0
+        version: 13.0.0
 
 packages:
 
