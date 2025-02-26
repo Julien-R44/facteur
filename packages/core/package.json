@@ -15,6 +15,7 @@
     "stub": "unbuild --stub"
   },
   "dependencies": {
-    "@julr/utils": "^1.8.0"
+    "@julr/utils": "catalog:",
+    "@poppinss/exception": "catalog:"
   }
 }
