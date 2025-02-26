@@ -1,6 +1,14 @@
-export interface DiscordOptions {
-  webhookUrl: string
+export type DiscordOptions<WebhooksNames extends string> =
+  | { webhooks?: { [key in WebhooksNames]: string } }
+  | { webhookUrl: string }
+
+export type DiscordTargets<Options extends DiscordOptions<any>> = Options extends {
+  webhooks: infer Webhooks
 }
+  ? { [key in keyof Webhooks]?: boolean }
+  : { webhookUrl: string }
+
+export type HexadecimalColor = `#${string}`
 
 export interface DiscordResponse {
   type: number
@@ -31,4 +39,21 @@ export interface DiscordResponse {
   mention_everyone: boolean
   tts: boolean
   webhook_id: string
+}
+
+export interface DiscordEmbedField {
+  name: string
+  value: string
+  inline?: boolean
+}
+
+export interface DiscordEmbedAuthor {
+  name?: string
+  url?: string
+  iconUrl?: string
+}
+
+export interface DiscordEmbedFooter {
+  text: string
+  iconUrl?: string
 }
