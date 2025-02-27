@@ -1,52 +1,39 @@
 import pg from 'pg'
+import type { Knex } from 'knex'
 import { test } from '@japa/runner'
 import { createPool } from 'mysql2'
 import SQLite from 'better-sqlite3'
+import { default as knex } from 'knex'
 import { randomUUID } from 'node:crypto'
 import { createFacteur } from '@facteurjs/core'
-import { Kysely, MysqlDialect, PostgresDialect, SqliteDialect } from 'kysely'
 
-import { kyselyAdapter } from '../../src/adapters/kysely.js'
+import { knexAdapter } from '../../src/adapters/knex.js'
 import { DatabaseMessage, databaseProvider } from '../../src/provider.js'
 
-const postgresDialect = new PostgresDialect({
-  pool: new pg.Pool({
-    database: 'postgres',
-    host: 'localhost',
-    user: 'postgres',
-    password: 'postgres',
-    port: 5432,
-    max: 10,
-  }),
-})
-
-const mysqlDialect = new MysqlDialect({
-  pool: createPool({
-    database: 'mysql',
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    port: 3306,
-    connectionLimit: 10,
-  }),
-})
-const sqliteDialect = new SqliteDialect({ database: new SQLite('./database.sqlite') })
-
-function initFacteur(connection: Kysely<any>) {
+function initFacteur(connection: Knex) {
   const facteur = createFacteur({
-    providers: [databaseProvider({ adapter: kyselyAdapter({ connection }) })],
+    providers: [databaseProvider({ adapter: knexAdapter({ connection }) })],
   })
 
   return { facteur }
 }
 
-test.group('Kysely | Postgres', (group) => {
-  let postgres: Kysely<any>
+test.group('Knex | Postgres', (group) => {
+  let postgres: Knex
 
   group.setup(() => {
-    postgres = new Kysely<any>({ dialect: postgresDialect })
+    postgres = knex({
+      client: 'pg',
+      connection: {
+        host: 'localhost',
+        user: 'postgres',
+        password: 'postgres',
+        port: 5432,
+        database: 'postgres',
+      },
+    })
     return async () => {
-      await postgres.schema.dropTable('notifications').execute()
+      await postgres.schema.dropTable('notifications').catch(() => {})
       await postgres.destroy()
     }
   })
@@ -65,7 +52,7 @@ test.group('Kysely | Postgres', (group) => {
 
     await msg.send({}, {})
 
-    const result = await postgres.selectFrom('notifications').selectAll().execute()
+    const result = await postgres.table('notifications').select('*')
 
     assert.deepEqual(result.length, 1)
     assert.containsSubset(result[0], {
@@ -77,14 +64,23 @@ test.group('Kysely | Postgres', (group) => {
   })
 })
 
-test.group('Kysely | Mysql', (group) => {
-  let mysql: Kysely<any>
+test.group('Knex | Mysql', (group) => {
+  let mysql: Knex
 
   group.setup(() => {
-    mysql = new Kysely<any>({ dialect: mysqlDialect })
+    mysql = knex({
+      client: 'mysql2',
+      connection: {
+        database: 'mysql',
+        host: 'localhost',
+        user: 'root',
+        password: 'root',
+        port: 3306,
+      },
+    })
 
     return async () => {
-      await mysql.schema.dropTable('notifications').execute()
+      await mysql.schema.dropTable('notifications').catch(() => {})
       await mysql.destroy()
     }
   })
@@ -103,7 +99,7 @@ test.group('Kysely | Mysql', (group) => {
 
     await msg.send({}, {})
 
-    const result = await mysql.selectFrom('notifications').selectAll().execute()
+    const result = await mysql.table('notifications').select('*')
 
     assert.deepEqual(result.length, 1)
     assert.containsSubset(result[0], {
@@ -115,14 +111,18 @@ test.group('Kysely | Mysql', (group) => {
   })
 })
 
-test.group('Kysely | Sqlite', (group) => {
-  let sqlite: Kysely<any>
+test.group('Knex | Sqlite', (group) => {
+  let sqlite: Knex
 
   group.setup(() => {
-    sqlite = new Kysely<any>({ dialect: sqliteDialect })
+    sqlite = knex({
+      client: 'better-sqlite3',
+      connection: { filename: ':memory:' },
+      useNullAsDefault: true,
+    })
 
     return async () => {
-      await sqlite.schema.dropTable('notifications').execute()
+      await sqlite.schema.dropTable('notifications').catch(() => {})
       await sqlite.destroy()
     }
   })
@@ -141,7 +141,7 @@ test.group('Kysely | Sqlite', (group) => {
 
     await msg.send({}, {})
 
-    const result = await sqlite.selectFrom('notifications').selectAll().execute()
+    const result = await sqlite.table('notifications').select('*')
 
     assert.deepEqual(result.length, 1)
     assert.containsSubset(result[0], {

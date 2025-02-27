@@ -1,4 +1,4 @@
-import { SqliteAdapter, type Kysely, MysqlAdapter, sql } from 'kysely'
+import { type Kysely, sql } from 'kysely'
 
 import type { DatabaseAdapter, KyselyConfig, SaveToDatabaseParams } from '../types.js'
 
@@ -7,21 +7,11 @@ export function kyselyAdapter(config: KyselyConfig): DatabaseAdapter {
 }
 
 class KyselyAdapter implements DatabaseAdapter {
-  #dialect: 'mysql' | 'pg' | 'sqlite'
   #tableName!: string
   #connection: Kysely<any>
 
   constructor(config: KyselyConfig) {
     this.#connection = config.connection
-
-    const adapter = this.#connection.getExecutor().adapter
-    if (adapter instanceof SqliteAdapter) {
-      this.#dialect = 'sqlite'
-    } else if (adapter instanceof MysqlAdapter) {
-      this.#dialect = 'mysql'
-    } else {
-      this.#dialect = 'pg'
-    }
   }
 
   setTableName(tableName: string) {

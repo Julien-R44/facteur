@@ -1,12 +1,13 @@
+import type { Knex } from 'knex'
 import type { Kysely } from 'kysely'
 
 /**
- * The adapter for the database
+ * The interface for implementing a new database adapter
  */
 export interface DatabaseAdapter {
+  save: (options: SaveToDatabaseParams) => Promise<void>
   createTableIfNotExists: () => Promise<void>
   setTableName: (tableName: string) => void
-  save: (options: SaveToDatabaseParams) => Promise<void>
 }
 
 export interface SaveToDatabaseParams {
@@ -15,6 +16,9 @@ export interface SaveToDatabaseParams {
   content: Record<string, any>
 }
 
+/**
+ * Options accepted by the database provider
+ */
 export interface DatabaseConfig {
   adapter: DatabaseAdapter
 
@@ -31,6 +35,16 @@ export interface DatabaseConfig {
   autoCreateTable?: boolean
 }
 
+/**
+ * Options accepted by the Kysely adapter
+ */
 export interface KyselyConfig {
   connection: Kysely<any>
+}
+
+/**
+ * Options accepted by the Knex adapter
+ */
+export interface KnexConfig {
+  connection: Knex
 }
