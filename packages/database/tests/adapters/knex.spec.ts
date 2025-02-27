@@ -1,9 +1,6 @@
-import pg from 'pg'
+import knex from 'knex'
 import type { Knex } from 'knex'
 import { test } from '@japa/runner'
-import { createPool } from 'mysql2'
-import SQLite from 'better-sqlite3'
-import { default as knex } from 'knex'
 import { randomUUID } from 'node:crypto'
 import { createFacteur } from '@facteurjs/core'
 
