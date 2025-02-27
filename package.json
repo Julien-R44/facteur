@@ -35,7 +35,8 @@
   "prettier": "@julr/tooling-configs/prettier",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "better-sqlite3"
+      "better-sqlite3",
+      "esbuild"
     ]
   }
 }

@@ -1,0 +1,24 @@
+{
+  "links": {
+    "home": {
+      "title": "Facteur.ts",
+      "href": "/"
+    },
+    "github": {
+      "title": "Facteur on GitHub",
+      "href": "https://github.com/Julien-R44/facteur"
+    }
+  },
+  "sponsors_sources": ["julien-r44"],
+  "search": {},
+  "advertising_sponsors": [
+    {
+      "link": "",
+      "logo": "",
+      "logo_dark": "",
+      "logo_styles": ""
+    }
+  ],
+  "fileEditBaseUrl": "https://github.com/Julien-R44/facteur/tree/develop/docs",
+  "copyright": "Facteur.ts"
+}

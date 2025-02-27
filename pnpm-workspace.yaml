@@ -1,6 +1,7 @@
 packages:
   - 'packages/*'
   - 'playgrounds/*'
+  - docs
 
 catalog:
   '@poppinss/exception': ^1.2.0

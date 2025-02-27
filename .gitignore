@@ -3,3 +3,16 @@
 **/dist
 **/database.sqlite
 .todo.md
+.env
+.env.local
+.env.production.local
+.env.development.local
+**/public/hot
+**/public/build
+**/public/assets
+npm-debug.log
+yarn-error.log
+.fleet
+.idea
+.vscode
+dist
