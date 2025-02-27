@@ -34,7 +34,7 @@ class KyselyAdapter implements DatabaseAdapter {
       .values({
         notifiable_id: options.notifiableId,
         type: options.type,
-        content: options.content,
+        content: JSON.stringify(options.content),
       })
       .execute()
   }
@@ -42,10 +42,10 @@ class KyselyAdapter implements DatabaseAdapter {
   async createTableIfNotExists(): Promise<void> {
     await this.#connection.schema
       .createTable(this.#tableName)
-      .addColumn('id', 'integer', (col) => col.primaryKey().autoIncrement())
+      .addColumn('id', 'serial', (col) => col.primaryKey())
       .addColumn('notifiable_id', 'text', (col) => col.notNull())
       .addColumn('type', 'text', (col) => col.notNull())
-      .addColumn('content', 'jsonb', (col) => col.notNull())
+      .addColumn('content', 'json', (col) => col.notNull())
       .addColumn('read_at', 'timestamp')
       .addColumn('created_at', 'timestamp', (col) => col.defaultTo(sql`CURRENT_TIMESTAMP`))
       .ifNotExists()

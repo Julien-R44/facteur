@@ -5,15 +5,15 @@ export class DatabaseMessage {
 
   #type: string = 'default'
   #content: any = {}
-  #notifiableId: string = ''
+  #notifiableId?: string | number
 
   setType(type: string) {
     this.#type = type
     return this
   }
 
-  setNotifiableId(notifiableId: string) {
-    this.#content.notifiableId = notifiableId
+  setNotifiableId(notifiableId: string | number) {
+    this.#notifiableId = notifiableId
     return this
   }
 

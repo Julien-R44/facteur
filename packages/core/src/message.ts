@@ -41,7 +41,7 @@ export class FacteurMessage<Notifiable, Providers extends FacteurProviderFactory
       const fn = this.#params[`to${capitalize(provider.name)}`]
       const message = fn?.({ notifiable, params })
 
-      provider.send({ message, notifiable })
+      await provider.send({ message, notifiable })
     }
   }
 
