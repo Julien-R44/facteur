@@ -2,14 +2,12 @@ import { pino } from 'pino'
 import SQLite from 'better-sqlite3'
 import { Kysely, SqliteDialect } from 'kysely'
 import { createFacteur } from '@facteurjs/core'
-// import { slackProvider } from '@facteurjs/slack'
+import { webhookProvider } from '@facteurjs/webhook'
 import type { FacteurMessage } from '@facteurjs/core'
 import { databaseProvider } from '@facteurjs/database'
 import { discordWebhookProvider } from '@facteurjs/discord'
 import type { QueueItemOptions } from '@facteurjs/core/types'
 import { kyselyAdapter } from '@facteurjs/database/adapters/kysely'
-
-// import { bullQueueAdapter } from '../queue.js'
 
 const webhooks = {
   slack: 'https://hooks.slack.com/services/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',
@@ -26,23 +24,21 @@ const kyselySqlite = new Kysely<any>({ dialect })
 
 export const facteur = createFacteur({
   logger: pino({ transport: { target: 'pino-pretty', options: { colorize: true } } }),
-  // queueAdapter: bullQueueAdapter({
-  //   connection: { host: 'localhost', port: 6379 },
-  // }),
-  providers: [
-    // loggerProvider({ level: 'debug' }),
-    databaseProvider({ adapter: kyselyAdapter({ connection: kyselySqlite }) }),
-    discordWebhookProvider({
-      // webhookUrl: webhooks.discord.default,
+  providers: {
+    // database: databaseProvider({
+    //   adapter: kyselyAdapter({ connection: kyselySqlite }),
+    // }),
+    discord: discordWebhookProvider({
       webhooks: {
         default: webhooks.discord.default,
         marketing: webhooks.discord.marketing,
       },
     }),
-    // telegramProvider({ token: '1234' }),
-    // mailProvider({ adapter: adonisJsMailAdapter() }),
-    // slackProvider({ webhookUrl: webhooks.slack }),
-  ],
+    // myProvider: webhookProvider({
+    //   webhookUrl:
+    //     'https://hooks.slack.com/services/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',
+    // }),
+  },
 })
 
 /**

@@ -3,15 +3,15 @@ import { invoke } from '@julr/utils/functions'
 import { capitalize } from '@julr/utils/string'
 
 import type { FacteurOptions } from './options.js'
-import type { FacteurProviderFactory, CreateMessageParams, QueueItemOptions } from './types.js'
+import type { CreateMessageParams, QueueItemOptions, Provider } from './types.js'
 
-export class FacteurMessage<Notifiable, Providers extends FacteurProviderFactory, Payload> {
-  #facteurOptions: FacteurOptions<Providers>
-  #params: CreateMessageParams<Notifiable, Providers, Payload>
+export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Provider>, Payload> {
+  #facteurOptions: FacteurOptions<KnownProviders>
+  #params: CreateMessageParams<Notifiable, KnownProviders, Payload>
 
   constructor(
-    facteurOptions: FacteurOptions<Providers>,
-    params: CreateMessageParams<Notifiable, Providers, Payload>,
+    facteurOptions: FacteurOptions<KnownProviders>,
+    params: CreateMessageParams<Notifiable, KnownProviders, Payload>,
   ) {
     this.#facteurOptions = facteurOptions
     this.#params = params
@@ -21,15 +21,17 @@ export class FacteurMessage<Notifiable, Providers extends FacteurProviderFactory
     const providerNames = invoke(() => {
       if (this.#params.via) return toArray(this.#params.via(notifiable))
 
-      return this.#facteurOptions.providers.map((p) => p.name)
+      return Object.keys(this.#facteurOptions.providers)
     })
 
     return providerNames.map((providerName) => {
-      const provider = this.#facteurOptions.providers.find((p) => p.name === providerName)
-      // TODO better error message
-      if (!provider) throw new Error(`Provider ${providerName} not found`)
+      const provider = this.#facteurOptions.providers[providerName]
+      if (!provider)
+        throw new Error(
+          `Provider '${providerName as string}' was selected through 'via' but does not exist`,
+        )
 
-      return provider
+      return { providerName, provider }
     })
   }
 
@@ -38,10 +40,10 @@ export class FacteurMessage<Notifiable, Providers extends FacteurProviderFactory
 
     for (const provider of providers) {
       // @ts-expect-error osef
-      const fn = this.#params[`to${capitalize(provider.name)}`]
+      const fn = this.#params[`to${capitalize(provider.providerName)}`]
       const message = fn?.({ notifiable, params })
 
-      await provider.send({ message, notifiable })
+      await provider.provider.send({ message, notifiable })
     }
   }
 

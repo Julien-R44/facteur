@@ -178,6 +178,9 @@ importers:
 
   packages/discord:
     dependencies:
+      '@facteurjs/webhook':
+        specifier: workspace:*
+        version: link:../webhook
       '@julr/utils':
         specifier: 'catalog:'
         version: 1.8.0
@@ -201,6 +204,22 @@ importers:
       '@slack/webhook':
         specifier: ^7.0.4
         version: 7.0.4
+
+  packages/test:
+    dependencies:
+      '@facteurjs/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/webhook:
+    dependencies:
+      '@julr/utils':
+        specifier: 'catalog:'
+        version: 1.8.0
+    devDependencies:
+      '@facteurjs/core':
+        specifier: workspace:*
+        version: link:../core
 
   playgrounds/adonisjs:
     dependencies:
@@ -274,6 +293,9 @@ importers:
       '@facteurjs/slack':
         specifier: workspace:*
         version: link:../../packages/slack
+      '@facteurjs/webhook':
+        specifier: workspace:*
+        version: link:../../packages/webhook
       bullmq:
         specifier: ^5.41.3
         version: 5.41.3

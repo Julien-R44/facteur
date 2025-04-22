@@ -19,11 +19,13 @@ export const backupStartedMessage = facteur.createMessage<User, BackupStartedMes
   toDatabase: ({ params }) => {
     return DatabaseMessage.create()
       .setType('backup-started')
+      .setNotifiableId(1)
       .setContent(`Backup started: ${params.backupName} to ${params.destination}`)
   },
 
   toDiscord: ({ params }) => {
     return DiscordMessage.create()
+      .setBody('Backup started')
       .setBotUsername('Test')
       .setBotAvatar('https://modii.org/wp-content/uploads/2020/12/random.png')
       .addEmbed((embed) => {

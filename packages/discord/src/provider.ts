@@ -1,5 +1,6 @@
-import { invoke } from '@julr/utils/functions'
-import type { Provider } from '@facteurjs/core/types'
+import type { Awaitable } from '@julr/utils/types'
+import { WebhookProvider } from '@facteurjs/webhook'
+import type { Provider, ProvidersToTargets } from '@facteurjs/core/types'
 
 import type { DiscordMessage } from './message.js'
 import type { DiscordOptions, DiscordResponse, DiscordTargets } from './types.js'
@@ -8,79 +9,27 @@ export function discordWebhookProvider<Options extends DiscordOptions<any>>(opti
   return new DiscordProvider(options)
 }
 
-type DiscordProviderInterface = Provider<
-  DiscordOptions<any>,
-  DiscordMessage,
-  DiscordResponse,
-  DiscordTargets<any>
->
+// Type pour stocker l'information du type Target
+type GetTargets<T> = T extends Provider<any, any, any, infer U> ? U : never
 
-class DiscordProvider implements DiscordProviderInterface {
-  name = 'discord' as const
-  #webhooksUrls: Map<string, URL> = new Map()
+// Définir l'interface Discord avec le type Target voulu
+interface DiscordProviderInterface<Options extends DiscordOptions<any>>
+  extends Provider<Options, DiscordMessage, DiscordResponse, { yes: true }> {}
 
-  #buildWebhookEntry(key: string, endpoint: string) {
-    const url = new URL(endpoint)
-    url.searchParams.set('wait', 'true')
-
-    return [key, url] as const
-  }
-
-  #initWebhooksEndpoints(options: DiscordOptions<any>) {
-    if ('webhookUrl' in options) {
-      this.#webhooksUrls.set(...this.#buildWebhookEntry('default', options.webhookUrl))
-      return
-    }
-
-    if (!options.webhooks) return
-
-    for (const [key, endpoint] of Object.entries(options.webhooks)) {
-      this.#webhooksUrls.set(key, new URL(endpoint))
-    }
-  }
-
-  constructor(options: DiscordOptions<any>) {
-    this.#initWebhooksEndpoints(options)
-  }
-
-  async #sendMessageToWebhook(url: URL, message: DiscordMessage) {
-    await fetch(url.toString(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(message.serialize()),
-    })
-  }
-
-  #normalizeTargets(targets: DiscordTargets<any>) {
-    if (!targets) return [...this.#webhooksUrls.values()]
-
-    if ('webhookUrl' in targets) {
-      return [this.#buildWebhookEntry('default', targets.webhookUrl)[1]]
-    }
-
-    return Object.keys(targets)
-      .map(([key]) => this.#webhooksUrls.get(key)!)
-      .filter(Boolean)
-  }
-
-  async send(params: { notifiable: any; message: DiscordMessage; targets?: DiscordTargets<any> }) {
-    const { notifiable, message } = params
-
-    const targets = invoke<DiscordTargets<any>>(() => {
-      if (notifiable.notificationTargetForDiscord) {
-        return notifiable.notificationTargetForDiscord()
-      }
-
-      return params.targets
-    })
-
-    const normalizedTargets = this.#normalizeTargets(targets)
-    for (const url of normalizedTargets) {
-      console.log('Sending message to', url)
-      await this.#sendMessageToWebhook(url, message)
-    }
-
-    // TODO
+// Implémenter la classe sans la propriété targets
+class DiscordProvider<Options extends DiscordOptions<any>>
+  implements DiscordProviderInterface<Options>
+{
+  send(options: { notifiable: any; message: DiscordMessage }) {
     return null as any
   }
 }
+
+// Extraire le type directement à partir du type, pas de l'instance
+// type Targets = GetTargets<DiscordProviderInterface<{ webhookUrl: string }>>
+
+type ExtractTargetsType<T> =
+  T extends Provider<infer _O, infer _M, infer _R, infer Targets> ? Targets : never
+
+// Utiliser le type auxiliaire directement sur l'interface, pas sur la classe
+type Targets = ExtractTargetsType<DiscordProviderInterface<{ webhookUrl: string }>>

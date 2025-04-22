@@ -1,3 +1,5 @@
+import { WebhookMessage } from '@facteurjs/webhook'
+
 import type {
   DiscordEmbedAuthor,
   DiscordEmbedField,
@@ -5,7 +7,7 @@ import type {
   HexadecimalColor,
 } from './types.js'
 
-export class DiscordMessage {
+export class DiscordMessage extends WebhookMessage {
   #body = ''
   #username = ''
   #avatarUrl = ''
@@ -15,14 +17,14 @@ export class DiscordMessage {
   /**
    * Creates a new instance of DiscordMessage.
    */
-  static create() {
+  static override create() {
     return new DiscordMessage()
   }
 
   /**
    * Sets the content of the message.
    */
-  setContent(body: string) {
+  override setBody(body: string) {
     this.#body = body
     return this
   }
@@ -61,13 +63,17 @@ export class DiscordMessage {
     return this
   }
 
-  serialize() {
+  override serialize() {
+    console.log('DiscordMessage#serialize')
     return {
-      tts: this.#tts,
-      content: this.#body,
-      username: this.#username,
-      avatar_url: this.#avatarUrl,
-      embeds: this.#embeds.map((embed) => embed.serialize()),
+      ...super.serialize(),
+      body: {
+        tts: this.#tts,
+        content: this.#body,
+        username: this.#username,
+        avatar_url: this.#avatarUrl,
+        embeds: this.#embeds.map((embed) => embed.serialize()),
+      },
     }
   }
 }

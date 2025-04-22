@@ -2,20 +2,15 @@ import EventEmitter from 'node:events'
 import { type Logger, noopLogger } from '@julr/utils/logger'
 
 import { errors } from './exceptions.js'
-import type {
-  FacteurProviderFactory,
-  Emitter,
-  QueueAdapter,
-  FacteurConfiguration,
-} from './types.js'
+import type { Emitter, QueueAdapter, FacteurConfiguration, Provider } from './types.js'
 
-export class FacteurOptions<Providers extends FacteurProviderFactory> {
+export class FacteurOptions<KnownProviders extends Record<string, Provider>> {
   logger: Logger = noopLogger()
   emitter: Emitter = new EventEmitter()
-  providers: Providers[]
+  providers: KnownProviders
   queueAdapter: QueueAdapter
 
-  constructor(config: FacteurConfiguration<Providers>) {
+  constructor(config: FacteurConfiguration<KnownProviders>) {
     this.logger = config.logger ?? this.logger
     this.emitter = config.emitter ?? this.emitter
     this.providers = config.providers

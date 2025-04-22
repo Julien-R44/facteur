@@ -14,30 +14,40 @@ export interface QueueAdapter {
   disconnect(): void
 }
 
-export interface FacteurConfiguration<Providers extends FacteurProviderFactory> {
+export interface FacteurConfiguration<KnownProviders extends Record<string, Provider>> {
   logger?: Logger
   emitter?: EventEmitter
-  providers: Array<Providers>
+  providers: KnownProviders
   queueAdapter?: QueueAdapter
 }
 
 // TODO must be added to eslint default config
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export interface Provider<_Options, Message, Response, _Targets> {
-  name: string
+export interface Provider<_Options = any, Message = any, Response = any, _Targets = any> {
+  // targets: _Targets
   send: (options: { notifiable: any; message: Message }) => Awaitable<Response>
 }
 
-export type CreateMessageParams<Notifiable, Providers extends FacteurProviderFactory, Params> = {
-  name: string
-  via?: (notifiable: Notifiable) => Arrayable<Providers['name']>
-} & ProvidersToFunctions<Providers, Notifiable, Params>
+type KeyOf<T> = Extract<keyof T, string>
 
-export type ProvidersToFunctions<Providers extends FacteurProviderFactory, Notifiable, Params> = {
-  [K in Providers['name'] as `to${Capitalize<K>}`]?: (options: {
+export type CreateMessageParams<
+  Notifiable,
+  KnownProviders extends Record<string, Provider>,
+  Params,
+> = {
+  name: string
+  via?: (notifiable: Notifiable) => Arrayable<keyof KnownProviders>
+} & ProvidersToFunctions<KnownProviders, Notifiable, Params>
+
+export type ProvidersToFunctions<
+  KnownProviders extends Record<string, Provider>,
+  Notifiable,
+  Params,
+> = {
+  [K in KeyOf<KnownProviders> as `to${Capitalize<K>}`]?: (options: {
     notifiable: Notifiable
     params: Params
-  }) => Parameters<Providers['send']>[0]['message']
+  }) => Parameters<KnownProviders[K]['send']>[0]['message']
 }
 
 /**
@@ -56,10 +66,8 @@ export type ToProviderParams<Params> = {
   params: Params
 }
 
-export type ProvidersToTargets<Providers extends FacteurProviderFactory> = {
-  [K in Providers['name']]?: Extract<Providers, { name: K }> extends { provider: infer P }
-    ? P extends Provider<any, any, any, infer T>
-      ? T
-      : never
+export type ProvidersToTargets<KnownProviders extends Record<string, Provider>> = {
+  [K in keyof KnownProviders]?: KnownProviders[K] extends Provider<any, any, any, infer T>
+    ? T
     : never
 }

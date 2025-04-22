@@ -11,6 +11,7 @@
     "@facteurjs/database": "workspace:*",
     "@facteurjs/discord": "workspace:*",
     "@facteurjs/slack": "workspace:*",
+    "@facteurjs/webhook": "workspace:*",
     "bullmq": "^5.41.3",
     "ioredis": "^5.5.0",
     "pino": "^9.6.0"

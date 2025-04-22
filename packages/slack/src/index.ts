@@ -44,39 +44,3 @@ export const slackProvider = defineProvider<SlackOptions, any, DiscordResponse>(
     }
   },
 )
-
-export class SlackMessage {
-  static create() {
-    return new SlackMessage()
-  }
-
-  #body = ''
-  #username = ''
-  #tts = false
-
-  setBody(body: string) {
-    this.#body = body
-    return this
-  }
-
-  setBotUsername(username: string) {
-    this.#username = username
-    return this
-  }
-
-  /**
-   * Whether or not this notification should be read as text to speech.
-   */
-  setTTS(flag: boolean) {
-    this.#tts = flag
-    return this
-  }
-
-  serialize() {
-    return {
-      content: this.#body,
-      username: this.#username,
-      tts: this.#tts,
-    }
-  }
-}

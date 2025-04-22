@@ -9,7 +9,7 @@ export function databaseProvider(options: DatabaseConfig) {
   return new DatabaseProvider(options)
 }
 
-type DatabaseProviderInterface = Provider<DatabaseConfig, DatabaseMessage, any, any>
+type DatabaseProviderInterface = Provider<DatabaseConfig, DatabaseMessage, any, { caca: true }>
 
 export class DatabaseProvider implements DatabaseProviderInterface {
   name = 'database' as const
@@ -41,3 +41,11 @@ export class DatabaseProvider implements DatabaseProviderInterface {
     return result
   }
 }
+
+// type Provider<A, B, C, D> = { pipi: true }
+
+// type DatabaseProvider2 = Provider<any, any, any, { caca: true }>
+
+// type ShouldBeCaca = DatabaseProvider2 extends Provider<any, any, any, infer T> ? T : never
+
+type X = DatabaseProvider extends Provider<any, any, any, infer T> ? T : never
