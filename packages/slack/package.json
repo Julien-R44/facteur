@@ -19,6 +19,6 @@
   },
   "devDependencies": {
     "@facteurjs/core": "workspace:*",
-    "@slack/webhook": "^7.0.4"
+    "@slack/webhook": "^7.0.5"
   }
 }

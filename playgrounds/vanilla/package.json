@@ -2,7 +2,7 @@
   "name": "@facteurjs/vanilla-playground",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@10.10.0",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "MIT",
   "keywords": [],
@@ -12,14 +12,14 @@
     "@facteurjs/discord": "workspace:*",
     "@facteurjs/slack": "workspace:*",
     "@facteurjs/webhook": "workspace:*",
-    "bullmq": "^5.41.3",
-    "ioredis": "^5.5.0",
+    "bullmq": "^5.52.1",
+    "ioredis": "^5.6.1",
     "pino": "^9.6.0"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.12",
-    "better-sqlite3": "^11.8.1",
-    "kysely": "^0.27.5",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^11.9.1",
+    "kysely": "^0.28.2",
     "pino-pretty": "^13.0.0"
   }
 }

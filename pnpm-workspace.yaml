@@ -4,5 +4,5 @@ packages:
   - docs
 
 catalog:
-  '@poppinss/exception': ^1.2.0
-  '@julr/utils': ^1.8.0
+  '@poppinss/exception': ^1.2.1
+  '@julr/utils': ^1.9.0
