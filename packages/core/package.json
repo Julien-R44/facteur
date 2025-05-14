@@ -19,5 +19,8 @@
   "dependencies": {
     "@julr/utils": "catalog:",
     "@poppinss/exception": "catalog:"
+  },
+  "devDependencies": {
+    "p-event": "^6.0.1"
   }
 }

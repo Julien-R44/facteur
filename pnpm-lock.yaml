@@ -148,6 +148,10 @@ importers:
       '@poppinss/exception':
         specifier: 'catalog:'
         version: 1.2.1
+    devDependencies:
+      p-event:
+        specifier: ^6.0.1
+        version: 6.0.1
 
   packages/database:
     dependencies:

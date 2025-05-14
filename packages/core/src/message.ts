@@ -3,11 +3,12 @@ import { invoke } from '@julr/utils/functions'
 import { capitalize } from '@julr/utils/string'
 
 import type { FacteurOptions } from './options.js'
-import type { CreateMessageParams, QueueItemOptions, Provider } from './types.js'
+import type { CreateMessageParams, QueueItemOptions, Provider, Emitter } from './types.js'
 
 export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Provider>, Payload> {
   #facteurOptions: FacteurOptions<KnownProviders>
   #params: CreateMessageParams<Notifiable, KnownProviders, Payload>
+  #emitter: Emitter
 
   constructor(
     facteurOptions: FacteurOptions<KnownProviders>,
@@ -15,6 +16,7 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
   ) {
     this.#facteurOptions = facteurOptions
     this.#params = params
+    this.#emitter = facteurOptions.emitter
   }
 
   #pickProvidersToUse(options: SendOptions<any, any, any>) {
@@ -29,27 +31,43 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
       return Object.keys(this.#facteurOptions.providers)
     })
 
-    return providerNames.map((providerName) => {
-      const provider = this.#facteurOptions.providers[providerName]
+    return providerNames.map((name) => {
+      const provider = this.#facteurOptions.providers[name]
       if (!provider)
         throw new Error(
-          `Provider '${providerName as string}' was selected through 'via' but does not exist`,
+          `Provider '${name as string}' was selected through 'via' but does not exist`,
         )
 
-      return { providerName, provider }
+      return { name, provider }
     })
   }
 
   async send(options: SendOptions<Notifiable, Payload, KnownProviders>) {
     const providers = this.#pickProvidersToUse(options)
 
-    for (const provider of providers) {
+    for (const { name, provider } of providers) {
       // @ts-expect-error osef
-      const fn = this.#params[`to${capitalize(provider.providerName)}`]
+      const fn = this.#params[`to${capitalize(name)}`]
       const message = fn?.({ notifiable: options.notifiable, params: options.params })
-      const targets = options.via?.[provider.providerName]
+      const targets = options.via?.[name]
 
-      await provider.provider.send({ message, notifiable: options.notifiable, targets })
+      this.#emitter.emit('facteur:message:send', {
+        provider: name,
+        notifiable: options.notifiable,
+        message,
+        targets,
+        params: options.params,
+      })
+
+      await provider.send({ message, targets, notifiable: options.notifiable })
+
+      this.#emitter.emit('facteur:message:sent', {
+        provider: name,
+        notifiable: options.notifiable,
+        message,
+        targets,
+        params: options.params,
+      })
     }
   }
 
