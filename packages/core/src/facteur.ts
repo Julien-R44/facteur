@@ -6,7 +6,7 @@ export function createFacteur<T extends Record<string, Provider>>(config: Facteu
   return new Facteur(config)
 }
 
-class Facteur<KnownProviders extends Record<string, Provider>> {
+export class Facteur<KnownProviders extends Record<string, Provider>> {
   #options: FacteurOptions<KnownProviders>
 
   constructor(config: FacteurConfiguration<KnownProviders>) {

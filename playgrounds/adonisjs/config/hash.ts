@@ -5,10 +5,10 @@ const hashConfig = defineConfig({
 
   list: {
     scrypt: drivers.scrypt({
-      cost: 16_384,
+      cost: 16384,
       blockSize: 8,
       parallelization: 1,
-      maxMemory: 33_554_432,
+      maxMemory: 33554432,
     }),
   },
 })

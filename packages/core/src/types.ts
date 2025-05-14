@@ -1,6 +1,7 @@
-import type EventEmitter from 'node:events'
 import type { Logger } from '@julr/utils/logger'
 import type { Arrayable, Awaitable } from '@julr/utils/types'
+
+import type { Facteur } from './facteur.js'
 
 export type FacteurProviderFactory = Provider<any, any, any, any>
 
@@ -16,7 +17,7 @@ export interface QueueAdapter {
 
 export interface FacteurConfiguration<KnownProviders extends Record<string, Provider>> {
   logger?: Logger
-  emitter?: EventEmitter
+  emitter?: Emitter
   providers: KnownProviders
   queueAdapter?: QueueAdapter
 }
@@ -65,4 +66,21 @@ export interface Emitter {
   once: (event: string, callback: (...values: any[]) => void) => void
   off: (event: string, callback: (...values: any[]) => void) => void
   emit: (event: string, ...values: any[]) => void
+}
+
+/**
+ * Class paradigm
+ */
+export interface ViaParameters<Notifiable> {
+  notifiable: Notifiable
+}
+
+export type ViaResult = Arrayable<keyof NotificationChannels>
+
+export type InferChannelsFromConfig<T> =
+  T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
+export interface NotificationChannels {}
+
+export interface Notification<Notifiable> {
+  via?(options: { notifiable: Notifiable }): Arrayable<keyof NotificationChannels>
 }

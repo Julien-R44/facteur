@@ -5,6 +5,10 @@ import { capitalize } from '@julr/utils/string'
 import type { FacteurOptions } from './options.js'
 import type { CreateMessageParams, QueueItemOptions, Provider, Emitter } from './types.js'
 
+export class Notifier {
+  constructor()
+}
+
 export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Provider>, Payload> {
   #facteurOptions: FacteurOptions<KnownProviders>
   #params: CreateMessageParams<Notifiable, KnownProviders, Payload>
@@ -51,7 +55,7 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
       const message = fn?.({ notifiable: options.notifiable, params: options.params })
       const targets = options.via?.[name]
 
-      this.#emitter.emit('facteur:message:send', {
+      this.#emitter.emit('notifications:message:send', {
         provider: name,
         notifiable: options.notifiable,
         message,
@@ -61,7 +65,7 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
 
       await provider.send({ message, targets, notifiable: options.notifiable })
 
-      this.#emitter.emit('facteur:message:sent', {
+      this.#emitter.emit('notifications:message:sent', {
         provider: name,
         notifiable: options.notifiable,
         message,

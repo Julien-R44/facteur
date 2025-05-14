@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import EventEmitter from 'node:events'
-import { pEvent, pEventMultiple } from 'p-event'
+import { pEventMultiple } from 'p-event'
 
 import { testProvider } from '../helpers/index.js'
 import { createFacteur } from '../../src/facteur.js'

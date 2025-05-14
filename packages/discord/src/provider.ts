@@ -15,3 +15,9 @@ class DiscordProvider<T extends WebhookOptions<any>>
 {
   name = 'discord' as const
 }
+
+declare module '@facteurjs/core/types' {
+  interface Notification {
+    toDiscord(): DiscordMessage
+  }
+}
