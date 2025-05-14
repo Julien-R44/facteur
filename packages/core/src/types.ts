@@ -21,11 +21,17 @@ export interface FacteurConfiguration<KnownProviders extends Record<string, Prov
   queueAdapter?: QueueAdapter
 }
 
-// TODO must be added to eslint default config
+export type ProviderSendParams<Message, Targets> = {
+  notifiable?: any
+  message: Message
+  targets?: Targets
+}
+
+export const kTargetSymbol = Symbol('facteur:targets')
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export interface Provider<_Options = any, Message = any, Response = any, _Targets = any> {
-  // targets: _Targets
-  send: (options: { notifiable: any; message: Message }) => Awaitable<Response>
+export interface Provider<_Options = any, Message = any, Response = any, Targets = any> {
+  [kTargetSymbol]: Targets
+  send: (options: ProviderSendParams<Message, Targets>) => Awaitable<Response>
 }
 
 type KeyOf<T> = Extract<keyof T, string>
@@ -36,7 +42,7 @@ export type CreateMessageParams<
   Params,
 > = {
   name: string
-  via?: (notifiable: Notifiable) => Arrayable<keyof KnownProviders>
+  via?: (options: { notifiable: Notifiable }) => Arrayable<keyof KnownProviders>
 } & ProvidersToFunctions<KnownProviders, Notifiable, Params>
 
 export type ProvidersToFunctions<
@@ -59,15 +65,4 @@ export interface Emitter {
   once: (event: string, callback: (...values: any[]) => void) => void
   off: (event: string, callback: (...values: any[]) => void) => void
   emit: (event: string, ...values: any[]) => void
-}
-
-export type ToProviderParams<Params> = {
-  notifiable: any
-  params: Params
-}
-
-export type ProvidersToTargets<KnownProviders extends Record<string, Provider>> = {
-  [K in keyof KnownProviders]?: KnownProviders[K] extends Provider<any, any, any, infer T>
-    ? T
-    : never
 }

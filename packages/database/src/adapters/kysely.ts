@@ -32,7 +32,7 @@ class KyselyAdapter implements DatabaseAdapter {
   async createTableIfNotExists(): Promise<void> {
     await this.#connection.schema
       .createTable(this.#tableName)
-      .addColumn('id', 'serial', (col) => col.primaryKey())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull().autoIncrement())
       .addColumn('notifiable_id', 'text', (col) => col.notNull())
       .addColumn('type', 'text', (col) => col.notNull())
       .addColumn('content', 'json', (col) => col.notNull())

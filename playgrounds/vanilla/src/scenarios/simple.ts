@@ -1,14 +1,29 @@
-import { facteur, rootUser } from '../init/facteur.js'
+import { rootUser } from '../init/facteur.js'
 import { backupStartedMessage } from '../init/messages.js'
 
 /**
  * Send a notification to the user
  */
-const result = await rootUser.notify(backupStartedMessage, {
-  backupName: 'My backup',
-  destination: 'My destination',
+await rootUser.notify({
+  message: backupStartedMessage,
+  params: { backupName: 'My backup', destination: 'My destination' },
 })
 
-console.log(result)
+// /**
+//  * Send a notification to the user
+//  */
+// await backupStartedMessage.send({
+//   notifiable: rootUser,
+//   params: { backupName: 'My backup', destination: 'My destination' },
+// })
 
-facteur.compose(backupStartedMessage).via({})
+/**
+ * Send a notification to anonymous user
+ */
+await backupStartedMessage.send({
+  params: { backupName: 'My backup', destination: 'My destination' },
+  via: {
+    discord: { marketing: true },
+    database: { notifiableId: '1543' },
+  },
+})

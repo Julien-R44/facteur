@@ -2,7 +2,7 @@
   "name": "@facteurjs/monorepo",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "pnpm@10.11.0",
   "description": "",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "checks": "pnpm lint && pnpm typecheck"
   },
   "dependencies": {
-    "@types/node": "^22.15.3"
+    "@types/node": "^22.15.17"
   },
   "devDependencies": {
     "@japa/assert": "^4.0.1",
@@ -25,7 +25,7 @@
     "@japa/file-system": "^2.3.2",
     "@japa/runner": "^4.2.0",
     "@julr/tooling-configs": "^4.0.0",
-    "@poppinss/utils": "^6.9.2",
+    "@poppinss/utils": "^6.9.3",
     "eslint": "^9.26.0",
     "prettier": "^3.5.3",
     "tsup": "^8.4.0",

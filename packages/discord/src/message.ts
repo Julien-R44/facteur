@@ -18,7 +18,7 @@ export class DiscordMessage extends WebhookMessage {
    * Creates a new instance of DiscordMessage.
    */
   static override create() {
-    return new DiscordMessage()
+    return new DiscordMessage().setQueryParameters({ wait: 'true' })
   }
 
   /**
@@ -64,7 +64,6 @@ export class DiscordMessage extends WebhookMessage {
   }
 
   override serialize() {
-    console.log('DiscordMessage#serialize')
     return {
       ...super.serialize(),
       body: {

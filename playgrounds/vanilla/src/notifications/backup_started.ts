@@ -9,7 +9,7 @@ export interface BackupStartedMessageParams {
   destination: string
 }
 
-export const backupStartedMessage = facteur.createMessage<User, BackupStartedMessageParams>({
+export const backupStartedMessage = facteur.defineMessage<User, BackupStartedMessageParams>({
   name: 'backupStarted',
 
   via() {

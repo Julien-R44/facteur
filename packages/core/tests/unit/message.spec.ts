@@ -10,7 +10,7 @@ test.group('Message', () => {
 
     const facteur = createFacteur({ providers: { test1: provider, test2: provider2 } })
 
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'test',
       via: () => ['test1'],
     })
@@ -27,7 +27,7 @@ test.group('Message', () => {
 
     const facteur = createFacteur({ providers: { test: provider, test2: provider2 } })
 
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'test',
       via: () => ['test3' as any],
     })
@@ -44,7 +44,7 @@ test.group('Message', () => {
 
     const facteur = createFacteur({ providers: { test: provider, test2: provider2 } })
 
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'test',
     })
 

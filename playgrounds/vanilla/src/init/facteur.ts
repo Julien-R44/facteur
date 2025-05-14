@@ -13,7 +13,7 @@ const webhooks = {
   slack: 'https://hooks.slack.com/services/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',
   discord: {
     default:
-      'https://discord.com/api/webhooks/1343710934870523914/_2-322y4d65GsM4FL4dbvpQ4ICnGPVEI1PoOYFaX9QWrC3b7yHvY8Z3q0QfbJHVEEekS',
+      'https://discord.com/api/webhooks/1371596880093380710/Y18O5mrWy4vZWowe5NdmM1F_VuFJQqc7_UvnniZCfgsf_rTAAJaBzKHBPxtOXT-JXljd',
     marketing:
       'https://discord.com/api/webhooks/1343710574009253910/EYhKJWVKmSzx_X54Pe8Z2CPfDS1DDQwKrbDIE-_5MFft0vCLvle_K7XJ1B0J1yNIxzOC',
   },
@@ -25,19 +25,22 @@ const kyselySqlite = new Kysely<any>({ dialect })
 export const facteur = createFacteur({
   logger: pino({ transport: { target: 'pino-pretty', options: { colorize: true } } }),
   providers: {
-    // database: databaseProvider({
-    //   adapter: kyselyAdapter({ connection: kyselySqlite }),
-    // }),
+    database: databaseProvider({ adapter: kyselyAdapter({ connection: kyselySqlite }) }),
+    // slack: webhookProvider({ webhookUrl: webhooks.slack }),
+    // discordGeneral: discordWebhookProvider({ webhookUrl: webhooks.discord.default }),
     discord: discordWebhookProvider({
       webhooks: {
-        default: webhooks.discord.default,
         marketing: webhooks.discord.marketing,
+        default: webhooks.discord.default,
       },
     }),
-    // myProvider: webhookProvider({
-    //   webhookUrl:
-    //     'https://hooks.slack.com/services/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',
-    // }),
+    webhook: webhookProvider({
+      name: 'webhook',
+      webhooks: {
+        slack: webhooks.slack,
+        discord: webhooks.discord.default,
+      },
+    }),
   },
 })
 
@@ -58,11 +61,14 @@ export class User {
   /**
    * This will also included as a Notifiable mixin and not in user codebase
    */
-  async notify<T extends FacteurMessage<User, any, any>>(
-    message: T,
-    params: Parameters<T['send']>[1],
-  ) {
-    return await message.send(this, params)
+  async notify<T extends FacteurMessage<User, any, any>>({
+    message,
+    params,
+  }: {
+    message: T
+    params: Parameters<T['send']>['0']['params']
+  }) {
+    return await message.send({ notifiable: this, params })
   }
 
   async notifyLater<T extends FacteurMessage<User, any, any>>(
@@ -71,6 +77,12 @@ export class User {
     options: QueueItemOptions,
   ) {
     return await message.sendLater(this, params, options)
+  }
+
+  notificationTargetForDatabase() {
+    return {
+      notifiableId: this.discordUsername,
+    }
   }
 }
 

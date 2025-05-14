@@ -16,14 +16,17 @@
     "test": "tsx tests/index.ts",
     "quick:test": "tsx tests/index.ts"
   },
+  "dependencies": {
+    "@julr/utils": "catalog:"
+  },
   "devDependencies": {
     "@facteurjs/core": "workspace:*",
-    "@types/better-sqlite3": "^7.6.12",
-    "@types/pg": "^8.11.11",
-    "better-sqlite3": "^11.8.1",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/pg": "^8.15.1",
+    "better-sqlite3": "^11.10.0",
     "knex": "^3.1.0",
-    "mysql2": "^3.12.0",
-    "pg": "^8.13.3",
-    "kysely": "^0.28.2"
+    "kysely": "^0.28.2",
+    "mysql2": "^3.14.1",
+    "pg": "^8.16.0"
   }
 }

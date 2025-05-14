@@ -38,7 +38,7 @@ test.group('Knex | Postgres', (group) => {
   test('insert correctly in database', async ({ assert }) => {
     const { facteur } = initFacteur(postgres)
     const id = randomUUID()
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'welcome',
       toDatabase: () => {
         return DatabaseMessage.create()
@@ -85,7 +85,7 @@ test.group('Knex | Mysql', (group) => {
   test('insert correctly in database', async ({ assert }) => {
     const { facteur } = initFacteur(mysql)
     const id = randomUUID()
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'welcome',
       toDatabase: () => {
         return DatabaseMessage.create()
@@ -127,7 +127,7 @@ test.group('Knex | Sqlite', (group) => {
   test('insert correctly in database', async ({ assert }) => {
     const { facteur } = initFacteur(sqlite)
     const id = randomUUID()
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'welcome',
       toDatabase: () => {
         return DatabaseMessage.create()

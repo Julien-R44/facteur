@@ -17,10 +17,15 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
     this.#params = params
   }
 
-  #pickProvidersToUse(notifiable: Notifiable) {
+  #pickProvidersToUse(options: SendOptions<any, any, any>) {
     const providerNames = invoke(() => {
-      if (this.#params.via) return toArray(this.#params.via(notifiable))
+      // First priority is the `via` options
+      if (options.via) return Object.keys(options.via)
 
+      // Second priority is the `via` method of the message
+      if (this.#params.via) return toArray(this.#params.via(options.notifiable))
+
+      // Otherwise, we use all providers
       return Object.keys(this.#facteurOptions.providers)
     })
 
@@ -35,15 +40,16 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
     })
   }
 
-  async send(notifiable: Notifiable, params: Payload) {
-    const providers = this.#pickProvidersToUse(notifiable)
+  async send(options: SendOptions<Notifiable, Payload, KnownProviders>) {
+    const providers = this.#pickProvidersToUse(options)
 
     for (const provider of providers) {
       // @ts-expect-error osef
       const fn = this.#params[`to${capitalize(provider.providerName)}`]
-      const message = fn?.({ notifiable, params })
+      const message = fn?.({ notifiable: options.notifiable, params: options.params })
+      const targets = options.via?.[provider.providerName]
 
-      await provider.provider.send({ message, notifiable })
+      await provider.provider.send({ message, notifiable: options.notifiable, targets })
     }
   }
 
@@ -51,3 +57,17 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
     await this.#facteurOptions.queueAdapter.queue({ notifiable, message: { params } }, options)
   }
 }
+
+type ExtractProviderTargets<T> = T extends Provider<any, any, any, infer U> ? U : never
+
+type SendOptions<Notifiable, Payload, KnownProviders extends Record<string, Provider>> =
+  | {
+      notifiable: Notifiable
+      params: Payload
+      via?: { [K in keyof KnownProviders]?: boolean | ExtractProviderTargets<KnownProviders[K]> }
+    }
+  | {
+      notifiable?: null | undefined
+      params: Payload
+      via: { [K in keyof KnownProviders]?: ExtractProviderTargets<KnownProviders[K]> }
+    }

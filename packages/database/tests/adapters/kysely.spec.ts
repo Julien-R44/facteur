@@ -54,7 +54,7 @@ test.group('Kysely | Postgres', (group) => {
   test('insert correctly in database', async ({ assert }) => {
     const { facteur } = initFacteur(postgres)
     const id = randomUUID()
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'welcome',
       toDatabase: () => {
         return DatabaseMessage.create()
@@ -92,7 +92,7 @@ test.group('Kysely | Mysql', (group) => {
   test('insert correctly in database', async ({ assert }) => {
     const { facteur } = initFacteur(mysql)
     const id = randomUUID()
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'welcome',
       toDatabase: () => {
         return DatabaseMessage.create()
@@ -130,7 +130,7 @@ test.group('Kysely | Sqlite', (group) => {
   test('insert correctly in database', async ({ assert }) => {
     const { facteur } = initFacteur(sqlite)
     const id = randomUUID()
-    const msg = facteur.createMessage({
+    const msg = facteur.defineMessage({
       name: 'welcome',
       toDatabase: () => {
         return DatabaseMessage.create()

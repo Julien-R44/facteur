@@ -1,4 +1,5 @@
-import type { Provider } from '@facteurjs/core/types'
+import { asyncNoop, invoke, once } from '@julr/utils/functions'
+import { kTargetSymbol, type Provider, type ProviderSendParams } from '@facteurjs/core/types'
 
 import type { DatabaseMessage } from './message.js'
 import type { DatabaseAdapter, DatabaseConfig } from './types.js'
@@ -9,43 +10,51 @@ export function databaseProvider(options: DatabaseConfig) {
   return new DatabaseProvider(options)
 }
 
-type DatabaseProviderInterface = Provider<DatabaseConfig, DatabaseMessage, any, { caca: true }>
+type DatabaseTargets = {
+  notifiableId: string
+}
 
-export class DatabaseProvider implements DatabaseProviderInterface {
+export class DatabaseProvider
+  implements Provider<DatabaseConfig, DatabaseMessage, any, DatabaseTargets>
+{
   name = 'database' as const
-  #adapter: DatabaseAdapter
-  #initialized: Promise<void>
+  #adapter: DatabaseAdapter;
+  [kTargetSymbol] = null as any as DatabaseTargets
+  initializer: () => Promise<any>
 
   constructor(config: DatabaseConfig) {
     this.#adapter = config.adapter
     this.#adapter.setTableName(config.tableName || 'notifications')
 
     if (config.autoCreateTable !== false) {
-      this.#initialized = this.#adapter.createTableIfNotExists()
+      this.initializer = once(async () => await this.#adapter.createTableIfNotExists())
     } else {
-      this.#initialized = Promise.resolve()
+      this.initializer = asyncNoop
     }
   }
 
-  async send(options: { notifiable: any; message: DatabaseMessage }) {
-    await this.#initialized
-
+  async send(options: ProviderSendParams<DatabaseMessage, DatabaseTargets>) {
+    await this.initializer()
     const message = options.message.serialize()
+
+    const notifiableId = invoke(() => {
+      if (message.notifiableId) return message.notifiableId
+
+      if (options.notifiable?.[`notificationTargetForDatabase`]) {
+        return options.notifiable.notificationTargetForDatabase().notifiableId
+      }
+
+      return options.targets?.notifiableId || options.notifiable.id
+    })
+
+    if (!notifiableId) throw new Error('No notifiableId provided')
+
     const result = await this.#adapter.save({
-      notifiableId: message.notifiableId || options.notifiable.id,
+      notifiableId,
       content: message.content,
-      // TODO: will be awesome if we can get the notification name here by default
       type: message.type,
     })
 
     return result
   }
 }
-
-// type Provider<A, B, C, D> = { pipi: true }
-
-// type DatabaseProvider2 = Provider<any, any, any, { caca: true }>
-
-// type ShouldBeCaca = DatabaseProvider2 extends Provider<any, any, any, infer T> ? T : never
-
-type X = DatabaseProvider extends Provider<any, any, any, infer T> ? T : never

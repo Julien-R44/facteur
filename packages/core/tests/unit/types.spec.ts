@@ -17,7 +17,7 @@ test.group('Types', () => {
 
     type Payload = { foo: string }
 
-    const msg = facteur.createMessage<User, Payload>({
+    const msg = facteur.defineMessage<User, Payload>({
       name: 'foo',
 
       // @ts-expect-error unvalid provider

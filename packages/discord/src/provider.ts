@@ -1,35 +1,17 @@
-import type { Awaitable } from '@julr/utils/types'
 import { WebhookProvider } from '@facteurjs/webhook'
-import type { Provider, ProvidersToTargets } from '@facteurjs/core/types'
+import type { Provider } from '@facteurjs/core/types'
+import type { WebhookOptions, WebhookTargets } from '@facteurjs/webhook/types'
 
+import type { DiscordResponse } from './types.js'
 import type { DiscordMessage } from './message.js'
-import type { DiscordOptions, DiscordResponse, DiscordTargets } from './types.js'
 
-export function discordWebhookProvider<Options extends DiscordOptions<any>>(options: Options) {
-  return new DiscordProvider(options)
+export function discordWebhookProvider<Options extends WebhookOptions<any>>(options: Options) {
+  return new DiscordProvider({ name: 'discord', ...options })
 }
 
-// Type pour stocker l'information du type Target
-type GetTargets<T> = T extends Provider<any, any, any, infer U> ? U : never
-
-// Définir l'interface Discord avec le type Target voulu
-interface DiscordProviderInterface<Options extends DiscordOptions<any>>
-  extends Provider<Options, DiscordMessage, DiscordResponse, { yes: true }> {}
-
-// Implémenter la classe sans la propriété targets
-class DiscordProvider<Options extends DiscordOptions<any>>
-  implements DiscordProviderInterface<Options>
+class DiscordProvider<T extends WebhookOptions<any>>
+  extends WebhookProvider<T>
+  implements Provider<T, DiscordMessage, DiscordResponse, WebhookTargets<T>>
 {
-  send(options: { notifiable: any; message: DiscordMessage }) {
-    return null as any
-  }
+  name = 'discord' as const
 }
-
-// Extraire le type directement à partir du type, pas de l'instance
-// type Targets = GetTargets<DiscordProviderInterface<{ webhookUrl: string }>>
-
-type ExtractTargetsType<T> =
-  T extends Provider<infer _O, infer _M, infer _R, infer Targets> ? Targets : never
-
-// Utiliser le type auxiliaire directement sur l'interface, pas sur la classe
-type Targets = ExtractTargetsType<DiscordProviderInterface<{ webhookUrl: string }>>
