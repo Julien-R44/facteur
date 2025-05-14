@@ -1,12 +1,7 @@
-export type DiscordOptions<WebhooksNames extends string> =
-  | { webhooks?: { [key in WebhooksNames]: string } }
-  | { webhookUrl: string }
+import type { WebhookOptions, WebhookTargets } from '@facteurjs/webhook/types'
 
-export type DiscordTargets<Options extends DiscordOptions<any>> = Options extends {
-  webhooks: infer Webhooks
-}
-  ? { [key in keyof Webhooks]?: boolean }
-  : { webhookUrl: string }
+export type DiscordOptions<WebhooksNames extends string> = WebhookOptions<WebhooksNames>
+export type DiscordTargets<Options extends DiscordOptions<any>> = WebhookTargets<Options>
 
 export type HexadecimalColor = `#${string}`
 

@@ -6,7 +6,7 @@ import { createFacteur } from '../../src/facteur.js'
 test.group('Types', () => {
   test('functional style', ({ expectTypeOf }) => {
     const facteur = createFacteur({
-      providers: {
+      channels: {
         foo: testProvider(),
         bar: testProvider(),
         BarBar: testProvider(),

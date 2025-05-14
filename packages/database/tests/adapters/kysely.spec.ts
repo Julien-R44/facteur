@@ -7,7 +7,7 @@ import { createFacteur } from '@facteurjs/core'
 import { Kysely, MysqlDialect, PostgresDialect, SqliteDialect } from 'kysely'
 
 import { kyselyAdapter } from '../../src/adapters/kysely.js'
-import { DatabaseMessage, databaseProvider } from '../../src/provider.js'
+import { DatabaseMessage, databaseChannel } from '../../src/channel.js'
 
 const postgresDialect = new PostgresDialect({
   pool: new pg.Pool({
@@ -34,7 +34,7 @@ const sqliteDialect = new SqliteDialect({ database: new SQLite('./database.sqlit
 
 function initFacteur(connection: Kysely<any>) {
   const facteur = createFacteur({
-    providers: [databaseProvider({ adapter: kyselyAdapter({ connection }) })],
+    channels: [databaseChannel({ adapter: kyselyAdapter({ connection }) })],
   })
 
   return { facteur }

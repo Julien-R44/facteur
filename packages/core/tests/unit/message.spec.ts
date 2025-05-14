@@ -10,7 +10,7 @@ test.group('Message', () => {
     const provider = testProvider()
     const provider2 = testProvider()
 
-    const facteur = createFacteur({ providers: { test1: provider, test2: provider2 } })
+    const facteur = createFacteur({ channels: { test1: provider, test2: provider2 } })
 
     const msg = facteur.defineMessage(() => ({
       name: 'test',
@@ -30,7 +30,7 @@ test.group('Message', () => {
     const provider = testProvider()
     const provider2 = testProvider()
 
-    const facteur = createFacteur({ providers: { test: provider, test2: provider2 } })
+    const facteur = createFacteur({ channels: { test: provider, test2: provider2 } })
 
     const msg = facteur.defineMessage(() => ({
       name: 'test',
@@ -47,7 +47,7 @@ test.group('Message', () => {
     const provider = testProvider()
     const provider2 = testProvider()
 
-    const facteur = createFacteur({ providers: { test: provider, test2: provider2 } })
+    const facteur = createFacteur({ channels: { test: provider, test2: provider2 } })
 
     const msg = facteur.defineMessage(() => ({
       name: 'test',
@@ -66,7 +66,7 @@ test.group('Message', () => {
 
     const facteur = createFacteur({
       emitter,
-      providers: { test: provider, test2: provider2 },
+      channels: { test: provider, test2: provider2 },
     })
 
     const msg = facteur.defineMessage(() => ({

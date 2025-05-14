@@ -2,8 +2,9 @@ import type { Logger } from '@julr/utils/logger'
 import type { Arrayable, Awaitable } from '@julr/utils/types'
 
 import type { Facteur } from './facteur.js'
+import type { ExtractChannelTargets } from './message.js'
 
-export type FacteurProviderFactory = Provider<any, any, any, any>
+export type FacteurChannelFactory = Channel<any, any, any, any>
 
 export interface QueueItemOptions {
   delay?: number
@@ -15,14 +16,14 @@ export interface QueueAdapter {
   disconnect(): void
 }
 
-export interface FacteurConfiguration<KnownProviders extends Record<string, Provider>> {
+export interface FacteurConfiguration<KnownChannels extends Record<string, Channel>> {
   logger?: Logger
   emitter?: Emitter
-  providers: KnownProviders
+  channels: KnownChannels
   queueAdapter?: QueueAdapter
 }
 
-export type ProviderSendParams<Message, Targets> = {
+export type ChannelSendParams<Message, Targets> = {
   notifiable?: any
   message: Message
   targets?: Targets
@@ -30,31 +31,31 @@ export type ProviderSendParams<Message, Targets> = {
 
 export const kTargetSymbol = Symbol('facteur:targets')
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export interface Provider<_Options = any, Message = any, Response = any, Targets = any> {
+export interface Channel<_Options = any, Message = any, Response = any, Targets = any> {
   [kTargetSymbol]: Targets
-  send: (options: ProviderSendParams<Message, Targets>) => Awaitable<Response>
+  send: (options: ChannelSendParams<Message, Targets>) => Awaitable<Response>
 }
 
 type KeyOf<T> = Extract<keyof T, string>
 
 export type CreateMessageParams<
   Notifiable,
-  KnownProviders extends Record<string, Provider>,
+  KnownChannels extends Record<string, Channel>,
   Params,
 > = {
   name: string
-  via?: (options: { notifiable: Notifiable }) => Arrayable<keyof KnownProviders>
-} & ProvidersToFunctions<KnownProviders, Notifiable, Params>
+  via?: (options: { notifiable: Notifiable }) => Arrayable<keyof KnownChannels>
+} & ChannelsToFunction<KnownChannels, Notifiable, Params>
 
-export type ProvidersToFunctions<
-  KnownProviders extends Record<string, Provider>,
+export type ChannelsToFunction<
+  KnownChannels extends Record<string, Channel>,
   Notifiable,
   Params,
 > = {
-  [K in KeyOf<KnownProviders> as `to${Capitalize<K>}`]?: (options: {
+  [K in KeyOf<KnownChannels> as `to${Capitalize<K>}`]?: (options: {
     notifiable: Notifiable
     params: Params
-  }) => Parameters<KnownProviders[K]['send']>[0]['message']
+  }) => Parameters<KnownChannels[K]['send']>[0]['message']
 }
 
 /**
@@ -77,10 +78,22 @@ export interface ViaParameters<Notifiable> {
 
 export type ViaResult = Arrayable<keyof NotificationChannels>
 
+export interface Notifiable {
+  notificationTargets?(): NotifiableTargets
+}
+
+export type NotifiableTargets = {
+  [K in keyof NotificationChannels]?: ExtractChannelTargets<NotificationChannels[K]>
+}
+
 export type InferChannelsFromConfig<T> =
   T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
 export interface NotificationChannels {}
 
-export interface Notification<Notifiable> {
-  via?(options: { notifiable: Notifiable }): Arrayable<keyof NotificationChannels>
+// export interface Notification<Notifiable> {
+//   via?(options: { notifiable: Notifiable }): Arrayable<keyof NotificationChannels>
+// }
+
+export abstract class Notification<Notifiable> {
+  abstract via?(options: ViaParameters<Notifiable>): ViaResult
 }

@@ -5,11 +5,11 @@ import { randomUUID } from 'node:crypto'
 import { createFacteur } from '@facteurjs/core'
 
 import { knexAdapter } from '../../src/adapters/knex.js'
-import { DatabaseMessage, databaseProvider } from '../../src/provider.js'
+import { DatabaseMessage, databaseChannel } from '../../src/channel.js'
 
 function initFacteur(connection: Knex) {
   const facteur = createFacteur({
-    providers: [databaseProvider({ adapter: knexAdapter({ connection }) })],
+    channels: [databaseChannel({ adapter: knexAdapter({ connection }) })],
   })
 
   return { facteur }

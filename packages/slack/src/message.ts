@@ -1,26 +1,47 @@
-import { Blocks, Message } from 'slack-block-builder'
+import type { IncomingWebhookSendArguments } from '@slack/webhook'
 
-Message({})
+import { WebhookMessage } from '../../webhook/src/message.js'
 
-export class SlackMessage {
-  #message: typeof Message
+export class SlackMessage extends WebhookMessage {
+  #template: IncomingWebhookSendArguments = {}
 
-  static create() {
+  static override create() {
     return new SlackMessage()
   }
 
-  constructor() {
-    this.#message = Message()
+  useBlockKitTemplate(template: IncomingWebhookSendArguments) {
+    this.#template = template
+    return this
   }
 
-  setBlocks(callback: (blocks: typeof Blocks) => void) {
-    callback(Blocks)
+  text(text: string) {
+    this.#template.blocks = this.#template.blocks || []
+    this.#template.blocks?.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text },
+    })
+
+    return this
+  }
+
+  headerBlock(text: string) {
+    return this
+  }
+
+  contextBlock(text: string) {
+    this.#template.blocks = this.#template.blocks || []
+    this.#template.blocks?.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text }],
+    })
+
+    return this
+  }
+
+  dividerBlock() {
+    this.#template.blocks = this.#template.blocks || []
+    this.#template.blocks?.push({ type: 'divider' })
+
     return this
   }
 }
-
-SlackMessage.create().setBlocks((blocks) => {
-  blocks.Section({ text: 'Hey there, colleague!' })
-  blocks.Section({ text: "Hurray for corporate pizza! Let's get you fed and happy :pizza:" })
-  blocks.Input({ label: 'What can we call you?' }).label
-})

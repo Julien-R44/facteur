@@ -2,18 +2,18 @@ import EventEmitter from 'node:events'
 import { type Logger, noopLogger } from '@julr/utils/logger'
 
 import { errors } from './exceptions.js'
-import type { Emitter, QueueAdapter, FacteurConfiguration, Provider } from './types.js'
+import type { Emitter, QueueAdapter, FacteurConfiguration, Channel } from './types.js'
 
-export class FacteurOptions<KnownProviders extends Record<string, Provider>> {
+export class FacteurOptions<KnownChannels extends Record<string, Channel>> {
   logger: Logger = noopLogger()
   emitter: Emitter = new EventEmitter()
-  providers: KnownProviders
+  channels: KnownChannels
   queueAdapter: QueueAdapter
 
-  constructor(config: FacteurConfiguration<KnownProviders>) {
+  constructor(config: FacteurConfiguration<KnownChannels>) {
     this.logger = config.logger ?? this.logger
     this.emitter = config.emitter ?? this.emitter
-    this.providers = config.providers
+    this.channels = config.channels
 
     const throwIfQueueNotSet = () => {
       throw new errors.E_QUEUE_NOT_SET()

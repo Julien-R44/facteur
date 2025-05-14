@@ -3,9 +3,9 @@ import SQLite from 'better-sqlite3'
 import { Kysely, SqliteDialect } from 'kysely'
 import { webhookProvider } from '@facteurjs/webhook'
 import type { FacteurMessage } from '@facteurjs/core'
-import { databaseProvider } from '@facteurjs/database'
+import { databaseChannel } from '@facteurjs/database'
 import { Facteur, createFacteur } from '@facteurjs/core'
-import { discordWebhookProvider } from '@facteurjs/discord'
+import { discordWebhookChannel } from '@facteurjs/discord'
 import type { QueueItemOptions } from '@facteurjs/core/types'
 import { kyselyAdapter } from '@facteurjs/database/adapters/kysely'
 
@@ -24,11 +24,11 @@ const kyselySqlite = new Kysely<any>({ dialect })
 
 export const facteur = createFacteur({
   logger: pino({ transport: { target: 'pino-pretty', options: { colorize: true } } }),
-  providers: {
-    database: databaseProvider({ adapter: kyselyAdapter({ connection: kyselySqlite }) }),
+  channels: {
+    database: databaseChannel({ adapter: kyselyAdapter({ connection: kyselySqlite }) }),
     // slack: webhookProvider({ webhookUrl: webhooks.slack }),
-    // discordGeneral: discordWebhookProvider({ webhookUrl: webhooks.discord.default }),
-    discord: discordWebhookProvider({
+    // discordGeneral: discordWebhookChannel({ webhookUrl: webhooks.discord.default }),
+    discord: discordWebhookChannel({
       webhooks: {
         marketing: webhooks.discord.marketing,
         default: webhooks.discord.default,

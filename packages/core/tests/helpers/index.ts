@@ -1,13 +1,13 @@
 import { AssertionError } from 'node:assert'
 
-import { kTargetSymbol, type Provider, type ProviderSendParams } from '../../src/types.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../src/types.js'
 
-class TestProvider implements Provider<any, any, any, any> {
+class TestProvider implements Channel<any, any, any, any> {
   [kTargetSymbol] = null as any
-  #sent: Array<ProviderSendParams<any, any>> = []
-  #queued: Array<ProviderSendParams<any, any>> = []
+  #sent: Array<ChannelSendParams<any, any>> = []
+  #queued: Array<ChannelSendParams<any, any>> = []
 
-  send(options: ProviderSendParams<any, any>) {
+  send(options: ChannelSendParams<any, any>) {
     this.#sent.push(options)
   }
 

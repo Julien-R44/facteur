@@ -3,70 +3,64 @@ import { invoke } from '@julr/utils/functions'
 import { capitalize } from '@julr/utils/string'
 
 import type { FacteurOptions } from './options.js'
-import type { CreateMessageParams, QueueItemOptions, Provider, Emitter } from './types.js'
+import type { CreateMessageParams, QueueItemOptions, Channel, Emitter } from './types.js'
 
-export class Notifier {
-  constructor()
-}
-
-export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Provider>, Payload> {
-  #facteurOptions: FacteurOptions<KnownProviders>
-  #params: CreateMessageParams<Notifiable, KnownProviders, Payload>
+export class FacteurMessage<Notifiable, KnownChannels extends Record<string, Channel>, Payload> {
+  #facteurOptions: FacteurOptions<KnownChannels>
+  #params: CreateMessageParams<Notifiable, KnownChannels, Payload>
   #emitter: Emitter
 
   constructor(
-    facteurOptions: FacteurOptions<KnownProviders>,
-    params: CreateMessageParams<Notifiable, KnownProviders, Payload>,
+    facteurOptions: FacteurOptions<KnownChannels>,
+    params: CreateMessageParams<Notifiable, KnownChannels, Payload>,
   ) {
     this.#facteurOptions = facteurOptions
     this.#params = params
     this.#emitter = facteurOptions.emitter
   }
 
-  #pickProvidersToUse(options: SendOptions<any, any, any>) {
-    const providerNames = invoke(() => {
+  #pickChannelsToUse(options: SendOptions<any, any, any>) {
+    const channelNames = invoke(() => {
       // First priority is the `via` options
       if (options.via) return Object.keys(options.via)
 
       // Second priority is the `via` method of the message
       if (this.#params.via) return toArray(this.#params.via(options.notifiable))
 
-      // Otherwise, we use all providers
-      return Object.keys(this.#facteurOptions.providers)
+      // Otherwise, we use all channels
+      return Object.keys(this.#facteurOptions.channels)
     })
 
-    return providerNames.map((name) => {
-      const provider = this.#facteurOptions.providers[name]
-      if (!provider)
-        throw new Error(
-          `Provider '${name as string}' was selected through 'via' but does not exist`,
-        )
+    return channelNames.map((name) => {
+      const channel = this.#facteurOptions.channels[name]
+      if (!channel)
+        throw new Error(`Channel '${name as string}' was selected through 'via' but does not exist`)
 
-      return { name, provider }
+      return { name, channel }
     })
   }
 
-  async send(options: SendOptions<Notifiable, Payload, KnownProviders>) {
-    const providers = this.#pickProvidersToUse(options)
+  async send(options: SendOptions<Notifiable, Payload, KnownChannels>) {
+    const channels = this.#pickChannelsToUse(options)
 
-    for (const { name, provider } of providers) {
+    for (const { name, channel } of channels) {
       // @ts-expect-error osef
       const fn = this.#params[`to${capitalize(name)}`]
       const message = fn?.({ notifiable: options.notifiable, params: options.params })
       const targets = options.via?.[name]
 
       this.#emitter.emit('notifications:message:send', {
-        provider: name,
+        channel: name,
         notifiable: options.notifiable,
         message,
         targets,
         params: options.params,
       })
 
-      await provider.send({ message, targets, notifiable: options.notifiable })
+      await channel.send({ message, targets, notifiable: options.notifiable })
 
       this.#emitter.emit('notifications:message:sent', {
-        provider: name,
+        channel: name,
         notifiable: options.notifiable,
         message,
         targets,
@@ -80,16 +74,16 @@ export class FacteurMessage<Notifiable, KnownProviders extends Record<string, Pr
   }
 }
 
-type ExtractProviderTargets<T> = T extends Provider<any, any, any, infer U> ? U : never
+export type ExtractChannelTargets<T> = T extends Channel<any, any, any, infer U> ? U : never
 
-type SendOptions<Notifiable, Payload, KnownProviders extends Record<string, Provider>> =
+export type SendOptions<Notifiable, Payload, KnownChannels extends Record<string, Channel>> =
   | {
       notifiable: Notifiable
       params: Payload
-      via?: { [K in keyof KnownProviders]?: boolean | ExtractProviderTargets<KnownProviders[K]> }
+      via?: { [K in keyof KnownChannels]?: boolean | ExtractChannelTargets<KnownChannels[K]> }
     }
   | {
       notifiable?: null | undefined
       params: Payload
-      via: { [K in keyof KnownProviders]?: ExtractProviderTargets<KnownProviders[K]> }
+      via: { [K in keyof KnownChannels]?: ExtractChannelTargets<KnownChannels[K]> }
     }

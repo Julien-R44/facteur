@@ -7,13 +7,15 @@
   "license": "ISC",
   "keywords": [],
   "exports": {
-    ".": "./build/index.mjs"
+    ".": "./build/index.mjs",
+    "./types": "./build/types.mjs"
   },
   "scripts": {
     "build": "unbuild",
     "stub": "unbuild --stub"
   },
   "dependencies": {
+    "@facteurjs/webhook": "workspace:*",
     "@slack/types": "^2.14.0",
     "slack-block-builder": "^2.8.0"
   },

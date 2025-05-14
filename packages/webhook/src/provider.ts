@@ -1,19 +1,19 @@
 import ky from 'ky'
 import { invoke } from '@julr/utils/functions'
 import { capitalize } from '@julr/utils/string'
-import { kTargetSymbol, type Provider, type ProviderSendParams } from '@facteurjs/core/types'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { WebhookMessage } from './message.js'
 import type { WebhookOptions, WebhookTargets } from './types.js'
 
-export function webhookProvider<Options extends WebhookOptions<any>>(
+export function webhookChannel<Options extends WebhookOptions<any>>(
   options: Options & { name: string },
 ) {
-  return new WebhookProvider(options)
+  return new WebhookChannel(options)
 }
 
-export class WebhookProvider<T extends WebhookOptions<any>>
-  implements Provider<T, WebhookMessage, any, WebhookTargets<T>>
+export class WebhookChannel<T extends WebhookOptions<any>>
+  implements Channel<T, WebhookMessage, any, WebhookTargets<T>>
 {
   [kTargetSymbol] = null as any as WebhookTargets<T>
   #webhooksUrls: Map<string, URL> = new Map()
@@ -64,7 +64,7 @@ export class WebhookProvider<T extends WebhookOptions<any>>
       .filter(Boolean)
   }
 
-  async send(params: ProviderSendParams<WebhookMessage, WebhookTargets<T>>) {
+  async send(params: ChannelSendParams<WebhookMessage, WebhookTargets<T>>) {
     const { notifiable, message } = params
 
     const targets = invoke<WebhookTargets<any>>(() => {

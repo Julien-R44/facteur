@@ -1,21 +1,19 @@
 import { asyncNoop, invoke, once } from '@julr/utils/functions'
-import { kTargetSymbol, type Provider, type ProviderSendParams } from '@facteurjs/core/types'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { DatabaseMessage } from './message.js'
 import type { DatabaseAdapter, DatabaseConfig } from './types.js'
 
 export { DatabaseMessage } from './message.js'
 
-export function databaseProvider(options: DatabaseConfig) {
-  return new DatabaseProvider(options)
+export function databaseChannel(options: DatabaseConfig) {
+  return new DatabaseChannel(options)
 }
 
-type DatabaseTargets = {
-  notifiableId: string
-}
+type DatabaseTargets = { notifiableId: string }
 
-export class DatabaseProvider
-  implements Provider<DatabaseConfig, DatabaseMessage, any, DatabaseTargets>
+export class DatabaseChannel
+  implements Channel<DatabaseConfig, DatabaseMessage, any, DatabaseTargets>
 {
   name = 'database' as const
   #adapter: DatabaseAdapter;
@@ -33,7 +31,7 @@ export class DatabaseProvider
     }
   }
 
-  async send(options: ProviderSendParams<DatabaseMessage, DatabaseTargets>) {
+  async send(options: ChannelSendParams<DatabaseMessage, DatabaseTargets>) {
     await this.initializer()
     const message = options.message.serialize()
 

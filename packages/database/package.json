@@ -8,7 +8,8 @@
   "keywords": [],
   "exports": {
     ".": "./build/index.mjs",
-    "./adapters/*": "./build/adapters/*.mjs"
+    "./adapters/*": "./build/adapters/*.mjs",
+    "./types": "./build/types.mjs"
   },
   "scripts": {
     "build": "unbuild",
