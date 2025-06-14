@@ -8,12 +8,15 @@
   "license": "MIT",
   "keywords": [],
   "exports": {
-    ".": "./build/index.mjs",
-    "./types": "./build/types.mjs"
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts",
+    "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "scripts": {
-    "build": "unbuild",
-    "stub": "unbuild --stub"
+    "build": "tsdown",
+    "stub": "tsdown"
   },
   "dependencies": {
     "@julr/utils": "catalog:",
