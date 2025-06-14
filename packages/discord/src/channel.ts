@@ -1,4 +1,4 @@
-import { WebhookProvider } from '@facteurjs/webhook'
+import { WebhookChannel } from '@facteurjs/webhook'
 import type { Channel } from '@facteurjs/core/types'
 import type { WebhookOptions, WebhookTargets } from '@facteurjs/webhook/types'
 
@@ -10,13 +10,14 @@ export function discordWebhookChannel<Options extends WebhookOptions<any>>(optio
 }
 
 class DiscordProvider<T extends WebhookOptions<any>>
-  extends WebhookProvider<T>
+  extends WebhookChannel<T>
   implements Channel<T, DiscordMessage, DiscordResponse, WebhookTargets<T>>
 {
   name = 'discord' as const
 }
 
 declare module '@facteurjs/core/types' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Notification<Notifiable> {
     toDiscord(): DiscordMessage
   }

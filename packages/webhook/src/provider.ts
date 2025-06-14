@@ -1,9 +1,11 @@
-import ky from 'ky'
+import ky, { HTTPError } from 'ky'
 import { invoke } from '@julr/utils/functions'
 import { capitalize } from '@julr/utils/string'
+import { HTTPErrorExtractor } from '@facteurjs/core'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { WebhookMessage } from './message.js'
+import { WebhookRequestException } from './exceptions.js'
 import type { WebhookOptions, WebhookTargets } from './types.js'
 
 export function webhookChannel<Options extends WebhookOptions<any>>(
@@ -45,11 +47,18 @@ export class WebhookChannel<T extends WebhookOptions<any>>
   async #sendMessageToWebhook(url: URL, message: WebhookMessage) {
     const serialized = message.serialize()
 
-    return await ky.post(url, {
-      searchParams: serialized.queryParameters,
-      headers: serialized.headers,
-      json: serialized.body,
-    })
+    return await ky
+      .post(url, {
+        searchParams: serialized.queryParameters,
+        headers: serialized.headers,
+        json: serialized.body,
+      })
+      .catch(async (error) => {
+        if (error instanceof HTTPError) {
+          throw new WebhookRequestException(await HTTPErrorExtractor.extract(error))
+        }
+        throw error
+      })
   }
 
   #normalizeTargets(targets: WebhookTargets<any>) {

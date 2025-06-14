@@ -1,4 +1,4 @@
-import { WebhookProvider } from '@facteurjs/webhook'
+import { WebhookChannel } from '@facteurjs/webhook'
 import type { Channel } from '@facteurjs/core/types'
 
 import type { SlackMessage } from './message.js'
@@ -10,13 +10,14 @@ export function slackWebhookChannel<Options extends SlackOptions<any>>(options: 
 
 type SlackResponse = {}
 export class SlackWebhookChannel<T extends SlackOptions<any>>
-  extends WebhookProvider<T>
+  extends WebhookChannel<T>
   implements Channel<T, SlackMessage, SlackResponse, SlackTargets<T>>
 {
   name = 'slack' as const
 }
 
 declare module '@facteurjs/core/types' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Notification<Notifiable> {
     toSlack(): SlackMessage
   }
