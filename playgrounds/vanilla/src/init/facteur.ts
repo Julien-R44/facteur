@@ -1,9 +1,10 @@
 import { pino } from 'pino'
 import SQLite from 'better-sqlite3'
 import { Kysely, SqliteDialect } from 'kysely'
-import { webhookProvider } from '@facteurjs/webhook'
+import { webhookChannel } from '@facteurjs/webhook'
 import type { FacteurMessage } from '@facteurjs/core'
 import { databaseChannel } from '@facteurjs/database'
+import { slackWebhookChannel } from '@facteurjs/slack'
 import { Facteur, createFacteur } from '@facteurjs/core'
 import { discordWebhookChannel } from '@facteurjs/discord'
 import type { QueueItemOptions } from '@facteurjs/core/types'
@@ -26,15 +27,14 @@ export const facteur = createFacteur({
   logger: pino({ transport: { target: 'pino-pretty', options: { colorize: true } } }),
   channels: {
     database: databaseChannel({ adapter: kyselyAdapter({ connection: kyselySqlite }) }),
-    // slack: webhookProvider({ webhookUrl: webhooks.slack }),
-    // discordGeneral: discordWebhookChannel({ webhookUrl: webhooks.discord.default }),
+    slack: slackWebhookChannel({ webhookUrl: webhooks.slack }),
     discord: discordWebhookChannel({
       webhooks: {
         marketing: webhooks.discord.marketing,
         default: webhooks.discord.default,
       },
     }),
-    webhook: webhookProvider({
+    webhook: webhookChannel({
       name: 'webhook',
       webhooks: {
         slack: webhooks.slack,
@@ -43,6 +43,10 @@ export const facteur = createFacteur({
     }),
   },
 })
+
+declare module '@facteurjs/core/types' {
+  // interface NotificationChannels {
+}
 
 /**
  * Let's say this is a Lucid Model
@@ -58,26 +62,26 @@ export class User {
     this.discordOnly = params.discordOnly
   }
 
-  /**
-   * This will also included as a Notifiable mixin and not in user codebase
-   */
-  async notify<T extends FacteurMessage<User, any, any>>({
-    message,
-    params,
-  }: {
-    message: T
-    params: Parameters<T['send']>['0']['params']
-  }) {
-    return await message.send({ notifiable: this, params })
-  }
+  // /**
+  //  * This will also included as a Notifiable mixin and not in user codebase
+  //  */
+  // async notify<T extends FacteurMessage<User, any, any>>({
+  //   message,
+  //   params,
+  // }: {
+  //   message: T
+  //   params: Parameters<T['send']>['0']['params']
+  // }) {
+  //   return await message.send({ notifiable: this, params })
+  // }
 
-  async notifyLater<T extends FacteurMessage<User, any, any>>(
-    message: T,
-    params: Parameters<T['send']>[1],
-    options: QueueItemOptions,
-  ) {
-    return await message.sendLater(this, params, options)
-  }
+  // async notifyLater<T extends FacteurMessage<User, any, any>>(
+  //   message: T,
+  //   params: Parameters<T['send']>[1],
+  //   options: QueueItemOptions,
+  // ) {
+  //   return await message.sendLater(this, params, options)
+  // }
 
   notificationTargetForDatabase() {
     return {

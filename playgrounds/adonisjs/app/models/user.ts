@@ -13,40 +13,31 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   passwordColumnName: 'password',
 })
 
-// interface UserWithNotifiableClass<Model extends NormalizeConstructor<typeof BaseModel>> {
-//   notify<T extends Notification<Model>>(notification: T): Promise<any>
+// export function withNotifiable<Model extends LucidModel>() {
+//   return function <Model extends NormalizeConstructor<typeof BaseModel>>(superclass: Model) {
+//     class UserWithNotifiable extends superclass {
+//       async notify<T extends Notification<Model>>(notification: T) {
+//         return 'ok'
+//       }
+//     }
+//     return UserWithNotifiable
+//   }
 // }
 
-export function withNotifiable<Model extends LucidModel>() {
-  return function <Model extends NormalizeConstructor<typeof BaseModel>>(superclass: Model) {
-    class UserWithNotifiable extends superclass {
-      async notify<T extends Notification<Model>>(notification: T) {
-        return 'ok'
-      }
-    }
-    return UserWithNotifiable
-  }
-}
+// const Notifiable = withNotifiable<User>()
 
-const Notifiable = withNotifiable<User>()
-
-export default class User extends compose(BaseModel, AuthFinder, Notifiable) {
+export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true }) declare id: number
   @column() declare fullName: string | null
   @column() declare email: string
   @column({ serializeAs: null }) declare password: string
-
-  @column.dateTime({ autoCreate: true }) declare createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true }) declare updatedAt: DateTime | null
-
-  // async notify<T extends Notification<any>>(notification: T) {
-  //   facteur.send({ notification: new InvoicePaidNotification(), notifiable })
-  // }
+  @column() declare discordWebHookUrl: string | null
 
   notificationTargets(): NotifiableTargets {
     return {
-      discord: { default: true },
+      discord: { default: true, marketing: true },
+      database: { notifiableId: this.id.toString() },
+      slack: { default: true },
     }
   }
 }

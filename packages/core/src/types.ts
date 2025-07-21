@@ -78,6 +78,16 @@ export interface ViaParameters<Notifiable> {
 
 export type ViaResult = Arrayable<keyof NotificationChannels>
 
+export type ChannelName = keyof NotificationChannels
+
+export type ProviderTarget<N extends Notifiable, K extends ChannelName> = ExtractChannelTargets<
+  NotificationChannels[K]
+>
+
+export type ChannelSpecificConfig<N extends Notifiable> = {
+  [K in ChannelName]?: boolean | ProviderTarget<N, K>
+}
+
 export interface Notifiable {
   notificationTargets?(): NotifiableTargets
 }
@@ -94,6 +104,12 @@ export interface NotificationChannels {}
 //   via?(options: { notifiable: Notifiable }): Arrayable<keyof NotificationChannels>
 // }
 
-export abstract class Notification<Notifiable> {
-  abstract via?(options: ViaParameters<Notifiable>): ViaResult
+export abstract class Notification<N extends Notifiable> {
+  abstract via(options: ViaParameters<N>): ChannelName[]
+}
+
+export interface SendOptions<N extends Notifiable> {
+  message: Notification<N>
+  notifiable: N
+  via?: ChannelSpecificConfig<N>
 }

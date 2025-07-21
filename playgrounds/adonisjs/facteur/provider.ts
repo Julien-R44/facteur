@@ -1,9 +1,10 @@
 import { ApplicationService } from '@adonisjs/core/types'
 import { defineConfig } from './define_config.js'
+import { Facteur } from '@facteurjs/core'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {
-    'notifications.manager': any
+    'notifications.manager': Facteur<any>
   }
 
   export interface EventsList {
@@ -12,7 +13,7 @@ declare module '@adonisjs/core/types' {
   }
 }
 
-export class NotificationsProvider {
+export default class NotificationsProvider {
   constructor(protected app: ApplicationService) {}
 
   async register() {
@@ -22,7 +23,14 @@ export class NotificationsProvider {
       const { createFacteur } = await import('@facteurjs/core')
       const emitter = await this.app.container.make('emitter')
 
-      return createFacteur({ emitter: emitter as any, ...config })
+      const resolvedChannels = Object.entries(config.channels).map(async ([name, channel]) => {
+        return [name, await channel.resolver(this.app)]
+      })
+
+      return createFacteur({
+        emitter: emitter as any,
+        channels: await Object.fromEntries(await Promise.all(resolvedChannels)),
+      })
     })
   }
 }

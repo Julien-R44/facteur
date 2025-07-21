@@ -11,7 +11,13 @@ const config = defineConfig({
   channels: {
     database: channels.database({ connectionName: 'sqlite' }),
     slack: channels.slackWebhook({ webhooks: { default: webhooks.slack } }),
-    discord: channels.discordWebhook({ webhooks: { default: webhooks.discord } }),
+    discord: channels.discordWebhook({
+      webhooks: {
+        default: webhooks.discord,
+        marketing:
+          'https://discord.com/api/webhooks/1343710574009253910/EYhKJWVKmSzx_X54Pe8Z2CPfDS1DDQwKrbDIE-_5MFft0vCLvle_K7XJ1B0J1yNIxzOC',
+      },
+    }),
   },
 })
 
