@@ -3,10 +3,19 @@ import { Notification, ViaParameters, ViaResult } from '@facteurjs/adonisjs/type
 import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
 import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
 import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
+import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
 
 export class InvoicePaidNotification extends Notification<User, any> {
   via(options: ViaParameters<User>): ViaResult {
-    return ['slack', 'database', 'discord'] as const
+    return ['transmit'] as const
+  }
+
+  asTransmitMessage(): TransmitMessage {
+    return TransmitMessage.create().setContent({
+      title: 'Invoice Paid',
+      body: 'Your invoice has been successfully paid.',
+      timestamp: new Date().toISOString(),
+    })
   }
 
   asDatabaseMessage(): DatabaseMessage {

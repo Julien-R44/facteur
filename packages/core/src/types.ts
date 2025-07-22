@@ -100,16 +100,12 @@ export type InferChannelsFromConfig<T> =
   T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
 export interface NotificationChannels {}
 
-// export interface Notification<Notifiable> {
-//   via?(options: { notifiable: Notifiable }): Arrayable<keyof NotificationChannels>
-// }
-
 export abstract class Notification<N extends Notifiable> {
   abstract via(options: ViaParameters<N>): ChannelName[]
 }
 
 export interface SendOptions<N extends Notifiable> {
-  message: Notification<N>
+  notification: new (...args: any[]) => Notification<N>
   notifiable: N
   via?: ChannelSpecificConfig<N>
 }

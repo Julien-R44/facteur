@@ -9,6 +9,7 @@ const webhooks = {
 
 const config = defineConfig({
   channels: {
+    transmit: channels.transmit(),
     database: channels.database({ connectionName: 'sqlite' }),
     slack: channels.slackWebhook({ webhooks: { default: webhooks.slack } }),
     discord: channels.discordWebhook({

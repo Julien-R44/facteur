@@ -40,6 +40,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
       discord: { default: true, marketing: true },
       database: { notifiableId: this.id.toString() },
       slack: { default: true },
+      transmit: { channel: `users/${this.id}` },
     }
   }
 }

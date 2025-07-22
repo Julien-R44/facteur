@@ -23,6 +23,9 @@ class KnexAdapter implements DatabaseAdapter {
       notifiable_id: options.notifiableId,
       type: options.type,
       content: JSON.stringify(options.content),
+      created_at: options.createdAt || new Date(),
+      updated_at: options.updatedAt || new Date(),
+      tags: options.tags ? JSON.stringify(options.tags) : null,
     })
   }
 

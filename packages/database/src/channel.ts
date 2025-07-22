@@ -51,8 +51,18 @@ export class DatabaseChannel
       notifiableId,
       content: message.content,
       type: message.type,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: message.tags,
     })
 
     return result
+  }
+}
+
+declare module '@facteurjs/core/types' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface Notification<Notifiable> {
+    asDatabaseMessage(): DatabaseMessage
   }
 }

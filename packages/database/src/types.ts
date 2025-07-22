@@ -14,6 +14,9 @@ export interface SaveToDatabaseParams {
   notifiableId: string
   type: string
   content: Record<string, any>
+  tags?: string[]
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 /**

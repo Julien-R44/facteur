@@ -1,5 +1,6 @@
 /// <reference types="@adonisjs/redis/redis_provider" />
 /// <reference types="@adonisjs/lucid/database_provider" />
+/// <reference types="@adonisjs/transmit/transmit_provider" />
 
 import { configProvider } from '@adonisjs/core'
 import type { SlackOptions } from '@facteurjs/slack/types'
@@ -64,6 +65,18 @@ export const channels = {
       const { kyselyAdapter } = await import('@facteurjs/database/adapters/kysely')
 
       return databaseChannel({ adapter: kyselyAdapter({ connection: config.connection }) })
+    })
+  },
+
+  /**
+   * Transmit Channel
+   */
+  transmit() {
+    return configProvider.create(async (app) => {
+      const { transmitChannel } = await import('@facteurjs/transmit')
+      const transmit = await app.container.make('transmit')
+
+      return transmitChannel({ transmit: transmit as any })
     })
   },
 }

@@ -7,7 +7,7 @@ settings:
 catalogs:
   default:
     '@julr/utils':
-      specifier: ^1.9.0
+      specifier: 1.9.0
       version: 1.9.0
     '@poppinss/exception':
       specifier: ^1.2.2
@@ -157,6 +157,9 @@ importers:
       '@facteurjs/slack':
         specifier: 'workspace:'
         version: link:../slack
+      '@facteurjs/transmit':
+        specifier: 'workspace:'
+        version: link:../transmit
       '@julr/utils':
         specifier: 'catalog:'
         version: 1.9.0
@@ -173,6 +176,9 @@ importers:
       '@adonisjs/redis':
         specifier: ^9.2.0
         version: 9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))
+      '@adonisjs/transmit':
+        specifier: ^2.0.2
+        version: 2.0.2(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(ioredis@5.6.1)
       p-event:
         specifier: ^6.0.1
         version: 6.0.1
@@ -253,6 +259,19 @@ importers:
         specifier: ^7.0.5
         version: 7.0.5
 
+  packages/transmit:
+    dependencies:
+      '@boringnode/transmit':
+        specifier: ^0.3.0
+        version: 0.3.0(ioredis@5.6.1)
+      '@julr/utils':
+        specifier: 'catalog:'
+        version: 1.9.0
+    devDependencies:
+      '@facteurjs/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/webhook:
     dependencies:
       '@julr/utils':
@@ -298,6 +317,12 @@ importers:
       '@adonisjs/static':
         specifier: ^1.1.1
         version: 1.1.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))
+      '@adonisjs/transmit':
+        specifier: ^2.0.2
+        version: 2.0.2(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(ioredis@5.6.1)
+      '@adonisjs/transmit-client':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@adonisjs/vite':
         specifier: ^5.0.0-next.0
         version: 5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(edge.js@6.3.0))(edge.js@6.3.0))(edge.js@6.3.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))
@@ -649,6 +674,16 @@ packages:
     peerDependencies:
       '@adonisjs/core': ^6.2.0
 
+  '@adonisjs/transmit-client@1.0.0':
+    resolution: {integrity: sha512-S8P4ouxoDRpHA6iEu13OxzVuG9aV6eObxBYFlsAouIDmqoiUjcgDWUJrtI26nediV2nGvaAuK98ObIEy1UWGFg==}
+    engines: {node: '>=18.16.0'}
+
+  '@adonisjs/transmit@2.0.2':
+    resolution: {integrity: sha512-Oyh4S1773N1Ams9mmFM2pplLx8R0IdYwqSTBLRgeDWaR+cyWrL9ZQvF2q7GqIjNzZsXuDgMdPuLlNo+69zIZIg==}
+    engines: {node: '>=20.11.1'}
+    peerDependencies:
+      '@adonisjs/core': ^6.2.0
+
   '@adonisjs/tsconfig@1.4.1':
     resolution: {integrity: sha512-b7bHdnTaDRGfec4XVtpwsSEukZ549MgqOShScCd1b4xkMK8z1q/jb0Xs4iUL86oIDhty2y7k5vvA6aoQKPAvXQ==}
 
@@ -800,6 +835,14 @@ packages:
     peerDependenciesMeta:
       ioredis:
         optional: true
+
+  '@boringnode/transmit@0.2.2':
+    resolution: {integrity: sha512-xIBg5PKqqgawNsXffq1P+BpRDjplfwOspwcFH5wfSN6uVcd5hYGC9lJpcXa1oL3wkQZimtiJhrTHhZZtgh2lqA==}
+    engines: {node: '>=20.11.1'}
+
+  '@boringnode/transmit@0.3.0':
+    resolution: {integrity: sha512-MtuU7dxSKJ/J7UN/zi6kY6N7QOczN2Hjj8u6sCWuo70RkqUiAiBITkMl2/82IJy7JOCFeFf/6NxMgL9yEQnD6A==}
+    engines: {node: '>=20.6'}
 
   '@chevrotain/cst-dts-gen@11.0.3':
     resolution: {integrity: sha512-BvIKpRLeS/8UbfxXxgC33xOumsacaeCKAjAeLyOn7Pcp95HiRbrpl14S+9vaZLolnbssPIUuiUd8IvgkRyt6NQ==}
@@ -3004,6 +3047,10 @@ packages:
     resolution: {integrity: sha512-rsX7ktqARv/6UQDgMaLfIqUWAEzzbCQiVh7V9rhDXp6c37yoJcks12NVD+XPkgl4AEavmNhVfrhGoqYwIsMYYA==}
     engines: {node: '>=14.16'}
 
+  emittery@1.2.0:
+    resolution: {integrity: sha512-KxdRyyFcS85pH3dnU8Y5yFUm2YJdaHwcBZWrfG8o89ZY9a13/f9itbN+YG3ELbBo9Pg5zvIozstmuV8bX13q6g==}
+    engines: {node: '>=14.16'}
+
   emoji-regex@10.4.0:
     resolution: {integrity: sha512-EC+0oUMY1Rqm4O6LLrgjtYDvcVYTy7chDnM4Q7030tP4Kwj3u/pR6gP9ygnp2CJMK5Gq+9Q2oqmrFJAz01DXjw==}
 
@@ -4092,6 +4139,10 @@ packages:
 
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
+
+  matchit@1.1.0:
+    resolution: {integrity: sha512-+nGYoOlfHmxe5BW5tE0EMJppXEwdSf8uBA1GTZC7Q77kbT35+VKLYJMzVNWCHSsga1ps1tPYFtFyvxvKzWVmMA==}
+    engines: {node: '>=6'}
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -6409,6 +6460,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@adonisjs/transmit-client@1.0.0': {}
+
+  '@adonisjs/transmit@2.0.2(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(ioredis@5.6.1)':
+    dependencies:
+      '@adonisjs/core': 6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)
+      '@boringnode/transmit': 0.2.2(ioredis@5.6.1)
+    transitivePeerDependencies:
+      - ioredis
+
   '@adonisjs/tsconfig@1.4.1': {}
 
   '@adonisjs/vite@5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0)))(edge.js@6.2.0))(edge.js@6.2.0))(edge.js@6.2.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))':
@@ -6599,6 +6659,24 @@ snapshots:
       object-hash: 3.0.0
     optionalDependencies:
       ioredis: 5.6.1
+
+  '@boringnode/transmit@0.2.2(ioredis@5.6.1)':
+    dependencies:
+      '@boringnode/bus': 0.7.1(ioredis@5.6.1)
+      '@poppinss/utils': 6.10.0
+      emittery: 1.2.0
+      matchit: 1.1.0
+    transitivePeerDependencies:
+      - ioredis
+
+  '@boringnode/transmit@0.3.0(ioredis@5.6.1)':
+    dependencies:
+      '@boringnode/bus': 0.7.1(ioredis@5.6.1)
+      '@poppinss/utils': 6.10.0
+      emittery: 1.2.0
+      matchit: 1.1.0
+    transitivePeerDependencies:
+      - ioredis
 
   '@chevrotain/cst-dts-gen@11.0.3':
     dependencies:
@@ -8702,6 +8780,8 @@ snapshots:
 
   emittery@1.1.0: {}
 
+  emittery@1.2.0: {}
+
   emoji-regex@10.4.0: {}
 
   emoji-regex@8.0.0: {}
@@ -9829,6 +9909,10 @@ snapshots:
   make-error@1.3.6: {}
 
   markdown-table@3.0.4: {}
+
+  matchit@1.1.0:
+    dependencies:
+      '@arr/every': 1.0.1
 
   math-intrinsics@1.1.0: {}
 

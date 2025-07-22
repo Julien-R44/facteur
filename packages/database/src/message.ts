@@ -4,11 +4,17 @@ export class DatabaseMessage {
   }
 
   #type: string = 'default'
+  #tags: string[] = []
   #content: any = {}
   #notifiableId?: string | number
 
   setType(type: string) {
     this.#type = type
+    return this
+  }
+
+  setTags(tags: string[]) {
+    this.#tags = tags
     return this
   }
 
@@ -27,6 +33,9 @@ export class DatabaseMessage {
       type: this.#type,
       content: this.#content,
       notifiableId: this.#notifiableId,
+      tags: this.#tags,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }
   }
 }
