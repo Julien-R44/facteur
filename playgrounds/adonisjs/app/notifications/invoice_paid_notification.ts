@@ -1,29 +1,30 @@
 import User from '#models/user'
-import { Notification, ViaParameters, ViaResult } from '@facteurjs/core/types'
-import { DiscordMessage } from '@facteurjs/discord'
-import { SlackMessage } from '@facteurjs/slack'
+import { Notification, ViaParameters, ViaResult } from '@facteurjs/adonisjs/types'
+import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
+import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
+import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
 
 export class InvoicePaidNotification extends Notification<User, any> {
   via(options: ViaParameters<User>): ViaResult {
-    return ['slack', 'database'] as const
+    return ['slack', 'database', 'discord'] as const
   }
 
-  toDiscord() {
+  asDatabaseMessage(): DatabaseMessage {
+    return DatabaseMessage.create().setContent('Invoice paid').setType('invoice_paid')
+  }
+
+  asDiscordMessage() {
     return DiscordMessage.create().setBotUsername('Test').setBody('Invoice paid')
   }
 
-  toSlack(): SlackMessage {
+  asSlackMessage(): SlackMessage {
     const result = SlackMessage.create()
       .setText('Hello from Facteur!')
       .setBotUsername('Facteur Bot')
       .setBotIconEmoji(':robot_face:')
       .setChannel('#general')
       .setUnfurlLinks(true)
-
-      // Ajouter un header block
       .addHeaderBlock('🚀 Notification importante')
-
-      // Ajouter un section block avec du texte et des champs
       .addSectionBlock((section) =>
         section
           .setMarkdownText(
@@ -40,26 +41,18 @@ export class InvoicePaidNotification extends Notification<User, any> {
             style: 'primary',
           })
       )
-
-      // Ajouter un divider
       .addDividerBlock()
-
-      // // Ajouter un context block
       .addContextBlock((context) =>
         context
           .addImage({ imageUrl: 'https://example.com/icon.png', altText: 'Icon' })
           .addMarkdownText('Envoyé par *Facteur* | <https://example.com|Documentation>')
       )
-
-      // // Ajouter une image block
       .addImageBlock((image) =>
         image
           .setImageUrl('https://i.imgur.com/SAmBAeZ.png')
           .setAltText('Graphique de performance')
           .setTitle('Performance cette semaine')
       )
-
-      // // Ajouter un actions block avec plusieurs boutons
       .addActionsBlock((actions) =>
         actions
           .addButton({
@@ -89,8 +82,6 @@ export class InvoicePaidNotification extends Notification<User, any> {
             initialDate: '2024-01-01',
           })
       )
-
-    console.log(JSON.stringify(result.serialize(), null, 2))
 
     return result
   }

@@ -45,7 +45,7 @@ export default defineConfig({
     () => import('@adonisjs/inertia/inertia_provider'),
     () => import('@adonisjs/cache/cache_provider'),
     () => import('@adonisjs/mail/mail_provider'),
-    () => import('./facteur/provider.js'),
+    () => import('@facteurjs/adonisjs/facteur_provider'),
   ],
 
   /*

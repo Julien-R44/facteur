@@ -18,7 +18,7 @@ router.get('/send', async () => {
   const user = await User.firstOrFail()
 
   await facteur.send({
-    message: new InvoicePaidNotification(),
+    notification: InvoicePaidNotification,
     notifiable: user,
     via: { discord: { default: true } },
   })

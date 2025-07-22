@@ -1,5 +1,5 @@
-import { defineConfig, InferChannels } from '../facteur/define_config.js'
-import { channels } from '../facteur/channels.js'
+import { defineConfig, channels } from '@facteurjs/adonisjs'
+import { InferChannels } from '@facteurjs/adonisjs/types'
 
 const webhooks = {
   slack: 'https://hooks.slack.com/services/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',
@@ -23,6 +23,6 @@ const config = defineConfig({
 
 export default config
 
-declare module '@facteurjs/core/types' {
+declare module '@facteurjs/adonisjs/types' {
   interface NotificationChannels extends InferChannels<typeof config> {}
 }
