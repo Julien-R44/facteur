@@ -2,7 +2,7 @@
   "name": "@facteurjs/webhook",
   "type": "module",
   "version": "0.0.0",
-  "packageManager": "pnpm@10.11.0",
+  "packageManager": "pnpm@10.13.1",
   "description": "Webhook provider for Facteur",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "MIT",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@julr/utils": "catalog:",
-    "ky": "^1.8.1"
+    "ky": "^1.8.2"
   },
   "devDependencies": {
     "@facteurjs/core": "workspace:*"

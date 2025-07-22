@@ -7,13 +7,16 @@
   "license": "ISC",
   "keywords": [],
   "exports": {
-    ".": "./build/index.mjs",
-    "./adapters/*": "./build/adapters/*.mjs",
-    "./types": "./build/types.mjs"
+    ".": "./src/index.ts",
+    "./adapters/knex": "./src/adapters/knex.ts",
+    "./adapters/kysely": "./src/adapters/kysely.ts",
+    "./types": "./src/types.ts",
+    "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "scripts": {
-    "build": "unbuild",
-    "stub": "unbuild --stub",
+    "build": "tsdown",
     "test": "tsx tests/index.ts",
     "quick:test": "tsx tests/index.ts"
   },
@@ -23,11 +26,20 @@
   "devDependencies": {
     "@facteurjs/core": "workspace:*",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/pg": "^8.15.1",
-    "better-sqlite3": "^11.10.0",
+    "@types/pg": "^8.15.4",
+    "better-sqlite3": "^12.2.0",
     "knex": "^3.1.0",
-    "kysely": "^0.28.2",
-    "mysql2": "^3.14.1",
-    "pg": "^8.16.0"
+    "kysely": "^0.28.3",
+    "mysql2": "^3.14.2",
+    "pg": "^8.16.3"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./adapters/knex": "./dist/adapters/knex.js",
+      "./adapters/kysely": "./dist/adapters/kysely.js",
+      "./types": "./dist/types.js",
+      "./package.json": "./package.json"
+    }
   }
 }

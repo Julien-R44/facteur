@@ -7,12 +7,14 @@
   "license": "ISC",
   "keywords": [],
   "exports": {
-    ".": "./build/index.mjs",
-    "./types": "./build/types.mjs"
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts",
+    "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "scripts": {
-    "build": "unbuild",
-    "stub": "unbuild --stub"
+    "build": "tsdown"
   },
   "dependencies": {
     "@facteurjs/webhook": "workspace:*",
@@ -20,5 +22,12 @@
   },
   "devDependencies": {
     "@facteurjs/core": "workspace:*"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./types": "./dist/types.js",
+      "./package.json": "./package.json"
+    }
   }
 }

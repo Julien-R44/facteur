@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@facteurjs/webhook": "workspace:*",
-    "@slack/types": "^2.14.0",
+    "@slack/types": "^2.15.0",
     "slack-block-builder": "^2.8.0"
   },
   "devDependencies": {

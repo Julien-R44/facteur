@@ -19,6 +19,6 @@ class DiscordProvider<T extends WebhookOptions<any>>
 declare module '@facteurjs/core/types' {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Notification<Notifiable> {
-    toDiscord(): DiscordMessage
+    asDiscordMessage(): DiscordMessage
   }
 }
