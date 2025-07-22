@@ -1,0 +1,9 @@
+{{{
+  exports({
+    to: app.makePath(app.rcFile.directories['notifications'], notificationFileName)
+  })
+}}}
+import User from '#models/user'
+
+interface NotificationParams {}
+export class {{ notificationName }} extends Notification<User, NotificationParams> {}
