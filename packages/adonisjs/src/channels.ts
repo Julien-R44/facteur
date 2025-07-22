@@ -1,6 +1,7 @@
 /// <reference types="@adonisjs/redis/redis_provider" />
 /// <reference types="@adonisjs/lucid/database_provider" />
 /// <reference types="@adonisjs/transmit/transmit_provider" />
+/// <reference types="@adonisjs/mail/mail_provider" />
 
 import { configProvider } from '@adonisjs/core'
 import type { SlackOptions } from '@facteurjs/slack/types'
@@ -77,6 +78,18 @@ export const channels = {
       const transmit = await app.container.make('transmit')
 
       return transmitChannel({ transmit: transmit as any })
+    })
+  },
+
+  /**
+   * Mail channel
+   */
+  mail() {
+    return configProvider.create(async (app) => {
+      const { mailChannel } = await import('./channels/mail.js')
+      const mailer = await app.container.make('mail.manager')
+
+      return mailChannel({ mailer })
     })
   },
 }

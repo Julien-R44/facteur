@@ -4,16 +4,16 @@ import { defineConfig, transports } from '@adonisjs/mail'
 const mailConfig = defineConfig({
   default: 'smtp',
 
-   /**
-    * The mailers object can be used to configure multiple mailers
-    * each using a different transport or same transport with different
-    * options.
+  /**
+   * The mailers object can be used to configure multiple mailers
+   * each using a different transport or same transport with different
+   * options.
    */
-  mailers: { 
+  mailers: {
     smtp: transports.smtp({
       host: env.get('SMTP_HOST'),
       port: env.get('SMTP_PORT'),
-			/**
+      /**
        * Uncomment the auth block if your SMTP
        * server needs authentication
        */
@@ -23,17 +23,16 @@ const mailConfig = defineConfig({
         pass: env.get('SMTP_PASSWORD'),
       }, */
     }),
-		    
+
     brevo: transports.brevo({
       key: env.get('BREVO_API_KEY'),
       baseUrl: 'https://api.brevo.com/v3',
     }),
-     
+
     resend: transports.resend({
       key: env.get('RESEND_API_KEY'),
       baseUrl: 'https://api.resend.com',
     }),
-    
   },
 })
 

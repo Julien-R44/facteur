@@ -3,7 +3,7 @@ import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
-import { NotifiableTargets, Notification } from '@facteurjs/core/types'
+import { NotifiableTargets, Notification } from '@facteurjs/adonisjs/types'
 import { InvoicePaidNotification } from '../notifications/invoice_paid_notification.js'
 import { NormalizeConstructor } from '@adonisjs/core/types/helpers'
 import { LucidModel } from '@adonisjs/lucid/types/model'
@@ -41,6 +41,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
       database: { notifiableId: this.id.toString() },
       slack: { default: true },
       transmit: { channel: `users/${this.id}` },
+      mail: { email: this.email },
     }
   }
 }

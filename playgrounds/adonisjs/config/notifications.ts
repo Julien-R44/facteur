@@ -5,6 +5,8 @@ const webhooks = {
   slack: 'https://hooks.slack.com/services/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',
   discord:
     'https://discord.com/api/webhooks/1371596880093380710/Y18O5mrWy4vZWowe5NdmM1F_VuFJQqc7_UvnniZCfgsf_rTAAJaBzKHBPxtOXT-JXljd',
+  marketing:
+    'https://discord.com/api/webhooks/1343710574009253910/EYhKJWVKmSzx_X54Pe8Z2CPfDS1DDQwKrbDIE-_5MFft0vCLvle_K7XJ1B0J1yNIxzOC',
 }
 
 const config = defineConfig({
@@ -12,12 +14,9 @@ const config = defineConfig({
     transmit: channels.transmit(),
     database: channels.database({ connectionName: 'sqlite' }),
     slack: channels.slackWebhook({ webhooks: { default: webhooks.slack } }),
+    mail: channels.mail(),
     discord: channels.discordWebhook({
-      webhooks: {
-        default: webhooks.discord,
-        marketing:
-          'https://discord.com/api/webhooks/1343710574009253910/EYhKJWVKmSzx_X54Pe8Z2CPfDS1DDQwKrbDIE-_5MFft0vCLvle_K7XJ1B0J1yNIxzOC',
-      },
+      webhooks: { default: webhooks.discord, marketing: webhooks.marketing },
     }),
   },
 })

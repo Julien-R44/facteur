@@ -173,6 +173,9 @@ importers:
       '@adonisjs/lucid':
         specifier: ^21.8.0
         version: 21.8.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@vinejs/vine@3.0.1)(better-sqlite3@12.2.0)(luxon@3.7.1)
+      '@adonisjs/mail':
+        specifier: ^9.2.2
+        version: 9.2.2(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@types/luxon@3.6.2)(@types/node@24.1.0)(dayjs@1.11.13)(edge.js@6.3.0)(luxon@3.7.1)
       '@adonisjs/redis':
         specifier: ^9.2.0
         version: 9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))
@@ -6350,8 +6353,8 @@ snapshots:
   '@adonisjs/mail@9.2.2(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@types/luxon@3.6.2)(@types/node@24.1.0)(dayjs@1.11.13)(edge.js@6.3.0)(luxon@3.7.1)':
     dependencies:
       '@adonisjs/core': 6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)
-      '@poppinss/colors': 4.1.4
-      '@poppinss/macroable': 1.0.4
+      '@poppinss/colors': 4.1.5
+      '@poppinss/macroable': 1.0.5
       '@poppinss/utils': 6.10.0
       '@types/nodemailer': 6.4.17
       edge.js: 6.3.0
@@ -9453,7 +9456,7 @@ snapshots:
 
   got@14.4.7:
     dependencies:
-      '@sindresorhus/is': 7.0.1
+      '@sindresorhus/is': 7.0.2
       '@szmarczak/http-timer': 5.0.1
       cacheable-lookup: 7.0.0
       cacheable-request: 12.0.1
