@@ -77,13 +77,6 @@ export interface Emitter {
   emit: (event: string, ...values: any[]) => void
 }
 
-/**
- * Class paradigm
- */
-export interface ViaParameters<Notifiable> {
-  notifiable: Notifiable
-}
-
 export type ViaResult = Arrayable<keyof NotificationChannels>
 
 export type ChannelName = keyof NotificationChannels
@@ -110,11 +103,39 @@ export type InferChannelsFromConfig<T> =
   T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
 export interface NotificationChannels {}
 
+export interface NotificationOptions<N extends Notifiable = Notifiable> {
+  /**
+   * A human readable name for the notification.
+   * Used for UI purpose
+   */
+  name: string
+
+  /**
+   * Bypass preferences and send the notification regardless of user settings.
+   * Useful for critical notifications that should always be sent.
+   */
+  critical?: boolean
+
+  /**
+   * Human readable tags. Also used for UI purpose
+   */
+  tags?: string[]
+
+  /**
+   * Channels to deliver the notification by.
+   */
+  deliverBy: Record<ChannelName, boolean | { if: (options: { notifiable: N }) => boolean }>
+}
+
 export abstract class Notification<
   N extends Notifiable = Notifiable,
   Params extends Record<string, any> = {},
 > {
-  abstract via(options: ViaParameters<N>): ChannelName[]
+  static options: NotificationOptions<any> = {
+    name: '',
+    tags: [],
+    deliverBy: {},
+  }
 }
 
 export interface SendOptions<N extends Notifiable> {

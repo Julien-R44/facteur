@@ -1,5 +1,5 @@
 import User from '#models/user'
-import { ChannelName, Notification, ViaParameters } from '@facteurjs/adonisjs/types'
+import { Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
 import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
 import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
 import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
@@ -8,8 +8,10 @@ import { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
 import InvoicePaidMail from '#mails/invoice_paid_notification'
 
 export default class InvoicePaidNotification extends Notification<User, { amount: number }> {
-  via(options: ViaParameters<User>): ChannelName[] {
-    return ['database', 'transmit']
+  static options: NotificationOptions<User> = {
+    name: 'Invoice Paid',
+    tags: ['Billing'],
+    deliverBy: { database: true, transmit: true, discord: false, slack: false, mail: true },
   }
 
   asMailMessage(): PossibleMailMessage {

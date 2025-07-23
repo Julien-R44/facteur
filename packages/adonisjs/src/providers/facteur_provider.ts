@@ -41,7 +41,7 @@ export default class NotificationsProvider {
         },
         router,
       )
-      notifications.discoverer.discoverAndLoadNotifications()
+      await notifications.discoverer.discoverNotifications()
       return notifications
     })
   }

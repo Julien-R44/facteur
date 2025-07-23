@@ -17,6 +17,25 @@ export default function Home() {
     },
   })
 
+  const { data: preferences } = useQuery({
+    queryKey: ['notifications', 'notifiable', 1, 'preferences'],
+    queryFn: async () => {
+      const result = await fetch('/notifications/notifiable/1/preferences', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      })
+
+      return await result.json()
+    },
+  })
+
+  // const { mutate }
+
+  console.log(preferences)
+
   return (
     <>
       <Head title="Homepage" />

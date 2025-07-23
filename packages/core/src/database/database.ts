@@ -1,4 +1,5 @@
 import type { FacteurOptions } from '../options.js'
+import type { NotificationDiscoverer } from '../notification_discoverer.js'
 import type {
   DatabaseAdapter,
   GetNotificationsParams,
@@ -10,7 +11,10 @@ import type {
 } from './types.js'
 
 export class FacteurDatabase {
-  constructor(private options: FacteurOptions<any, DatabaseAdapter>) {}
+  constructor(
+    private options: FacteurOptions<Record<string, any>, DatabaseAdapter>,
+    private discoverer: NotificationDiscoverer,
+  ) {}
 
   getNotifications(options: GetNotificationsParams) {
     const page = options.page || 1
@@ -39,35 +43,30 @@ export class FacteurDatabase {
     })
   }
 
-  async getPreferences(options: GetPreferencesParams): Promise<Preferences> {
-    const rawPreferences = await this.options.databaseAdapter?.getPreferences(options)
-
-    if (!rawPreferences) {
-      return this.#createEmptyPreferences(options.tenantId)
+  async #createEmptyPreferences(tenantId?: string | number): Promise<Preferences> {
+    const initialChannels: Record<string, boolean> = {}
+    for (const channelName of Object.keys(this.options.channels)) {
+      initialChannels[channelName] = true
     }
 
-    const preferences = this.#createEmptyPreferences(options.tenantId)
+    const notificationIdentities = await this.discoverer.getNotificationIdentities()
+    const notificationPreferences = notificationIdentities.map((identity) => ({
+      notification: { name: identity.name, identifier: identity.identifier },
+      channels: { ...initialChannels },
+    }))
 
-    for (const row of rawPreferences) {
-      this.#processPreferenceRow(row, preferences, options.tenantId)
-    }
-
-    return preferences
-  }
-
-  #createEmptyPreferences(tenantId?: string | number): Preferences {
     const preferences: Preferences = {
       global: {
-        global: { channels: {} },
-        notifications: [],
+        global: { channels: { ...initialChannels } },
+        notifications: [...notificationPreferences],
       },
     }
 
     if (tenantId) {
       preferences.tenants = {
         [tenantId]: {
-          global: { channels: {} },
-          notifications: [],
+          global: { channels: { ...initialChannels } },
+          notifications: [...notificationPreferences],
         },
       }
     }
@@ -84,6 +83,22 @@ export class FacteurDatabase {
     } else {
       this.#updateGlobalPreferences(preferences.global, notificationName, channels)
     }
+  }
+
+  async getPreferences(options: GetPreferencesParams): Promise<Preferences> {
+    const rawPreferences = await this.options.databaseAdapter?.getPreferences(options)
+
+    if (!rawPreferences) {
+      return await this.#createEmptyPreferences(options.tenantId)
+    }
+
+    const preferences = await this.#createEmptyPreferences(options.tenantId)
+
+    for (const row of rawPreferences) {
+      this.#processPreferenceRow(row, preferences, options.tenantId)
+    }
+
+    return preferences
   }
 
   #updateTenantPreferences(

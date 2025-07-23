@@ -1,5 +1,6 @@
 import type { Facteur } from '../facteur.js'
 import type { RouteDefinition, ServerAdapter } from './types.js'
+import { getPreferencesRoute, updatePreferencesRoute } from './handlers/preferences.js'
 import {
   getNotificationRoute,
   markAllNotificationsAsRoute,
@@ -14,9 +15,13 @@ export function defineRoute(
 
 export const routes = (facteur: Facteur<any, any>) =>
   [
+    // Notification routes
     getNotificationRoute({ facteur }),
     markNotificationAsRoute({ facteur }),
     markAllNotificationsAsRoute({ facteur }),
+    // Preferences route
+    getPreferencesRoute({ facteur }),
+    updatePreferencesRoute({ facteur }),
   ] satisfies RouteDefinition[]
 
 export function createFacteurServer(options: {

@@ -89,10 +89,13 @@ export class NotificationDiscoverer {
     }
   }
 
-  /**
-   * Discover and load all notification classes from the configured directory
-   */
-  async discoverAndLoadNotifications(): Promise<Array<new (...args: any[]) => any>> {
+  async getNotifications(): Promise<Array<new (...args: any[]) => Notification>> {
+    await this.#ensureNotificationsDiscovered()
+
+    return this.#cachedNotifications || []
+  }
+
+  async discoverNotifications() {
     if (this.#cachedNotifications !== null) return this.#cachedNotifications
 
     const notifications = await this.#importNotifications()
@@ -104,6 +107,32 @@ export class NotificationDiscoverer {
 
     this.#cachedNotifications = validNotifications.map(({ notification }) => notification)
     return this.#cachedNotifications
+  }
+
+  async #ensureNotificationsDiscovered(): Promise<void> {
+    if (this.#cachedNotifications !== null) return
+
+    throw new Error(
+      `Notifications have not been discovered yet. Call 'discoverAndLoadNotifications' first.`,
+    )
+  }
+
+  async getAllNotificationTags(): Promise<string[]> {
+    await this.#ensureNotificationsDiscovered()
+
+    const notifications = this.#cachedNotifications!
+    return notifications.map((notification) => notification.name)
+  }
+
+  /**
+   * Get notification identities with both display name and class identifier
+   */
+  async getNotificationIdentities(): Promise<Array<{ name: string; identifier: string }>> {
+    const notifications = await this.getNotifications()
+    return notifications.map((NotificationClass) => {
+      const options = (NotificationClass as any).options || {}
+      return { name: options.name, identifier: NotificationClass.name }
+    })
   }
 
   /**

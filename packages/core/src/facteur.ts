@@ -11,6 +11,7 @@ import type {
   SendOptions,
   ChannelName,
   Notifiable,
+  NotificationOptions,
 } from './types.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
@@ -34,7 +35,7 @@ export class Facteur<
 
     if (this.#options.databaseAdapter) {
       const options = this.#options as FacteurOptions<KnownChannels, DatabaseAdapter>
-      this.#db = new FacteurDatabase(options)
+      this.#db = new FacteurDatabase(options, this.#discoverer)
     }
   }
 
@@ -48,7 +49,9 @@ export class Facteur<
 
   get discoverer() {
     return {
-      discoverAndLoadNotifications: () => this.#discoverer.discoverAndLoadNotifications(),
+      discoverNotifications: () => this.#discoverer.discoverNotifications(),
+      getNotifications: () => this.#discoverer.getNotifications(),
+      getNotificationTags: () => this.#discoverer.getAllNotificationTags(),
       clearCache: () => this.#discoverer.clearCache(),
     }
   }
@@ -65,8 +68,22 @@ export class Facteur<
     const { notifiable, via: sendTimeChannelConfig } = options
 
     const notification = new options.notification()
-    const suggestedChannels = notification.via?.({ notifiable })
-    const activeChannels = new Set<ChannelName>(suggestedChannels)
+    const notificationOptions = (notification.constructor as any).options as NotificationOptions<N>
+
+    // Get channels from static deliverBy configuration
+    const activeChannels = new Set<ChannelName>()
+    for (const [channelName, config] of Object.entries(notificationOptions.deliverBy)) {
+      const channel = channelName as ChannelName
+
+      if (typeof config === 'boolean' && config) {
+        activeChannels.add(channel)
+      }
+
+      if (config && typeof config === 'object' && 'if' in config) {
+        const configWithIf = config as { if: (options: { notifiable: N }) => boolean }
+        if (configWithIf.if({ notifiable })) activeChannels.add(channel)
+      }
+    }
 
     const resolvedTargets: Record<string, any> = {}
     const defaultTargetsFromNotifiable = notifiable.notificationTargets?.() ?? {}
