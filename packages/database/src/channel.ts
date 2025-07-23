@@ -1,4 +1,4 @@
-import { asyncNoop, invoke, once } from '@julr/utils/functions'
+import { invoke } from '@julr/utils/functions'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { DatabaseMessage } from './message.js'
@@ -18,21 +18,13 @@ export class DatabaseChannel
   name = 'database' as const
   #adapter: DatabaseAdapter;
   [kTargetSymbol] = null as any as DatabaseTargets
-  initializer: () => Promise<any>
 
   constructor(config: DatabaseConfig) {
     this.#adapter = config.adapter
     this.#adapter.setTableName(config.tableName || 'notifications')
-
-    if (config.autoCreateTable !== false) {
-      this.initializer = once(async () => await this.#adapter.createTableIfNotExists())
-    } else {
-      this.initializer = asyncNoop
-    }
   }
 
   async send(options: ChannelSendParams<DatabaseMessage, DatabaseTargets>) {
-    await this.initializer()
     const message = options.message.serialize()
 
     const notifiableId = invoke(() => {
@@ -49,11 +41,13 @@ export class DatabaseChannel
 
     const result = await this.#adapter.save({
       notifiableId,
+      tenantId: message.tenantId,
       content: message.content,
       type: message.type,
+      status: message.status,
+      tags: message.tags,
       createdAt: new Date(),
       updatedAt: new Date(),
-      tags: message.tags,
     })
 
     return result

@@ -1,3 +1,5 @@
+import type { NotificationStatus } from './types.js'
+
 export class DatabaseMessage {
   static create() {
     return new DatabaseMessage()
@@ -7,6 +9,8 @@ export class DatabaseMessage {
   #tags: string[] = []
   #content: any = {}
   #notifiableId?: string | number
+  #tenantId?: string | number
+  #status: NotificationStatus = 'unread'
 
   setType(type: string) {
     this.#type = type
@@ -23,6 +27,16 @@ export class DatabaseMessage {
     return this
   }
 
+  setTenantId(tenantId: string | number) {
+    this.#tenantId = tenantId
+    return this
+  }
+
+  setStatus(status: NotificationStatus) {
+    this.#status = status
+    return this
+  }
+
   setContent(content: any) {
     this.#content = content
     return this
@@ -33,6 +47,8 @@ export class DatabaseMessage {
       type: this.#type,
       content: this.#content,
       notifiableId: this.#notifiableId,
+      tenantId: this.#tenantId,
+      status: this.#status,
       tags: this.#tags,
       createdAt: new Date(),
       updatedAt: new Date(),

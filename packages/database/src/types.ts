@@ -1,22 +1,48 @@
 import type { Knex } from 'knex'
 import type { Kysely } from 'kysely'
 
-/**
- * The interface for implementing a new database adapter
- */
-export interface DatabaseAdapter {
-  save: (options: SaveToDatabaseParams) => Promise<void>
-  createTableIfNotExists: () => Promise<void>
-  setTableName: (tableName: string) => void
+export type NotificationStatus = 'read' | 'seen' | 'unread' | 'unseen'
+export type Identifier = string | number
+
+export interface GetNotificationsParams {
+  notifiableId: Identifier
+  tenantId?: Identifier
+  page?: number
+  limit?: number
+  type?: NotificationStatus
 }
 
-export interface SaveToDatabaseParams {
-  notifiableId: string
+export interface Notification {
+  id: Identifier
+  notifiableId: Identifier
+  tenantId?: Identifier | undefined
   type: string
   content: Record<string, any>
+  status: NotificationStatus
   tags?: string[]
+  readAt?: Date
+  seenAt?: Date
   createdAt?: Date
   updatedAt?: Date
+}
+
+export interface SaveToDatabaseParams extends Omit<Notification, 'id'> {}
+
+export interface UpdateNotificationParams {
+  id: Identifier
+  status: NotificationStatus
+}
+
+export interface UpdateAllNotificationsParams {
+  notifiableId: Identifier
+  tenantId?: Identifier
+  status: NotificationStatus
+}
+
+export interface PruneNotificationsParams {
+  notifiableId?: Identifier
+  tenantId?: Identifier
+  olderThan?: Date
 }
 
 /**
@@ -30,12 +56,6 @@ export interface DatabaseConfig {
    * @default 'notifications'
    */
   tableName?: string
-
-  /**
-   * If the table should be created automatically
-   * @default true
-   */
-  autoCreateTable?: boolean
 }
 
 /**
@@ -50,4 +70,16 @@ export interface KyselyConfig {
  */
 export interface KnexConfig {
   connection: Knex
+}
+
+/**
+ * The interface for implementing a new database adapter
+ */
+export interface DatabaseAdapter {
+  save: (options: SaveToDatabaseParams) => Promise<void>
+  setTableName: (tableName: string) => void
+  getNotifications: (options: GetNotificationsParams) => Promise<Notification[]>
+  updateNotification: (options: UpdateNotificationParams) => Promise<void>
+  updateAllNotifications: (options: UpdateAllNotificationsParams) => Promise<void>
+  pruneNotifications: (options: PruneNotificationsParams) => Promise<void>
 }
