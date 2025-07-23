@@ -55,8 +55,7 @@ export class DatabaseChannel
 }
 
 declare module '@facteurjs/core/types' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface Notification<Notifiable> {
+  interface Notification {
     asDatabaseMessage(): DatabaseMessage
   }
 }

@@ -17,8 +17,7 @@ export class SlackWebhookChannel<T extends SlackOptions<any>>
 }
 
 declare module '@facteurjs/core/types' {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface Notification<Notifiable> {
+  interface Notification {
     asSlackMessage(): SlackMessage
   }
 }

@@ -100,7 +100,7 @@ export type InferChannelsFromConfig<T> =
   T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
 export interface NotificationChannels {}
 
-export abstract class Notification<N extends Notifiable> {
+export abstract class Notification<N extends Notifiable = Notifiable> {
   abstract via(options: ViaParameters<N>): ChannelName[]
 }
 
