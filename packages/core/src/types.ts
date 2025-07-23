@@ -2,7 +2,6 @@ import type { Logger } from '@julr/utils/logger'
 import type { Arrayable, Awaitable } from '@julr/utils/types'
 
 import type { Facteur } from './facteur.js'
-import type { ExtractChannelTargets } from './message.js'
 import type { DatabaseAdapter } from './database/types.js'
 
 export type FacteurChannelFactory = Channel<any, any, any, any>
@@ -26,6 +25,10 @@ export interface FacteurConfiguration<
   channels: KnownChannels
   queueAdapter?: QueueAdapter
   databaseAdapter?: DBAdapter
+  discoverer: {
+    searchDirectory: URL
+    fileSuffix?: string
+  }
 }
 
 export type ChannelSendParams<Message, Targets> = {
@@ -96,6 +99,8 @@ export type ChannelSpecificConfig<N extends Notifiable> = {
 export interface Notifiable {
   notificationTargets?(): NotifiableTargets
 }
+
+export type ExtractChannelTargets<T> = T extends Channel<any, any, any, infer U> ? U : never
 
 export type NotifiableTargets = {
   [K in keyof NotificationChannels]?: ExtractChannelTargets<NotificationChannels[K]>

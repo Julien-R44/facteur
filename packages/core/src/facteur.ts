@@ -2,6 +2,9 @@ import { capitalize } from '@julr/utils/string'
 
 import debug from './debug.js'
 import { FacteurOptions } from './options.js'
+import { FacteurDatabase } from './database/database.js'
+import type { DatabaseAdapter } from './database/types.js'
+import { NotificationDiscoverer } from './notification_discoverer.js'
 import type {
   FacteurConfiguration,
   Channel,
@@ -9,43 +12,6 @@ import type {
   ChannelName,
   Notifiable,
 } from './types.js'
-import type {
-  DatabaseAdapter,
-  GetNotificationsParams,
-  UpdateAllNotificationsParams,
-  UpdateNotificationParams,
-} from './database/types.js'
-
-export class FacteurDatabase {
-  constructor(private options: FacteurOptions<any, DatabaseAdapter>) {}
-
-  getNotifications(options: GetNotificationsParams) {
-    const page = options.page || 1
-    const limit = Math.min(options.limit || 10, 100)
-
-    return this.options.databaseAdapter?.getNotifications({
-      page,
-      limit,
-      tenantId: options.tenantId,
-      notifiableId: options.notifiableId,
-    })
-  }
-
-  updateNotification(option: UpdateNotificationParams) {
-    return this.options.databaseAdapter?.updateNotification({
-      id: option.id,
-      status: option.status,
-    })
-  }
-
-  updateAllNotifications(options: UpdateAllNotificationsParams) {
-    return this.options.databaseAdapter?.updateAllNotifications({
-      notifiableId: options.notifiableId,
-      tenantId: options.tenantId,
-      status: options.status,
-    })
-  }
-}
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
   return new Facteur(config)
@@ -57,9 +23,15 @@ export class Facteur<
 > {
   #options: FacteurOptions<KnownChannels, DBAdapter>
   #db: FacteurDatabase | null = null
+  #discoverer: NotificationDiscoverer
 
   constructor(config: FacteurConfiguration<KnownChannels, DBAdapter>) {
     this.#options = new FacteurOptions(config)
+    this.#discoverer = new NotificationDiscoverer({
+      searchDirectory: config.discoverer.searchDirectory,
+      fileSuffix: config.discoverer.fileSuffix,
+    })
+
     if (this.#options.databaseAdapter) {
       const options = this.#options as FacteurOptions<KnownChannels, DatabaseAdapter>
       this.#db = new FacteurDatabase(options)
@@ -71,16 +43,14 @@ export class Facteur<
       throw new Error('No database adapter configured')
     }
 
-    // instantiate once
     return this.#db as any
   }
 
-  startWorker() {
-    this.#options.queueAdapter.startQueueProcessor()
-  }
-
-  disconnect() {
-    this.#options.queueAdapter.disconnect()
+  get discoverer() {
+    return {
+      discoverAndLoadNotifications: () => this.#discoverer.discoverAndLoadNotifications(),
+      clearCache: () => this.#discoverer.clearCache(),
+    }
   }
 
   #getProvider(channelName: ChannelName): Channel {

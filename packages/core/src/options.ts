@@ -1,7 +1,7 @@
 import EventEmitter from 'node:events'
 import { type Logger, noopLogger } from '@julr/utils/logger'
 
-import { errors } from './exceptions.js'
+import { errors } from './errors/index.js'
 import type { DatabaseAdapter } from './database/types.js'
 import type { Emitter, QueueAdapter, FacteurConfiguration, Channel } from './types.js'
 

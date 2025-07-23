@@ -31,15 +31,18 @@ export default class NotificationsProvider {
       })
 
       const dbAdapter = await config.databaseAdapter?.resolver(this.app)
-      return new NotificationManager(
+      const notifications = new NotificationManager(
         {
           channels: await Object.fromEntries(await Promise.all(resolvedChannels)),
           // queueAdapter: config.queueAdapter,
           databaseAdapter: dbAdapter ?? null,
           emitter: emitter as any,
+          discoverer: { searchDirectory: new URL('./app', this.app.appRoot) },
         },
         router,
       )
+      notifications.discoverer.discoverAndLoadNotifications()
+      return notifications
     })
   }
 }

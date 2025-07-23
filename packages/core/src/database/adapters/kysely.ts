@@ -9,6 +9,9 @@ import type {
   SaveToDatabaseParams,
   UpdateAllNotificationsParams,
   UpdateNotificationParams,
+  GetPreferencesParams,
+  RawPreferenceRow,
+  UpdatePreferencesParams,
 } from '../types.js'
 
 export function kyselyAdapter(config: KyselyConfig): DatabaseAdapter {
@@ -17,6 +20,7 @@ export function kyselyAdapter(config: KyselyConfig): DatabaseAdapter {
 
 class KyselyAdapter implements DatabaseAdapter {
   #tableName!: string
+  #preferencesTableName: string = 'notification_preferences'
   #connection: Kysely<any>
 
   constructor(config: KyselyConfig) {
@@ -120,5 +124,64 @@ class KyselyAdapter implements DatabaseAdapter {
       .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
       .$if(!!options.olderThan, (qb) => qb.where('created_at', '<', options.olderThan))
       .execute()
+  }
+
+  async getPreferences(options: GetPreferencesParams): Promise<RawPreferenceRow[]> {
+    const results = await this.#connection
+      .selectFrom(this.#preferencesTableName)
+      .selectAll()
+      .where('user_id', '=', options.notifiableId)
+      .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
+      .$if(!options.tenantId, (qb) => qb.where('tenant_id', 'is', null))
+      .execute()
+
+    return results.map((row: any) => ({
+      id: row.id,
+      user_id: row.user_id,
+      tenant_id: row.tenant_id,
+      notification_name: row.notification_name,
+      channels: typeof row.channels === 'string' ? JSON.parse(row.channels) : row.channels,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }))
+  }
+
+  async updatePreferences(options: UpdatePreferencesParams): Promise<void> {
+    await this.#connection.transaction().execute(async (trx) => {
+      // Check if preference already exists
+      const existing = await trx
+        .selectFrom(this.#preferencesTableName)
+        .selectAll()
+        .where('user_id', '=', options.notifiableId)
+        .where('notification_name', '=', options.notificationName)
+        .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
+        .$if(!options.tenantId, (qb) => qb.where('tenant_id', 'is', null))
+        .executeTakeFirst()
+
+      if (existing) {
+        // Update existing preference
+        await trx
+          .updateTable(this.#preferencesTableName)
+          .set({
+            channels: JSON.stringify(options.channelPreferences),
+            updated_at: new Date(),
+          })
+          .where('id', '=', existing.id)
+          .execute()
+      } else {
+        // Insert new preference
+        await trx
+          .insertInto(this.#preferencesTableName)
+          .values({
+            user_id: options.notifiableId,
+            tenant_id: options.tenantId || null,
+            notification_name: options.notificationName,
+            channels: JSON.stringify(options.channelPreferences),
+            created_at: new Date(),
+            updated_at: new Date(),
+          })
+          .execute()
+      }
+    })
   }
 }

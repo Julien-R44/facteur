@@ -1,5 +1,6 @@
 import type { Knex } from 'knex'
 import type { Kysely } from 'kysely'
+import type { ChannelName } from '@facteurjs/core/types'
 
 export type NotificationStatus = 'read' | 'seen' | 'unread' | 'unseen'
 export type Identifier = string | number
@@ -80,6 +81,63 @@ export interface KnexConfig {
   connection: Knex
 }
 
+export interface GetPreferencesParams {
+  notifiableId: Identifier
+  tenantId?: Identifier
+}
+
+export interface RawPreferenceRow {
+  id: Identifier
+  user_id: Identifier
+  tenant_id?: Identifier | null
+  notification_name?: string | null
+  channels: Record<string, boolean>
+  created_at: Date
+  updated_at?: Date | null
+}
+
+export interface NotificationsPreferences {
+  /**
+   * Global preferences
+   */
+  global: {
+    channels: Record<ChannelName, boolean>
+  }
+
+  /**
+   * Per-notification preferences
+   */
+  notifications: Array<{
+    notification: { name: string }
+    channels: Record<ChannelName, boolean>
+  }>
+}
+
+export interface Preferences {
+  /**
+   * Global preferences
+   */
+  global: NotificationsPreferences
+
+  /**
+   * Per-tenant per-notification preferences
+   */
+  tenants?: Record<Identifier, NotificationsPreferences>
+}
+
+export interface SavePreferencesParams {
+  notifiableId: Identifier
+  tenantId?: Identifier
+  preferences: Preferences
+}
+
+export interface UpdatePreferencesParams {
+  notifiableId: Identifier
+  tenantId?: Identifier
+  notificationName: string
+  channelPreferences: Record<ChannelName, boolean>
+}
+
 /**
  * The interface for implementing a new database adapter
  */
@@ -90,4 +148,6 @@ export interface DatabaseAdapter {
   updateNotification: (options: UpdateNotificationParams) => Promise<void>
   updateAllNotifications: (options: UpdateAllNotificationsParams) => Promise<void>
   pruneNotifications: (options: PruneNotificationsParams) => Promise<void>
+  getPreferences: (options: GetPreferencesParams) => Promise<RawPreferenceRow[]>
+  updatePreferences: (options: UpdatePreferencesParams) => Promise<void>
 }

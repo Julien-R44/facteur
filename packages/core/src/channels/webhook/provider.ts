@@ -1,12 +1,12 @@
 import ky, { HTTPError } from 'ky'
 import { invoke } from '@julr/utils/functions'
 import { capitalize } from '@julr/utils/string'
-import { HTTPErrorExtractor } from '@facteurjs/core'
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { WebhookMessage } from './message.js'
 import { WebhookRequestException } from './exceptions.js'
+import { HTTPErrorExtractor } from '../../errors/http_error.js'
 import type { WebhookOptions, WebhookTargets } from './types.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types.js'
 
 export function webhookChannel<Options extends WebhookOptions<any>>(
   options: Options & { name: string },

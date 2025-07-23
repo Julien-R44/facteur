@@ -14,17 +14,15 @@ export default class extends BaseSchema {
 
       table.text('user_id').notNullable()
       table.text('tenant_id').nullable()
-      table.text('notification_type').nullable()
-      table.text('notification_id').nullable()
-      table.text('channel')
-
-      table.boolean('enabled').notNullable().defaultTo(true)
+      table.text('notification_name').nullable()
+      table.json('channels').notNullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
 
       table.index(['user_id'])
       table.index(['tenant_id'])
+      table.unique(['user_id', 'tenant_id', 'notification_name'])
     })
   }
 

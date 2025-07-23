@@ -9,6 +9,9 @@ import type {
   SaveToDatabaseParams,
   UpdateAllNotificationsParams,
   UpdateNotificationParams,
+  GetPreferencesParams,
+  RawPreferenceRow,
+  UpdatePreferencesParams,
 } from '../types.js'
 
 export function knexAdapter(config: KnexConfig): DatabaseAdapter {
@@ -17,6 +20,7 @@ export function knexAdapter(config: KnexConfig): DatabaseAdapter {
 
 class KnexAdapter implements DatabaseAdapter {
   #tableName: string = 'notifications'
+  #preferencesTableName: string = 'notification_preferences'
   #connection: Knex
 
   constructor(config: KnexConfig) {
@@ -112,5 +116,68 @@ class KnexAdapter implements DatabaseAdapter {
     if (options.olderThan) query = query.where('created_at', '<', options.olderThan)
 
     await query.del()
+  }
+
+  async getPreferences(options: GetPreferencesParams): Promise<RawPreferenceRow[]> {
+    const results = await this.#connection
+      .table(this.#preferencesTableName)
+      .where('user_id', options.notifiableId)
+      .andWhere((builder) => {
+        if (options.tenantId) {
+          builder.where('tenant_id', options.tenantId)
+        } else {
+          builder.whereNull('tenant_id')
+        }
+      })
+      .select('*')
+
+    return results.map((row: any) => ({
+      id: row.id,
+      user_id: row.user_id,
+      tenant_id: row.tenant_id,
+      notification_name: row.notification_name,
+      channels: typeof row.channels === 'string' ? JSON.parse(row.channels) : row.channels,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }))
+  }
+
+  async updatePreferences(options: UpdatePreferencesParams): Promise<void> {
+    await this.#connection.transaction(async (trx) => {
+      // Check if preference already exists
+      const existing = await trx
+        .table(this.#preferencesTableName)
+        .where('user_id', options.notifiableId)
+        .andWhere('notification_name', options.notificationName)
+        .andWhere((builder) => {
+          if (options.tenantId) {
+            builder.where('tenant_id', options.tenantId)
+          } else {
+            builder.whereNull('tenant_id')
+          }
+        })
+        .first()
+
+      if (existing) {
+        // Update existing preference
+        await trx
+          .table(this.#preferencesTableName)
+          .where('id', existing.id)
+          .update({
+            channels: JSON.stringify(options.channelPreferences),
+            updated_at: new Date(),
+          })
+      } else {
+        // Insert new preference
+        await trx.table(this.#preferencesTableName).insert({
+          user_id: options.notifiableId,
+          tenant_id: options.tenantId || null,
+          notification_name: options.notificationName,
+          channels: JSON.stringify(options.channelPreferences),
+          created_at: new Date(),
+          updated_at: new Date(),
+        })
+      }
+    })
   }
 }

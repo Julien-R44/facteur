@@ -7,17 +7,13 @@ import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
 import { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
 import InvoicePaidMail from '#mails/invoice_paid_notification'
 
-export class InvoicePaidNotification extends Notification<User, { amount: number }> {
-  via(_: ViaParameters<User>): ChannelName[] {
-    return ['transmit', 'mail', 'database'] as const
+export default class InvoicePaidNotification extends Notification<User, { amount: number }> {
+  via(options: ViaParameters<User>): ChannelName[] {
+    return ['database', 'transmit']
   }
 
   asMailMessage(): PossibleMailMessage {
     return new InvoicePaidMail()
-    // return MailMessage.create()
-    //   .subject('Invoice Paid')
-    //   .text('Your invoice has been successfully paid.')
-    //   .from('noreply@example.com')
   }
 
   asTransmitMessage(): TransmitMessage {
@@ -42,6 +38,5 @@ export class InvoicePaidNotification extends Notification<User, { amount: number
       .setBotUsername('Facteur Bot')
       .setBotIconEmoji(':robot_face:')
       .setChannel('#general')
-      .addHeaderBlock('🚀 Notification importante')
   }
 }
