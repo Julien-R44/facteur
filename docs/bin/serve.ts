@@ -50,7 +50,7 @@ async function defineRoutes(app: ApplicationService) {
     for (const collection of collections) {
       await collection.refresh()
       const entry = collection.findByPermalink(request.url())
-      if (entry) return entry.render({ collection, entry }).catch((error) => console.log(error))
+      if (entry) return entry.render({ collection, entry }).catch((error) => console.error(error))
     }
 
     return response.notFound('Page not found')

@@ -10,7 +10,7 @@ export default class SendNotification extends BaseCommand {
   static options: CommandOptions = {}
 
   async run() {
-    const user = await User.firstOrFail()
+    await User.firstOrFail()
 
     new InvoicePaidNotification()
   }

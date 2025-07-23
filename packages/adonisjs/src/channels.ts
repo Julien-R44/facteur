@@ -6,8 +6,9 @@
 import { configProvider } from '@adonisjs/core'
 import type { SlackOptions } from '@facteurjs/slack/types'
 import { RuntimeException } from '@adonisjs/core/exceptions'
-import type { KyselyConfig } from '@facteurjs/database/types'
 import type { DiscordOptions } from '@facteurjs/discord/types'
+
+import type { KyselyConfig } from './channels/database.js'
 
 export const channels = {
   /**
@@ -49,8 +50,8 @@ export const channels = {
         )
       }
 
-      const { databaseChannel } = await import('@facteurjs/database')
-      const { knexAdapter } = await import('@facteurjs/database/adapters/knex')
+      const { databaseChannel } = await import('@facteurjs/core/database')
+      const { knexAdapter } = await import('@facteurjs/core/database/adapters/knex')
       return databaseChannel({
         adapter: knexAdapter({ connection: db.connection(connectionName).getWriteClient() }),
       })
@@ -62,8 +63,8 @@ export const channels = {
    */
   kysely(config: KyselyConfig) {
     return configProvider.create(async () => {
-      const { databaseChannel } = await import('@facteurjs/database')
-      const { kyselyAdapter } = await import('@facteurjs/database/adapters/kysely')
+      const { databaseChannel } = await import('@facteurjs/core/database')
+      const { kyselyAdapter } = await import('@facteurjs/core/database/adapters/kysely')
 
       return databaseChannel({ adapter: kyselyAdapter({ connection: config.connection }) })
     })

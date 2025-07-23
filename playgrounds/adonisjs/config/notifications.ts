@@ -1,5 +1,6 @@
 import { defineConfig, channels } from '@facteurjs/adonisjs'
 import { InferChannels } from '@facteurjs/adonisjs/types'
+import { databases } from '@facteurjs/adonisjs/database'
 
 const webhooks = {
   slack: 'https://hooks.slack.com/services/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',
@@ -10,6 +11,7 @@ const webhooks = {
 }
 
 const config = defineConfig({
+  databaseAdapter: databases.lucid({ connectionName: 'sqlite' }),
   channels: {
     transmit: channels.transmit(),
     database: channels.database({ connectionName: 'sqlite' }),

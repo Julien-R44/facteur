@@ -3,10 +3,7 @@ import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
-import { NotifiableTargets, Notification } from '@facteurjs/adonisjs/types'
-import { InvoicePaidNotification } from '../notifications/invoice_paid_notification.js'
-import { NormalizeConstructor } from '@adonisjs/core/types/helpers'
-import { LucidModel } from '@adonisjs/lucid/types/model'
+import { NotifiableTargets } from '@facteurjs/adonisjs/types'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],

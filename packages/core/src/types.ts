@@ -3,6 +3,7 @@ import type { Arrayable, Awaitable } from '@julr/utils/types'
 
 import type { Facteur } from './facteur.js'
 import type { ExtractChannelTargets } from './message.js'
+import type { DatabaseAdapter } from './database/types.js'
 
 export type FacteurChannelFactory = Channel<any, any, any, any>
 
@@ -16,11 +17,15 @@ export interface QueueAdapter {
   disconnect(): void
 }
 
-export interface FacteurConfiguration<KnownChannels extends Record<string, Channel>> {
+export interface FacteurConfiguration<
+  KnownChannels extends Record<string, Channel> = Record<string, Channel>,
+  DBAdapter extends DatabaseAdapter | null = null,
+> {
   logger?: Logger
   emitter?: Emitter
   channels: KnownChannels
   queueAdapter?: QueueAdapter
+  databaseAdapter?: DBAdapter
 }
 
 export type ChannelSendParams<Message, Targets> = {
@@ -80,7 +85,7 @@ export type ViaResult = Arrayable<keyof NotificationChannels>
 
 export type ChannelName = keyof NotificationChannels
 
-export type ProviderTarget<N extends Notifiable, K extends ChannelName> = ExtractChannelTargets<
+export type ProviderTarget<_N extends Notifiable, K extends ChannelName> = ExtractChannelTargets<
   NotificationChannels[K]
 >
 
@@ -100,7 +105,10 @@ export type InferChannelsFromConfig<T> =
   T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
 export interface NotificationChannels {}
 
-export abstract class Notification<N extends Notifiable = Notifiable> {
+export abstract class Notification<
+  N extends Notifiable = Notifiable,
+  Params extends Record<string, any> = {},
+> {
   abstract via(options: ViaParameters<N>): ChannelName[]
 }
 

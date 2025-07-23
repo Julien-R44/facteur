@@ -23,8 +23,6 @@ const CONFIG_FILE_PATH = new URL('../content/config.json', import.meta.url)
 const SPONSORS_FILE_PATH = new URL('../content/sponsors.json', import.meta.url)
 
 export async function downloadSponsors() {
-  console.log('starting to download sponsors...')
-
   try {
     const fileContents = await readFile(CONFIG_FILE_PATH, 'utf-8')
     const sources = JSON.parse(fileContents).sponsors_sources
@@ -35,7 +33,6 @@ export async function downloadSponsors() {
      * sponsors.json file.
      */
     if (sources.length === 0) {
-      console.log('skipping download. No sources found...')
       await writeFile(SPONSORS_FILE_PATH, JSON.stringify(sponsorsList))
       return
     }
@@ -48,7 +45,6 @@ export async function downloadSponsors() {
       const sponsors = await body.json()
       if (Array.isArray(sponsors)) {
         sponsorsList = sponsorsList.concat(sponsors)
-        console.log(`Downloaded "${sponsors.length} sponsors" from "${source}"`)
       }
     }
 

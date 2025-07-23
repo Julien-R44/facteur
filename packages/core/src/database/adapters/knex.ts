@@ -2,7 +2,7 @@ import type { Knex } from 'knex'
 
 import type {
   DatabaseAdapter,
-  GetNotificationsParams,
+  AdapterGetNotificationsParams,
   KnexConfig,
   Notification,
   PruneNotificationsParams,
@@ -16,7 +16,7 @@ export function knexAdapter(config: KnexConfig): DatabaseAdapter {
 }
 
 class KnexAdapter implements DatabaseAdapter {
-  #tableName!: string
+  #tableName: string = 'notifications'
   #connection: Knex
 
   constructor(config: KnexConfig) {
@@ -40,7 +40,7 @@ class KnexAdapter implements DatabaseAdapter {
     })
   }
 
-  async getNotifications(options: GetNotificationsParams): Promise<Notification[]> {
+  async getNotifications(options: AdapterGetNotificationsParams): Promise<Notification[]> {
     const page = options.page || 1
     const limit = Math.min(options.limit || 10, 100)
     const offset = (page - 1) * limit
@@ -48,7 +48,7 @@ class KnexAdapter implements DatabaseAdapter {
     let query = this.#connection.table(this.#tableName).where('notifiable_id', options.notifiableId)
 
     if (options.tenantId) query = query.where('tenant_id', options.tenantId)
-    if (options.type) query = query.where('status', options.type)
+    if (options.status) query = query.where('status', options.status)
 
     const results = await query
       .orderBy('created_at', 'desc')

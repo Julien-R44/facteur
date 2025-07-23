@@ -8,11 +8,17 @@
   "keywords": [],
   "exports": {
     ".": "./src/index.ts",
+    "./database": "./src/database/index.ts",
+    "./database/types": "./src/database/types.ts",
+    "./database/adapters/knex": "./src/database/adapters/knex.ts",
+    "./database/adapters/kysely": "./src/database/adapters/kysely.ts",
+    "./api": "./src/api/index.ts",
     "./types": "./src/types.ts",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsdown",
     "stub": "tsdown",
@@ -24,7 +30,8 @@
     "@poppinss/exception": "catalog:"
   },
   "devDependencies": {
+    "knex": "^3.1.0",
+    "kysely": "^0.28.3",
     "p-event": "^6.0.1"
-  },
-  "types": "./dist/index.d.ts"
+  }
 }

@@ -25,3 +25,4 @@ router.get('/send', async () => {
 })
 
 transmit.registerRoutes()
+facteur.registerRoutes()

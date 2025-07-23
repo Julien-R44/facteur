@@ -2,10 +2,9 @@ import type { Kysely } from 'kysely'
 
 import type {
   DatabaseAdapter,
-  GetNotificationsParams,
+  AdapterGetNotificationsParams,
   KyselyConfig,
   Notification,
-  NotificationStatus,
   PruneNotificationsParams,
   SaveToDatabaseParams,
   UpdateAllNotificationsParams,
@@ -44,7 +43,7 @@ class KyselyAdapter implements DatabaseAdapter {
       .execute()
   }
 
-  async getNotifications(options: GetNotificationsParams): Promise<Notification[]> {
+  async getNotifications(options: AdapterGetNotificationsParams): Promise<Notification[]> {
     const page = options.page || 1
     const limit = Math.min(options.limit || 10, 100)
     const offset = (page - 1) * limit
@@ -54,7 +53,7 @@ class KyselyAdapter implements DatabaseAdapter {
       .selectAll()
       .where('notifiable_id', '=', options.notifiableId)
       .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
-      .$if(!!options.type, (qb) => qb.where('status', '=', options.type))
+      .$if(!!options.status, (qb) => qb.where('status', '=', options.status))
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(offset)

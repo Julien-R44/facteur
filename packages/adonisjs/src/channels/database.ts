@@ -1,2 +1,2 @@
-export * from '@facteurjs/database'
-export * from '@facteurjs/database/types'
+export * from '@facteurjs/core/database'
+export * from '@facteurjs/core/database/types'

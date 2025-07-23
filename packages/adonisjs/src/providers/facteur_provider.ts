@@ -1,14 +1,16 @@
-import type { Facteur } from '@facteurjs/core'
 import type { ApplicationService } from '@adonisjs/core/types'
 
+import { NotificationManager } from '../manager.js'
 import type { defineConfig } from '../define_config.js'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {
-    'notifications.manager': Facteur<any>
+    // TODO
+    'notifications.manager': NotificationManager<any, any>
   }
 
   export interface EventsList {
+    // TODO
     'notifications:message:send': any
     'notifications:message:sent': any
   }
@@ -21,17 +23,23 @@ export default class NotificationsProvider {
     const config = this.app.config.get<ReturnType<typeof defineConfig>>('notifications')
 
     this.app.container.singleton('notifications.manager', async () => {
-      const { createFacteur } = await import('@facteurjs/core')
       const emitter = await this.app.container.make('emitter')
+      const router = await this.app.container.make('router')
 
       const resolvedChannels = Object.entries(config.channels).map(async ([name, channel]) => {
         return [name, await channel.resolver(this.app)]
       })
 
-      return createFacteur({
-        emitter: emitter as any,
-        channels: await Object.fromEntries(await Promise.all(resolvedChannels)),
-      })
+      const dbAdapter = await config.databaseAdapter?.resolver(this.app)
+      return new NotificationManager(
+        {
+          channels: await Object.fromEntries(await Promise.all(resolvedChannels)),
+          // queueAdapter: config.queueAdapter,
+          databaseAdapter: dbAdapter ?? null,
+          emitter: emitter as any,
+        },
+        router,
+      )
     })
   }
 }
