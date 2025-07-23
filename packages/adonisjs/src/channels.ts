@@ -4,9 +4,9 @@
 /// <reference types="@adonisjs/mail/mail_provider" />
 
 import { configProvider } from '@adonisjs/core'
-import type { SlackOptions } from '@facteurjs/slack/types'
 import { RuntimeException } from '@adonisjs/core/exceptions'
-import type { DiscordOptions } from '@facteurjs/discord/types'
+import type { SlackOptions } from '@facteurjs/core/channels/slack/types'
+import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
 
 import type { KyselyConfig } from './channels/database.js'
 
@@ -16,7 +16,7 @@ export const channels = {
    */
   discordWebhook<Options extends DiscordOptions<any>>(config: Options) {
     return configProvider.create(async () => {
-      const { discordWebhookChannel } = await import('@facteurjs/discord')
+      const { discordWebhookChannel } = await import('@facteurjs/core/channels/discord')
       return discordWebhookChannel(config)
     })
   },
@@ -26,7 +26,7 @@ export const channels = {
    */
   slackWebhook<Options extends SlackOptions<any>>(config: Options) {
     return configProvider.create(async () => {
-      const { slackWebhookChannel } = await import('@facteurjs/slack')
+      const { slackWebhookChannel } = await import('@facteurjs/core/channels/slack')
       return slackWebhookChannel(config)
     })
   },
@@ -75,7 +75,7 @@ export const channels = {
    */
   transmit() {
     return configProvider.create(async (app) => {
-      const { transmitChannel } = await import('@facteurjs/transmit')
+      const { transmitChannel } = await import('@facteurjs/core/channels/transmit')
       const transmit = await app.container.make('transmit')
 
       return transmitChannel({ transmit: transmit as any })

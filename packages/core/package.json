@@ -12,6 +12,12 @@
     "./database/types": "./src/database/types.ts",
     "./database/adapters/knex": "./src/database/adapters/knex.ts",
     "./database/adapters/kysely": "./src/database/adapters/kysely.ts",
+    "./channels/slack": "./src/channels/slack/index.ts",
+    "./channels/slack/types": "./src/channels/slack/types.ts",
+    "./channels/discord": "./src/channels/discord/index.ts",
+    "./channels/discord/types": "./src/channels/discord/types.ts",
+    "./channels/transmit": "./src/channels/transmit/index.ts",
+    "./channels/transmit/types": "./src/channels/transmit/types.ts",
     "./api": "./src/api/index.ts",
     "./types": "./src/types.ts",
     "./package.json": "./package.json"
@@ -23,13 +29,16 @@
     "build": "tsdown",
     "stub": "tsdown",
     "test": "tsx tests/index.ts",
+    "typecheck": "tsc --noEmit",
     "quick:test": "tsx tests/index.ts"
   },
   "dependencies": {
     "@julr/utils": "catalog:",
-    "@poppinss/exception": "catalog:"
+    "@poppinss/exception": "catalog:",
+    "ky": "^1.8.2"
   },
   "devDependencies": {
+    "@boringnode/transmit": "^0.3.0",
     "knex": "^3.1.0",
     "kysely": "^0.28.3",
     "p-event": "^6.0.1"

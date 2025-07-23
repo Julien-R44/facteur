@@ -1,4 +1,4 @@
-import { WebhookMessage } from '@facteurjs/webhook'
+import { WebhookMessage } from '../webhook/message.js'
 
 export class SlackMessage extends WebhookMessage {
   #text = ''

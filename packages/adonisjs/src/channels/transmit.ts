@@ -1,2 +1,2 @@
-export * from '@facteurjs/transmit'
-export * from '@facteurjs/transmit/types'
+export * from '@facteurjs/core/channels/transmit'
+export * from '@facteurjs/core/channels/transmit/types'

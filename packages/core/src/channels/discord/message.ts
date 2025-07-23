@@ -1,5 +1,4 @@
-import { WebhookMessage } from '@facteurjs/webhook'
-
+import { WebhookMessage } from '../webhook/message.js'
 import type {
   DiscordEmbedAuthor,
   DiscordEmbedField,

@@ -142,15 +142,6 @@ importers:
       '@facteurjs/core':
         specifier: 'workspace:'
         version: link:../core
-      '@facteurjs/discord':
-        specifier: 'workspace:'
-        version: link:../discord
-      '@facteurjs/slack':
-        specifier: 'workspace:'
-        version: link:../slack
-      '@facteurjs/transmit':
-        specifier: 'workspace:'
-        version: link:../transmit
       '@julr/utils':
         specifier: 'catalog:'
         version: 1.9.0
@@ -197,7 +188,13 @@ importers:
       '@poppinss/exception':
         specifier: 'catalog:'
         version: 1.2.2
+      ky:
+        specifier: ^1.8.2
+        version: 1.8.2
     devDependencies:
+      '@boringnode/transmit':
+        specifier: ^0.3.0
+        version: 0.3.0(ioredis@5.6.1)
       knex:
         specifier: ^3.1.0
         version: 3.1.0(better-sqlite3@12.2.0)

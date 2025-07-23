@@ -27,7 +27,8 @@
     "build": "tsdown",
     "stub": "tsdown",
     "test": "tsx tests/index.ts",
-    "quick:test": "tsx tests/index.ts"
+    "quick:test": "tsx tests/index.ts",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "@adonisjs/core": "^6.19.0",
@@ -38,9 +39,6 @@
   },
   "dependencies": {
     "@facteurjs/core": "workspace:",
-    "@facteurjs/discord": "workspace:",
-    "@facteurjs/slack": "workspace:",
-    "@facteurjs/transmit": "workspace:",
     "@julr/utils": "catalog:",
     "@poppinss/exception": "catalog:"
   },

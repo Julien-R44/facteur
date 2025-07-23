@@ -1,2 +1,2 @@
-export * from '@facteurjs/slack'
-export * from '@facteurjs/slack/types'
+export * from '@facteurjs/core/channels/slack'
+export * from '@facteurjs/core/channels/slack/types'
