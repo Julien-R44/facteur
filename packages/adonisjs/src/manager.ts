@@ -1,6 +1,7 @@
 import { Facteur } from '@facteurjs/core'
+import { createFacteurServer } from '@facteurjs/core/api'
 import type { HttpRouterService } from '@adonisjs/core/types'
-import { createFacteurServer, type ServerAdapter } from '@facteurjs/core/api'
+import type { ServerAdapter } from '@facteurjs/core/api/types'
 
 import { AdonisServerAdapter } from './server/adapter.js'
 import type { Channel, FacteurConfiguration } from './types.js'

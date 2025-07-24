@@ -1,12 +1,20 @@
+import type { HttpContext } from '@adonisjs/core/http'
 import type { ConfigProvider } from '@adonisjs/core/types'
 import type { Channel, FacteurConfiguration } from '@facteurjs/core/types'
 
 import type { DatabaseAdapter } from './channels/database.js'
 
-export function defineConfig<Channels extends Record<string, ConfigProvider<Channel>>>(options: {
+export interface AdonisFacteurConfiguration<
+  Channels extends Record<string, ConfigProvider<Channel>>,
+> {
   channels: Channels
   queueAdapter?: FacteurConfiguration['queueAdapter']
   databaseAdapter?: ConfigProvider<DatabaseAdapter>
-}) {
+  api?: { guard?: (ctx: HttpContext) => Promise<boolean> | boolean }
+}
+
+export function defineConfig<Channels extends Record<string, ConfigProvider<Channel>>>(
+  options: AdonisFacteurConfiguration<Channels>,
+) {
   return options
 }

@@ -21,6 +21,7 @@
     "./channels/twilio": "./src/channels/twilio/index.ts",
     "./channels/twilio/types": "./src/channels/twilio/types.ts",
     "./api": "./src/api/index.ts",
+    "./api/types": "./src/api/types.ts",
     "./types": "./src/types.ts",
     "./package.json": "./package.json"
   },

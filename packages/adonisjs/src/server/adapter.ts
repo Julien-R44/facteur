@@ -1,5 +1,5 @@
 import type { HttpRouterService } from '@adonisjs/core/types'
-import type { RouteDefinition, ServerAdapter } from '@facteurjs/core/api'
+import type { RouteDefinition, ServerAdapter } from '@facteurjs/core/api/types'
 
 export class AdonisServerAdapter implements ServerAdapter {
   constructor(private router: HttpRouterService) {}
