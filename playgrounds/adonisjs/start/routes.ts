@@ -17,7 +17,7 @@ import transmit from '@adonisjs/transmit/services/main'
 router.on('/').renderInertia('home')
 
 router.post('/send', async ({ request, response }) => {
-  const notificationIdentifier = request.body().identifier
+  const { identifier: notificationIdentifier, tenantId } = request.body()
 
   const user = await User.firstOrFail()
 
@@ -35,6 +35,7 @@ router.post('/send', async ({ request, response }) => {
     notification: NotificationClass,
     notifiable: user,
     params: { amount: 100 },
+    tenantId,
   })
 
   return response.ok({ message: 'Notification sent successfully' })

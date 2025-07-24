@@ -2,7 +2,7 @@ import { invoke } from '@julr/utils/functions'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { DatabaseMessage } from './message.js'
-import type { DatabaseAdapter, DatabaseConfig } from './types.js'
+import type { DatabaseAdapter, DatabaseConfig, Identifier } from './types.js'
 
 export { DatabaseMessage } from './message.js'
 
@@ -10,7 +10,10 @@ export function databaseChannel(options: DatabaseConfig) {
   return new DatabaseChannel(options)
 }
 
-type DatabaseTargets = { notifiableId: string }
+type DatabaseTargets = {
+  notifiableId: Identifier
+  tenantId?: Identifier
+}
 
 export class DatabaseChannel
   implements Channel<DatabaseConfig, DatabaseMessage, any, DatabaseTargets>
@@ -37,11 +40,21 @@ export class DatabaseChannel
       return options.targets?.notifiableId || options.notifiable.id
     })
 
+    const tenantId = invoke(() => {
+      if (message.tenantId) return message.tenantId
+
+      if (options.notifiable?.[`notificationTargetForDatabase`]) {
+        return options.notifiable.notificationTargetForDatabase().tenantId
+      }
+
+      return options.targets?.tenantId || options.tenantId
+    })
+
     if (!notifiableId) throw new Error('No notifiableId provided')
 
     const result = await this.#adapter.save({
       notifiableId,
-      tenantId: message.tenantId,
+      tenantId,
       content: message.content,
       type: message.type,
       status: message.status,

@@ -16,6 +16,10 @@ interface NotificationOption {
   tags: string[]
 }
 
+interface TestNotificationProps {
+  tenantId?: string
+}
+
 const availableNotifications: NotificationOption[] = [
   {
     id: 'InvoicePaidNotification',
@@ -45,7 +49,7 @@ const availableNotifications: NotificationOption[] = [
   },
 ]
 
-export default function TestNotification() {
+export default function TestNotification({ tenantId }: TestNotificationProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedNotification, setSelectedNotification] = useState<string>(
     availableNotifications[0].id,
@@ -62,7 +66,10 @@ export default function TestNotification() {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({ identifier: notificationId }),
+        body: JSON.stringify({
+          identifier: notificationId,
+          tenantId,
+        }),
       })
 
       if (!response.ok) {
@@ -73,7 +80,7 @@ export default function TestNotification() {
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: ['notifications', '1', tenantId] })
     },
     onError: () => {
       // Error handled in UI
@@ -100,6 +107,11 @@ export default function TestNotification() {
           <p className="text-sm text-gray-600">
             Send a test notification to see the system in action
           </p>
+          {tenantId && (
+            <p className="text-xs text-blue-600 mt-1">
+              Sending for tenant: <span className="font-medium">{tenantId}</span>
+            </p>
+          )}
         </div>
       </div>
 

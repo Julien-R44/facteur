@@ -1,6 +1,6 @@
 import User from '#models/user'
 import { MessageCtx, Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
-import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
+import { DatabaseMessage, Identifier } from '@facteurjs/adonisjs/channels/database'
 import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
 import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
 import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
@@ -15,7 +15,24 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
   static options: NotificationOptions<User> = {
     name: 'Invoice Paid',
     tags: ['Billing'],
-    deliverBy: { database: true, transmit: true, discord: false, slack: false, mail: true },
+    deliverBy: {
+      database: true,
+      transmit: true,
+      mail: true,
+      slack: false,
+      discord: false,
+      twilio: false,
+    },
+  }
+
+  #getOrganizationName(tenantId?: Identifier): string {
+    const orgMap: Record<string, string> = {
+      'acme-corp': 'Acme Corporation',
+      'tech-startup': 'Tech Startup Inc.',
+      'consulting-firm': 'Consulting Firm Ltd.',
+      'creative-agency': 'Creative Agency',
+    }
+    return orgMap[tenantId || 'acme-corp'] || 'Unknown Organization'
   }
 
   asMailMessage(): PossibleMailMessage {
@@ -30,12 +47,14 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     })
   }
 
-  asDatabaseMessage({ notifiable }: MessageCtx<User, InvoicePaidParams>): DatabaseMessage {
-    console.log('notifiable:', notifiable)
+  asDatabaseMessage({ params, tenantId }: MessageCtx<User, InvoicePaidParams>): DatabaseMessage {
     return DatabaseMessage.create()
-      .setContent('Invoice paid')
+      .setContent({
+        title: 'Invoice Paid',
+        body: `Your invoice of $${params.amount} has been successfully paid.`,
+        organization: this.#getOrganizationName(tenantId),
+      })
       .setType('invoice_paid')
-      .setTenantId(Math.floor(Math.random() * 2 + 1))
   }
 
   asDiscordMessage() {

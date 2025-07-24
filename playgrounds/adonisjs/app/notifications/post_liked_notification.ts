@@ -12,17 +12,17 @@ export default class PostLikedNotification extends Notification<User, { postId: 
     deliverBy: {
       database: true,
       transmit: true,
-      discord: true,
+      discord: false,
       slack: false,
       mail: false,
-      twilio: true,
+      twilio: false,
     },
   }
 
   asTransmitMessage(): TransmitMessage {
     return TransmitMessage.create().setContent({
-      title: 'Invoice Paid',
-      body: 'Your invoice has been successfully paid.',
+      title: 'Post Liked',
+      body: 'Your post has been liked.',
       timestamp: new Date().toISOString(),
     })
   }

@@ -2,7 +2,7 @@ import type { Logger } from '@julr/utils/logger'
 import type { Arrayable, Awaitable } from '@julr/utils/types'
 
 import type { Facteur } from './facteur.js'
-import type { DatabaseAdapter } from './database/types.js'
+import type { DatabaseAdapter, Identifier } from './database/types.js'
 
 export type FacteurChannelFactory = Channel<any, any, any, any>
 
@@ -35,12 +35,14 @@ export type ChannelSendParams<Message, Targets> = {
   notifiable?: any
   message: Message
   targets?: Targets
+  tenantId?: Identifier | undefined
 }
 
 export const kTargetSymbol = Symbol('facteur:targets')
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface Channel<_Options = any, Message = any, Response = any, Targets = any> {
   [kTargetSymbol]: Targets
+  name: string
   send: (options: ChannelSendParams<Message, Targets>) => Awaitable<Response>
 }
 
@@ -137,6 +139,7 @@ export interface MessageCtx<
 > {
   notifiable: N
   params: Params
+  tenantId?: Identifier
 }
 
 export abstract class Notification<
@@ -159,4 +162,5 @@ export interface SendOptions<TNotification extends Notification<any, any>> {
   via?: ChannelSpecificConfig<
     TNotification extends Notification<infer TNotifiable, any> ? TNotifiable : never
   >
+  tenantId?: Identifier
 }

@@ -13,6 +13,7 @@ import type {
   ChannelName,
   NotificationOptions,
   Notification,
+  MessageCtx,
 } from './types.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
@@ -144,10 +145,21 @@ export class Facteur<
       const messageBuilder = notification[channelMethodName]
 
       if (typeof messageBuilder === 'function') {
-        const messageContent = messageBuilder({ notifiable })
+        // @ts-expect-error Dynamic method call
+        const messageContent = notification[channelMethodName]({
+          notifiable,
+          params: options.params,
+          tenantId: options.tenantId,
+        } as MessageCtx<any, any>)
+
         if (!messageContent) continue
 
-        await channel.send({ message: messageContent, targets: target, notifiable })
+        await channel.send({
+          tenantId: options.tenantId,
+          message: messageContent,
+          targets: target,
+          notifiable,
+        })
       }
     }
   }
