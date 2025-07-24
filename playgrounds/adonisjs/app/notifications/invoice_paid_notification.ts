@@ -1,10 +1,13 @@
-import User from '#models/user'
-import { MessageCtx, Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
-import { DatabaseMessage, Identifier } from '@facteurjs/adonisjs/channels/database'
-import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
+import { Notification } from '@facteurjs/adonisjs/types'
 import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
+import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
 import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
-import { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
+import type { Identifier } from '@facteurjs/adonisjs/channels/database'
+import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
+import type { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
+import type { MessageCtx, NotificationOptions } from '@facteurjs/adonisjs/types'
+
+import type User from '#models/user'
 import InvoicePaidMail from '#mails/invoice_paid_notification'
 
 interface InvoicePaidParams {

@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import facteur from '../../facteur/service.js'
 import InvoicePaidNotification from '../../app/notifications/invoice_paid_notification.js'
 

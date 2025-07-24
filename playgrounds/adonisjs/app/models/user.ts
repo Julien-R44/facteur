@@ -1,9 +1,9 @@
-import { DateTime } from 'luxon'
+import type { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
-import { NotifiableTargets } from '@facteurjs/adonisjs/types'
+import type { NotifiableTargets } from '@facteurjs/adonisjs/types'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],

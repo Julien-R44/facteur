@@ -7,12 +7,13 @@
 |
 */
 
-import User from '#models/user'
 import router from '@adonisjs/core/services/router'
-import facteur from '../facteur/service.js'
-import InvoicePaidNotification from '../app/notifications/invoice_paid_notification.js'
-import PostLikedNotification from '../app/notifications/post_liked_notification.js'
 import transmit from '@adonisjs/transmit/services/main'
+
+import User from '#models/user'
+import facteur from '../facteur/service.js'
+import PostLikedNotification from '../app/notifications/post_liked_notification.js'
+import InvoicePaidNotification from '../app/notifications/invoice_paid_notification.js'
 
 router.on('/').renderInertia('home')
 
@@ -22,8 +23,8 @@ router.post('/send', async ({ request, response }) => {
   const user = await User.firstOrFail()
 
   const notificationMap: Record<string, any> = {
-    InvoicePaidNotification: InvoicePaidNotification,
-    PostLikedNotification: PostLikedNotification,
+    InvoicePaidNotification,
+    PostLikedNotification,
   }
 
   const NotificationClass = notificationMap[notificationIdentifier]

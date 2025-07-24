@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Head } from '@inertiajs/react'
-import NotificationCenter from '../components/NotificationCenter'
-import TestNotification from '~/components/TestNotification'
-import TenancySelector from '../components/TenancySelector'
+
+import TenancySelector from '../components/tenancy_selector'
+import TestNotification from '~/components/test_notification'
+import NotificationCenter from '../components/notification_center'
 
 interface Organization {
   id: string

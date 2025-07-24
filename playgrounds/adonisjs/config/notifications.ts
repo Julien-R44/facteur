@@ -1,6 +1,6 @@
-import { defineConfig, channels } from '@facteurjs/adonisjs'
-import { InferChannels } from '@facteurjs/adonisjs/types'
 import { databases } from '@facteurjs/adonisjs/database'
+import { defineConfig, channels } from '@facteurjs/adonisjs'
+import type { InferChannels } from '@facteurjs/adonisjs/types'
 
 const config = defineConfig({
   databaseAdapter: databases.lucid({ connectionName: 'sqlite' }),
@@ -21,7 +21,7 @@ const config = defineConfig({
       from: process.env.TWILIO_FROM,
       messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
       debugTo: process.env.TWILIO_DEBUG_TO,
-      ignoredErrorCodes: [21608, 21211, 21614, 21408], // Common test error codes
+      ignoredErrorCodes: [21_608, 21_211, 21_614, 21_408], // Common test error codes
     }),
   },
 })

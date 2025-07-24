@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { Notification } from '@facteurjs/client'
 import { Bell, BellRing, Check, Settings, X, Eye } from 'lucide-react'
-import NotificationSettings from './NotificationSettings'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { facteur } from '~/app/facteur'
-import { Notification } from '@facteurjs/client'
+import NotificationSettings from './notification_settings'
 
 interface NotificationCenterProps {
   userId: string

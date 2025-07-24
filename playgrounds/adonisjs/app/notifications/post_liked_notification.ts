@@ -1,9 +1,11 @@
-import User from '#models/user'
-import { Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
-import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
-import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
-import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
+import { Notification } from '@facteurjs/adonisjs/types'
 import { TwilioMessage } from '@facteurjs/adonisjs/channels/twilio'
+import type { NotificationOptions } from '@facteurjs/adonisjs/types'
+import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
+import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
+import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
+
+import type User from '#models/user'
 
 export default class PostLikedNotification extends Notification<User, { postId: number }> {
   static options: NotificationOptions<User> = {

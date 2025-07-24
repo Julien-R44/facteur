@@ -33,5 +33,5 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_HOST: Env.schema.string(),
   SMTP_PORT: Env.schema.string(),
   RESEND_API_KEY: Env.schema.string(),
-  BREVO_API_KEY: Env.schema.string()
+  BREVO_API_KEY: Env.schema.string(),
 })
