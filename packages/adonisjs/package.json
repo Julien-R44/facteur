@@ -16,7 +16,7 @@
     "./channels/slack": "./src/channels/slack.ts",
     "./channels/discord": "./src/channels/discord.ts",
     "./channels/transmit": "./src/channels/transmit.ts",
-    "./channels/twilio": "./src/channels/twilio/index.ts",
+    "./channels/twilio": "./src/channels/twilio.ts",
     "./channels/mail": "./src/channels/mail.ts",
     "./facteur_provider": "./src/providers/facteur_provider.ts",
     "./package.json": "./package.json"

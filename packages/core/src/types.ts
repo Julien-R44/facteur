@@ -103,6 +103,10 @@ export type InferChannelsFromConfig<T> =
   T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
 export interface NotificationChannels {}
 
+export interface DeliverByOptions<N extends Notifiable = Notifiable> {
+  if: (options: { notifiable: N }) => boolean
+}
+
 export interface NotificationOptions<N extends Notifiable = Notifiable> {
   /**
    * A human readable name for the notification.
@@ -124,7 +128,7 @@ export interface NotificationOptions<N extends Notifiable = Notifiable> {
   /**
    * Channels to deliver the notification by.
    */
-  deliverBy: Record<ChannelName, boolean | { if: (options: { notifiable: N }) => boolean }>
+  deliverBy: Partial<Record<ChannelName, boolean | DeliverByOptions<N>>>
 }
 
 export interface MessageCtx<
@@ -136,8 +140,10 @@ export interface MessageCtx<
 }
 
 export abstract class Notification<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   N extends Notifiable = Notifiable,
-  Params extends Record<string, any> = {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Params extends Record<string, any> = any,
 > {
   static options: NotificationOptions<any> = {
     name: '',
