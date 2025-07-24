@@ -21,7 +21,12 @@ const config = defineConfig({
       from: process.env.TWILIO_FROM,
       messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID,
       debugTo: process.env.TWILIO_DEBUG_TO,
-      ignoredErrorCodes: [21_608, 21_211, 21_614, 21_408], // Common test error codes
+      ignoredErrorCodes: [21_608, 21_211, 21_614, 21_408],
+    }),
+    fcm: channels.fcm({
+      serviceAccountKeyPath: process.env.FCM_SERVICE_ACCOUNT_KEY_PATH,
+      projectId: process.env.FCM_PROJECT_ID,
+      debugToken: process.env.FCM_DEBUG_TOKEN,
     }),
   },
 })

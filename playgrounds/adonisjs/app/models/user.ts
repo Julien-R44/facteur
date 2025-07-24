@@ -40,6 +40,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
       transmit: { channel: `users/${this.id}` },
       mail: { email: this.email },
       twilio: { to: process.env.TWILIO_TO_DEBUG || '' },
+      fcm: { token: process.env.FCM_DEBUG_TOKEN || '' },
     }
   }
 }

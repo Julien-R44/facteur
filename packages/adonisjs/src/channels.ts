@@ -8,6 +8,7 @@ import { RuntimeException } from '@adonisjs/core/exceptions'
 import type { SlackOptions } from '@facteurjs/core/channels/slack/types'
 import type { TwilioConfig } from '@facteurjs/core/channels/twilio/types'
 import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
+import type { FcmConfig } from '@facteurjs/core/channels/fcm/types'
 
 import type { KyselyConfig } from './channels/database.js'
 
@@ -102,6 +103,17 @@ export const channels = {
       const mailer = await app.container.make('mail.manager')
 
       return mailChannel({ mailer })
+    })
+  },
+
+  /**
+   * Firebase Cloud Messaging channel
+   */
+  fcm(config: FcmConfig) {
+    return configProvider.create(async () => {
+      const { fcmChannel } = await import('@facteurjs/core/channels/fcm')
+
+      return fcmChannel(config)
     })
   },
 }

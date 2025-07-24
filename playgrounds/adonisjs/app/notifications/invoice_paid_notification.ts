@@ -6,6 +6,7 @@ import type { Identifier } from '@facteurjs/adonisjs/channels/database'
 import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
 import type { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
 import type { MessageCtx, NotificationOptions } from '@facteurjs/adonisjs/types'
+import { FcmMessage } from '@facteurjs/adonisjs/channels/fcm'
 
 import type User from '#models/user'
 import InvoicePaidMail from '#mails/invoice_paid_notification'
@@ -25,6 +26,7 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
       slack: false,
       discord: false,
       twilio: false,
+      fcm: true,
     },
   }
 
@@ -70,5 +72,16 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
       .setBotUsername('Facteur Bot')
       .setBotIconEmoji(':robot_face:')
       .setChannel('#general')
+  }
+
+  asFcmMessage(ctx: MessageCtx<User, InvoicePaidParams>): FcmMessage {
+    return FcmMessage.create()
+      .setTitle('Yo! Invoice Paid')
+      .setBody(`Your invoice of $${ctx.params.amount} has been successfully paid....`)
+      .setData({
+        type: 'invoice_paid',
+        amount: ctx.params.amount.toString(),
+        organization: this.#getOrganizationName(ctx.tenantId),
+      })
   }
 }

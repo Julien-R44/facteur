@@ -34,10 +34,7 @@ export default class PostLikedNotification extends Notification<User, { postId: 
   }
 
   asDatabaseMessage(): DatabaseMessage {
-    return DatabaseMessage.create()
-      .setContent('Post liked !')
-      .setType('post_liked')
-      .setTenantId(Math.floor(Math.random() * 2 + 1))
+    return DatabaseMessage.create().setContent('Post liked !').setType('post_liked')
   }
 
   asDiscordMessage() {

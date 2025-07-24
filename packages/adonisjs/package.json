@@ -18,6 +18,7 @@
     "./channels/transmit": "./src/channels/transmit.ts",
     "./channels/twilio": "./src/channels/twilio.ts",
     "./channels/mail": "./src/channels/mail.ts",
+    "./channels/fcm": "./src/channels/fcm.ts",
     "./facteur_provider": "./src/providers/facteur_provider.ts",
     "./package.json": "./package.json"
   },
