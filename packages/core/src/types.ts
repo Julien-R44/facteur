@@ -146,8 +146,11 @@ export abstract class Notification<
   }
 }
 
-export interface SendOptions<N extends Notifiable> {
-  notification: new (...args: any[]) => Notification<N>
-  notifiable: N
-  via?: ChannelSpecificConfig<N>
+export interface SendOptions<TNotification extends Notification<any, any>> {
+  notification: new (...args: any[]) => TNotification
+  notifiable: TNotification extends Notification<infer TNotifiable, any> ? TNotifiable : never
+  params?: TNotification extends Notification<any, infer P> ? P : never
+  via?: ChannelSpecificConfig<
+    TNotification extends Notification<infer TNotifiable, any> ? TNotifiable : never
+  >
 }

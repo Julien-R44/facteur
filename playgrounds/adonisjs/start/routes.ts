@@ -34,6 +34,7 @@ router.post('/send', async ({ request, response }) => {
   await facteur.send({
     notification: NotificationClass,
     notifiable: user,
+    params: { amount: 100 },
   })
 
   return response.ok({ message: 'Notification sent successfully' })

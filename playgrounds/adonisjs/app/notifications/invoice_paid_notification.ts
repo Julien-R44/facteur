@@ -11,7 +11,7 @@ interface InvoicePaidParams {
   amount: number
 }
 
-export default class InvoicePaidNotification extends Notification<User, { amount: number }> {
+export default class InvoicePaidNotification extends Notification<User, InvoicePaidParams> {
   static options: NotificationOptions<User> = {
     name: 'Invoice Paid',
     tags: ['Billing'],

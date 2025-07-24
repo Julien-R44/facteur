@@ -1,6 +1,7 @@
 import { capitalize } from '@julr/utils/string'
 
 import debug from './debug.js'
+import { FacteurFake } from './fake.js'
 import { FacteurOptions } from './options.js'
 import { FacteurDatabase } from './database/database.js'
 import type { DatabaseAdapter } from './database/types.js'
@@ -10,8 +11,8 @@ import type {
   Channel,
   SendOptions,
   ChannelName,
-  Notifiable,
   NotificationOptions,
+  Notification,
 } from './types.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
@@ -22,9 +23,10 @@ export class Facteur<
   KnownChannels extends Record<string, Channel>,
   DBAdapter extends DatabaseAdapter | null = null,
 > {
-  #options: FacteurOptions<KnownChannels, DBAdapter>
+  #fake: FacteurFake | null = null
   #db: FacteurDatabase | null = null
   #discoverer: NotificationDiscoverer
+  #options: FacteurOptions<KnownChannels, DBAdapter>
 
   constructor(config: FacteurConfiguration<KnownChannels, DBAdapter>) {
     this.#options = new FacteurOptions(config)
@@ -64,11 +66,23 @@ export class Facteur<
     return channel
   }
 
-  async send<N extends Notifiable>(options: SendOptions<N>) {
+  fake(): FacteurFake {
+    this.#fake = new FacteurFake()
+    return this.#fake
+  }
+
+  restore() {
+    this.#fake = null
+  }
+
+  async send<N extends Notification>(options: SendOptions<N>) {
+    if (this.#fake) return this.#fake.recordSent(options)
+
     const { notifiable, via: sendTimeChannelConfig } = options
 
     const notification = new options.notification()
-    const notificationOptions = (notification.constructor as any).options as NotificationOptions<N>
+    const notificationOptions = (notification.constructor as any)
+      .options as NotificationOptions<any>
 
     // Get channels from static deliverBy configuration
     const activeChannels = new Set<ChannelName>()
@@ -80,7 +94,7 @@ export class Facteur<
       }
 
       if (config && typeof config === 'object' && 'if' in config) {
-        const configWithIf = config as { if: (options: { notifiable: N }) => boolean }
+        const configWithIf = config as { if: (options: { notifiable: any }) => boolean }
         if (configWithIf.if({ notifiable })) activeChannels.add(channel)
       }
     }
