@@ -1,0 +1,25 @@
+{
+  "name": "@facteurjs/client",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Core package for facteur",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "license": "ISC",
+  "keywords": [],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsdown",
+    "stub": "tsdown",
+    "test": "tsx tests/index.ts",
+    "typecheck": "tsc --noEmit",
+    "quick:test": "tsx tests/index.ts"
+  },
+  "dependencies": {
+    "ky": "^1.8.2"
+  }
+}
