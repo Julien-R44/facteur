@@ -55,7 +55,10 @@ export class DatabaseChannel
 }
 
 declare module '@facteurjs/core/types' {
-  interface Notification {
-    asDatabaseMessage(): DatabaseMessage
+  interface Notification<
+    N extends Notifiable = Notifiable,
+    Params extends Record<string, any> = any,
+  > {
+    asDatabaseMessage(ctx: MessageCtx<N, Params>): DatabaseMessage
   }
 }

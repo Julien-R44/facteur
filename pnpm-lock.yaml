@@ -168,6 +168,12 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
 
+  packages/client:
+    dependencies:
+      ky:
+        specifier: ^1.8.2
+        version: 1.8.2
+
   packages/core:
     dependencies:
       '@julr/utils':
@@ -237,6 +243,9 @@ importers:
       '@facteurjs/adonisjs':
         specifier: workspace:*
         version: link:../../packages/adonisjs
+      '@facteurjs/client':
+        specifier: workspace:*
+        version: link:../../packages/client
       '@inertiajs/react':
         specifier: ^2.0.17
         version: 2.0.17(react@19.1.0)

@@ -1,55 +1,43 @@
 import { Head } from '@inertiajs/react'
-import { useQuery } from '@tanstack/react-query'
+import NotificationCenter from '../components/NotificationCenter'
+import TestNotification from '~/components/TestNotification'
 
 export default function Home() {
-  const { data } = useQuery({
-    queryKey: ['notifications', 'notifiable', 1],
-    queryFn: async () => {
-      const result = await fetch('/notifications/notifiable/1/notifications', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      })
-
-      return await result.json()
-    },
-  })
-
-  const { data: preferences } = useQuery({
-    queryKey: ['notifications', 'notifiable', 1, 'preferences'],
-    queryFn: async () => {
-      const result = await fetch('/notifications/notifiable/1/preferences', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      })
-
-      return await result.json()
-    },
-  })
-
-  // const { mutate }
-
-  console.log(preferences)
-
   return (
     <>
-      <Head title="Homepage" />
+      <Head title="Facteur Notification System" />
 
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <div className="min-h-screen relative bg-gray-50">
+        <header className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center gap-4">
+                <h1 className="text-2xl font-bold text-gray-900">Facteur</h1>
+                <p className="text-gray-600"></p>
+              </div>
 
-      <h2 className="text-2xl font-semibold mt-4">Notifications</h2>
-      <ul className="list-disc pl-5">
-        {data?.map((notification: any) => (
-          <li key={notification.id} className="mt-2">
-            {JSON.stringify(notification, null, 2)}
-          </li>
-        ))}
-      </ul>
+              <div className="flex items-center gap-4">
+                <NotificationCenter userId="1" />
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="py-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Facteur</h2>
+                <p className="text-lg text-gray-600 mb-8">
+                  A flexible notification system for NodeJS
+                </p>
+              </div>
+            </div>
+
+            <TestNotification />
+          </div>
+        </main>
+      </div>
     </>
   )
 }

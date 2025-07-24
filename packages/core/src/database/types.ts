@@ -18,7 +18,7 @@ export interface GetNotificationsParams {
   tenantId?: Identifier
   page?: number
   limit?: number
-  type?: NotificationStatus
+  status?: NotificationStatus
 }
 
 export interface Notification {

@@ -14,7 +14,7 @@ export const getNotificationRoute = defineRoute(({ facteur }) => ({
       tenantId: request.query.tenantId,
       page: request.query.page,
       limit: request.query.limit,
-      type: request.query.type,
+      status: request.query.status,
     })
 
     return { status: 200, body: notifications || [] }

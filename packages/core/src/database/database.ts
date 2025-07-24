@@ -23,6 +23,7 @@ export class FacteurDatabase {
     return this.options.databaseAdapter?.getNotifications({
       page,
       limit,
+      status: options.status,
       tenantId: options.tenantId,
       notifiableId: options.notifiableId,
     })

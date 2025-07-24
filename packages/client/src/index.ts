@@ -26,7 +26,7 @@ export interface Notification {
   tags?: string[]
   readAt?: string
   seenAt?: string
-  createdAt?: string
+  createdAt: string
   updatedAt?: string
 }
 

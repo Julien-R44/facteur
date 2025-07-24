@@ -1,11 +1,15 @@
 import User from '#models/user'
-import { Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
+import { MessageCtx, Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
 import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
 import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
 import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
 import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
 import { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
 import InvoicePaidMail from '#mails/invoice_paid_notification'
+
+interface InvoicePaidParams {
+  amount: number
+}
 
 export default class InvoicePaidNotification extends Notification<User, { amount: number }> {
   static options: NotificationOptions<User> = {
@@ -26,8 +30,12 @@ export default class InvoicePaidNotification extends Notification<User, { amount
     })
   }
 
-  asDatabaseMessage(): DatabaseMessage {
-    return DatabaseMessage.create().setContent('Invoice paid').setType('invoice_paid')
+  asDatabaseMessage({ notifiable }: MessageCtx<User, InvoicePaidParams>): DatabaseMessage {
+    console.log('notifiable:', notifiable)
+    return DatabaseMessage.create()
+      .setContent('Invoice paid')
+      .setType('invoice_paid')
+      .setTenantId(Math.floor(Math.random() * 2 + 1))
   }
 
   asDiscordMessage() {

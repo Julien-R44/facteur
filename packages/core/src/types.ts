@@ -127,6 +127,14 @@ export interface NotificationOptions<N extends Notifiable = Notifiable> {
   deliverBy: Record<ChannelName, boolean | { if: (options: { notifiable: N }) => boolean }>
 }
 
+export interface MessageCtx<
+  N extends Notifiable = Notifiable,
+  Params extends Record<string, any> = {},
+> {
+  notifiable: N
+  params: Params
+}
+
 export abstract class Notification<
   N extends Notifiable = Notifiable,
   Params extends Record<string, any> = {},
