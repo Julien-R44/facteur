@@ -6,6 +6,7 @@
 import { configProvider } from '@adonisjs/core'
 import { RuntimeException } from '@adonisjs/core/exceptions'
 import type { SlackOptions } from '@facteurjs/core/channels/slack/types'
+import type { TwilioConfig } from '@facteurjs/core/channels/twilio/types'
 import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
 
 import type { KyselyConfig } from './channels/database.js'
@@ -67,6 +68,16 @@ export const channels = {
       const { kyselyAdapter } = await import('@facteurjs/core/database/adapters/kysely')
 
       return databaseChannel({ adapter: kyselyAdapter({ connection: config.connection }) })
+    })
+  },
+
+  /**
+   * Twilio SMS Channel
+   */
+  twilio(config: TwilioConfig) {
+    return configProvider.create(async () => {
+      const { twilioChannel } = await import('@facteurjs/core/channels/twilio')
+      return twilioChannel(config)
     })
   },
 

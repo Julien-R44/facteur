@@ -39,6 +39,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
       slack: { default: true },
       transmit: { channel: `users/${this.id}` },
       mail: { email: this.email },
+      twilio: { to: process.env.TWILIO_TO_DEBUG || '' },
     }
   }
 }

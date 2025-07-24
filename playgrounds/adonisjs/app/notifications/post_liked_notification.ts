@@ -1,8 +1,9 @@
 import User from '#models/user'
-import { MessageCtx, Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
+import { Notification, NotificationOptions } from '@facteurjs/adonisjs/types'
 import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
 import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
 import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
+import { TwilioMessage } from '@facteurjs/adonisjs'
 
 export default class PostLikedNotification extends Notification<User, { postId: number }> {
   static options: NotificationOptions<User> = {
@@ -14,6 +15,7 @@ export default class PostLikedNotification extends Notification<User, { postId: 
       discord: true,
       slack: false,
       mail: false,
+      twilio: true,
     },
   }
 
@@ -25,7 +27,11 @@ export default class PostLikedNotification extends Notification<User, { postId: 
     })
   }
 
-  asDatabaseMessage({ notifiable }: MessageCtx<User>): DatabaseMessage {
+  asTwilioMessage(): TwilioMessage {
+    return TwilioMessage.create().setBody('Post liked on localhost:3333')
+  }
+
+  asDatabaseMessage(): DatabaseMessage {
     return DatabaseMessage.create()
       .setContent('Post liked !')
       .setType('post_liked')
