@@ -11,7 +11,7 @@
   "scripts": {
     "typecheck": "pnpm run -r --parallel typecheck",
     "build": "pnpm run -r build",
-    "lint": "eslint .",
+    "lint": "oxlint",
     "stub": "pnpm -r --parallel run stub",
     "test": "FORCE_COLOR=1 pnpm -r --parallel run test",
     "checks": "pnpm lint && pnpm typecheck"
@@ -26,7 +26,8 @@
     "@japa/runner": "^4.3.0",
     "@julr/tooling-configs": "^4.0.0",
     "@poppinss/utils": "^6.10.0",
-    "eslint": "^9.31.0",
+    "@prettier/plugin-oxc": "^0.0.4",
+    "oxlint": "^1.8.0",
     "prettier": "^3.6.2",
     "tsdown": "^0.13.0",
     "typescript": "^5.9.0-beta"
