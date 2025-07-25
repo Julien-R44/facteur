@@ -3,6 +3,7 @@ import { AssertionError } from 'node:assert'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../src/types.js'
 
 class TestProvider implements Channel<any, any, any, any> {
+  name = 'test' as const;
   [kTargetSymbol] = null as any
   #sent: Array<ChannelSendParams<any, any>> = []
   #queued: Array<ChannelSendParams<any, any>> = []

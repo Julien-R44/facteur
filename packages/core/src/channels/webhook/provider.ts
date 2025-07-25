@@ -17,6 +17,7 @@ export function webhookChannel<Options extends WebhookOptions<any>>(
 export class WebhookChannel<T extends WebhookOptions<any>>
   implements Channel<T, WebhookMessage, any, WebhookTargets<T>>
 {
+  name = 'webhook' as const;
   [kTargetSymbol] = null as any as WebhookTargets<T>
   #webhooksUrls: Map<string, URL> = new Map()
   #name: string

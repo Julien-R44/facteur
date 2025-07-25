@@ -13,7 +13,7 @@ export class SlackWebhookChannel<T extends SlackOptions<any>>
   extends WebhookChannel<T>
   implements Channel<T, SlackMessage, SlackResponse, SlackTargets<T>>
 {
-  name = 'slack' as const
+  override name = 'slack' as any
 }
 
 declare module '@facteurjs/core/types' {

@@ -1,4 +1,4 @@
-import type { HTTPErrorInfo } from '@facteurjs/core'
+import type { HTTPErrorInfo } from '../../errors/http_error.js'
 
 /**
  * Exception thrown when a webhook request fails

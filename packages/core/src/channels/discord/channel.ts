@@ -13,7 +13,7 @@ class DiscordProvider<T extends WebhookOptions<any>>
   extends WebhookChannel<T>
   implements Channel<T, DiscordMessage, DiscordResponse, WebhookTargets<T>>
 {
-  name = 'discord' as const
+  override name = 'discord' as any
 }
 
 declare module '@facteurjs/core/types' {
