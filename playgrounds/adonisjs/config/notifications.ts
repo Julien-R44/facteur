@@ -29,6 +29,33 @@ const config = defineConfig({
       debugToken: process.env.FCM_DEBUG_TOKEN,
     }),
   },
+
+  preferences: {
+    global: {
+      channels: {
+        fcm: true,
+        database: true,
+        transmit: true,
+        mail: true,
+        slack: true,
+        discord: true,
+        twilio: true,
+      },
+    },
+
+    categories: {
+      billing: false,
+      marketing: {
+        channels: {
+          mail: true,
+          slack: true,
+          twilio: true,
+          fcm: false,
+          discord: false,
+        },
+      },
+    },
+  },
 })
 
 export default config

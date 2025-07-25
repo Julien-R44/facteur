@@ -10,6 +10,7 @@ import { FcmMessage } from '@facteurjs/adonisjs/channels/fcm'
 
 import type User from '#models/user'
 import InvoicePaidMail from '#mails/invoice_paid_notification'
+import { TwilioMessage } from '@facteurjs/adonisjs/channels/twilio'
 
 interface InvoicePaidParams {
   amount: number
@@ -18,7 +19,7 @@ interface InvoicePaidParams {
 export default class InvoicePaidNotification extends Notification<User, InvoicePaidParams> {
   static options: NotificationOptions<User> = {
     name: 'Invoice Paid',
-    tags: ['Billing'],
+    category: 'billing',
     deliverBy: {
       database: true,
       transmit: true,
@@ -26,7 +27,7 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
       slack: false,
       discord: false,
       twilio: false,
-      fcm: true,
+      fcm: false,
     },
   }
 
@@ -72,6 +73,10 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
       .setBotUsername('Facteur Bot')
       .setBotIconEmoji(':robot_face:')
       .setChannel('#general')
+  }
+
+  asTwilioMessage(): TwilioMessage {
+    return TwilioMessage.create().setBody('Post liked!!')
   }
 
   asFcmMessage(ctx: MessageCtx<User, InvoicePaidParams>): FcmMessage {

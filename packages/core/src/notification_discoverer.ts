@@ -2,7 +2,6 @@ import { fileURLToPath } from 'node:url'
 import { Notification } from '@facteurjs/core/types'
 import { fsReadAll, isScriptFile } from '@poppinss/utils'
 
-import { group } from './helpers.js'
 import { DuplicateNotificationException } from './errors/duplicate_notification_exception.js'
 
 export interface NotificationDiscovererConfig {
@@ -79,7 +78,7 @@ export class NotificationDiscoverer {
   #validateUniqueNotificationNames(
     notifications: { notification: new (...args: any[]) => any; file: URL | string }[],
   ) {
-    const notificationsByName = group(notifications, (i) => i.notification.name)
+    const notificationsByName = Object.groupBy(notifications, (i) => i.notification.name)
     const duplicates = Object.entries(notificationsByName)
       .filter(([_, notifications]) => (notifications?.length || 0) > 1)
       .map(([notificationName, notifications]) => ({ notificationName, notifications }))
@@ -127,11 +126,18 @@ export class NotificationDiscoverer {
   /**
    * Get notification identities with both display name and class identifier
    */
-  async getNotificationIdentities(): Promise<Array<{ name: string; identifier: string }>> {
+  async getNotificationIdentities(): Promise<
+    Array<{ name: string; identifier: string; tags?: string[]; category?: string }>
+  > {
     const notifications = await this.getNotifications()
     return notifications.map((NotificationClass) => {
       const options = (NotificationClass as any).options || {}
-      return { name: options.name, identifier: NotificationClass.name }
+      return {
+        name: options.name,
+        identifier: NotificationClass.name || options.identifier,
+        tags: options.tags || [],
+        category: options.category,
+      }
     })
   }
 

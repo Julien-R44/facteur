@@ -51,6 +51,9 @@ importers:
       tsdown:
         specifier: ^0.13.0
         version: 0.13.0(typescript@5.9.0-dev.20250722)
+      tsx:
+        specifier: ^4.20.3
+        version: 4.20.3
       typescript:
         specifier: ^5.9.0-beta
         version: 5.9.0-dev.20250722
@@ -84,7 +87,7 @@ importers:
         version: 1.4.1
       '@adonisjs/vite':
         specifier: ^5.0.0-next.0
-        version: 5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(edge.js@6.2.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))
+        version: 5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(edge.js@6.2.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))
       '@alpinejs/persist':
         specifier: ^3.14.9
         version: 3.14.9
@@ -138,7 +141,7 @@ importers:
         version: 3.11.0
       vite:
         specifier: ^7.0.5
-        version: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)
+        version: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3)
 
   packages/adonisjs:
     dependencies:
@@ -224,7 +227,7 @@ importers:
         version: 2.2.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))
       '@adonisjs/inertia':
         specifier: ^4.0.0-next.0
-        version: 4.0.0-next.0(2e609c28ad73009d0dfdb37317ce586c)
+        version: 4.0.0-next.0(4f97cca82d0e22878bb3c52358cc1532)
       '@adonisjs/lucid':
         specifier: ^21.8.0
         version: 21.8.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@vinejs/vine@3.0.1)(better-sqlite3@12.2.0)(luxon@3.7.1)
@@ -248,7 +251,7 @@ importers:
         version: 1.0.0
       '@adonisjs/vite':
         specifier: ^5.0.0-next.0
-        version: 5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(edge.js@6.3.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))
+        version: 5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(edge.js@6.3.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))
       '@facteurjs/adonisjs':
         specifier: workspace:*
         version: link:../../packages/adonisjs
@@ -272,7 +275,7 @@ importers:
         version: 3.0.1
       '@vitejs/plugin-react':
         specifier: ^4.7.0
-        version: 4.7.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))
+        version: 4.7.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))
       better-sqlite3:
         specifier: ^12.2.0
         version: 12.2.0
@@ -339,7 +342,7 @@ importers:
         version: 10.9.5(@swc/core@1.10.16)(@types/node@24.1.0)(typescript@5.9.0-dev.20250722)
       vite:
         specifier: ^7.0.5
-        version: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)
+        version: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3)
 
 packages:
 
@@ -5334,6 +5337,11 @@ packages:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
 
+  tsx@4.20.3:
+    resolution: {integrity: sha512-qjbnuR9Tr+FJOMBqJCW5ehvIo/buZq7vH7qD7JziU98h6l3qGy0a/yPFjwO+y0/T7GFpNgNAvEcPPVfyT8rrPQ==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
   tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
 
@@ -5932,11 +5940,11 @@ snapshots:
       vary: 1.1.2
       youch: 3.3.4
 
-  '@adonisjs/inertia@4.0.0-next.0(2e609c28ad73009d0dfdb37317ce586c)':
+  '@adonisjs/inertia@4.0.0-next.0(4f97cca82d0e22878bb3c52358cc1532)':
     dependencies:
       '@adonisjs/core': 6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)
       '@adonisjs/session': 7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0)
-      '@adonisjs/vite': 5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(edge.js@6.3.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))
+      '@adonisjs/vite': 5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(edge.js@6.3.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))
       '@poppinss/utils': 6.10.0
       '@tuyau/utils': 0.0.9
       edge-error: 4.0.2
@@ -6112,24 +6120,24 @@ snapshots:
 
   '@adonisjs/tsconfig@1.4.1': {}
 
-  '@adonisjs/vite@5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(edge.js@6.2.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))':
+  '@adonisjs/vite@5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(edge.js@6.2.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))':
     dependencies:
       '@adonisjs/core': 6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0)
       '@poppinss/utils': 6.10.0
       edge-error: 4.0.2
-      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)
-      vite-plugin-restart: 1.0.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))
+      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3)
+      vite-plugin-restart: 1.0.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))
     optionalDependencies:
       '@adonisjs/shield': 8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.2.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.2.0)
       edge.js: 6.2.0
 
-  '@adonisjs/vite@5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(edge.js@6.3.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))':
+  '@adonisjs/vite@5.0.0-next.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/shield@8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(edge.js@6.3.0)(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))':
     dependencies:
       '@adonisjs/core': 6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)
       '@poppinss/utils': 6.10.0
       edge-error: 4.0.2
-      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)
-      vite-plugin-restart: 1.0.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))
+      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3)
+      vite-plugin-restart: 1.0.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))
     optionalDependencies:
       '@adonisjs/shield': 8.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/session@7.5.1(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0))(@adonisjs/redis@9.2.0(@adonisjs/core@6.19.0(@adonisjs/assembler@7.8.2(typescript@5.9.0-dev.20250722))(@vinejs/vine@3.0.1)(edge.js@6.3.0)))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0))(@japa/api-client@3.1.0(@japa/assert@4.1.0(@japa/runner@4.3.0))(@japa/runner@4.3.0))(edge.js@6.3.0)
       edge.js: 6.3.0
@@ -8005,7 +8013,7 @@ snapshots:
       normalize-url: 8.0.1
       validator: 13.15.0
 
-  '@vitejs/plugin-react@4.7.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2))':
+  '@vitejs/plugin-react@4.7.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3))':
     dependencies:
       '@babel/core': 7.28.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.0)
@@ -8013,7 +8021,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)
+      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3)
     transitivePeerDependencies:
       - supports-color
 
@@ -11363,6 +11371,13 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
+  tsx@4.20.3:
+    dependencies:
+      esbuild: 0.25.0
+      get-tsconfig: 4.10.1
+    optionalDependencies:
+      fsevents: 2.3.3
+
   tunnel-agent@0.6.0:
     dependencies:
       safe-buffer: 5.2.1
@@ -11562,12 +11577,12 @@ snapshots:
       unist-util-stringify-position: 3.0.3
       vfile-message: 3.1.4
 
-  vite-plugin-restart@1.0.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)):
+  vite-plugin-restart@1.0.0(vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3)):
     dependencies:
       micromatch: 4.0.8
-      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)
+      vite: 7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3)
 
-  vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2):
+  vite@7.0.5(@types/node@24.1.0)(jiti@2.4.2)(tsx@4.20.3):
     dependencies:
       esbuild: 0.25.0
       fdir: 6.4.6(picomatch@4.0.2)
@@ -11579,6 +11594,7 @@ snapshots:
       '@types/node': 24.1.0
       fsevents: 2.3.3
       jiti: 2.4.2
+      tsx: 4.20.3
 
   vscode-oniguruma@1.7.0: {}
 

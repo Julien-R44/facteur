@@ -45,20 +45,17 @@ export class FacteurDatabase {
   }
 
   async #createEmptyPreferences(tenantId?: string | number): Promise<Preferences> {
-    const initialChannels: Record<string, boolean> = {}
-    for (const channelName of Object.keys(this.options.channels)) {
-      initialChannels[channelName] = true
-    }
+    const globalChannels = this.options.defaultPreferences.global.channels
 
     const notificationIdentities = await this.discoverer.getNotificationIdentities()
     const notificationPreferences = notificationIdentities.map((identity) => ({
       notification: { name: identity.name, identifier: identity.identifier },
-      channels: { ...initialChannels },
+      channels: { ...globalChannels },
     }))
 
     const preferences: Preferences = {
       global: {
-        global: { channels: { ...initialChannels } },
+        global: { channels: { ...globalChannels } },
         notifications: [...notificationPreferences],
       },
     }
@@ -66,7 +63,7 @@ export class FacteurDatabase {
     if (tenantId) {
       preferences.tenants = {
         [tenantId]: {
-          global: { channels: { ...initialChannels } },
+          global: { channels: { ...globalChannels } },
           notifications: [...notificationPreferences],
         },
       }

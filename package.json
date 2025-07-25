@@ -30,6 +30,7 @@
     "oxlint": "^1.8.0",
     "prettier": "^3.6.2",
     "tsdown": "^0.13.0",
+    "tsx": "^4.20.3",
     "typescript": "^5.9.0-beta"
   },
   "prettier": "@julr/tooling-configs/prettier",

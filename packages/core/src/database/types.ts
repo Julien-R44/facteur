@@ -108,7 +108,7 @@ export interface NotificationsPreferences {
    * Per-notification preferences
    */
   notifications: Array<{
-    notification: { name: string; identifier: string }
+    notification: { name?: string; identifier: string }
     channels: Record<ChannelName, boolean>
   }>
 }

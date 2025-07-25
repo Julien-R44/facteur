@@ -29,6 +29,22 @@ export interface FacteurConfiguration<
     searchDirectory: URL
     fileSuffix?: string
   }
+  preferences?: DefaultPreferences<KnownChannels>
+}
+
+export interface DefaultPreferences<KnownChannels extends Record<string, Channel>> {
+  enabled?: boolean
+  global?: { channels?: Record<keyof KnownChannels, boolean> }
+  categories?: Record<
+    string,
+    { channels?: Partial<Record<keyof KnownChannels, boolean>> } | boolean
+  >
+}
+
+export interface ResolvedDefaultPreferences<KnownChannels extends Record<string, Channel>> {
+  enabled: boolean
+  global: { channels: Record<keyof KnownChannels, boolean> }
+  categories: Record<string, { channels: Record<keyof KnownChannels, boolean> }>
 }
 
 export type ChannelSendParams<Message, Targets> = {
@@ -39,33 +55,10 @@ export type ChannelSendParams<Message, Targets> = {
 }
 
 export const kTargetSymbol = Symbol('facteur:targets')
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export interface Channel<_Options = any, Message = any, Response = any, Targets = any> {
   [kTargetSymbol]: Targets
   name: string
   send: (options: ChannelSendParams<Message, Targets>) => Awaitable<Response>
-}
-
-type KeyOf<T> = Extract<keyof T, string>
-
-export type CreateMessageParams<
-  Notifiable,
-  KnownChannels extends Record<string, Channel>,
-  Params,
-> = {
-  name: string
-  via?: (options: { notifiable: Notifiable }) => Arrayable<keyof KnownChannels>
-} & ChannelsToFunction<KnownChannels, Notifiable, Params>
-
-export type ChannelsToFunction<
-  KnownChannels extends Record<string, Channel>,
-  Notifiable,
-  Params,
-> = {
-  [K in KeyOf<KnownChannels> as `to${Capitalize<K>}`]?: (options: {
-    notifiable: Notifiable
-    params: Params
-  }) => Parameters<KnownChannels[K]['send']>[0]['message']
 }
 
 /**
@@ -79,17 +72,11 @@ export interface Emitter {
   emit: (event: string, ...values: any[]) => void
 }
 
-export type ViaResult = Arrayable<keyof NotificationChannels>
-
 export type ChannelName = keyof NotificationChannels
 
 export type ProviderTarget<_N extends Notifiable, K extends ChannelName> = ExtractChannelTargets<
   NotificationChannels[K]
 >
-
-export type ChannelSpecificConfig<N extends Notifiable> = {
-  [K in ChannelName]?: boolean | ProviderTarget<N, K>
-}
 
 export interface Notifiable {
   notificationTargets?(): NotifiableTargets
@@ -106,7 +93,11 @@ export type InferChannelsFromConfig<T> =
 export interface NotificationChannels {}
 
 export interface DeliverByOptions<N extends Notifiable = Notifiable> {
-  if: (options: { notifiable: N }) => boolean
+  if: (options: {
+    notifiable: N
+    params?: any
+    preferences?: Record<string, boolean | undefined>
+  }) => boolean
 }
 
 export interface NotificationOptions<N extends Notifiable = Notifiable> {
@@ -115,6 +106,14 @@ export interface NotificationOptions<N extends Notifiable = Notifiable> {
    * Used for UI purpose
    */
   name: string
+
+  /**
+   * A unique identifier for the notification.
+   * Used to identify the notification in the database and preferences.
+   *
+   * By default it is the class name
+   */
+  identifier?: string
 
   /**
    * Bypass preferences and send the notification regardless of user settings.
@@ -126,6 +125,11 @@ export interface NotificationOptions<N extends Notifiable = Notifiable> {
    * Human readable tags. Also used for UI purpose
    */
   tags?: string[]
+
+  /**
+   * Channel category
+   */
+  category?: string
 
   /**
    * Channels to deliver the notification by.
@@ -155,12 +159,21 @@ export abstract class Notification<
   }
 }
 
-export interface SendOptions<TNotification extends Notification<any, any>> {
+export type ChannelSpecificConfig<N extends Notifiable> = N extends never
+  ? {
+      [K in ChannelName]?: ProviderTarget<never, K>
+    }
+  : {
+      [K in ChannelName]?: boolean | ProviderTarget<N, K>
+    }
+
+export interface SendOptions<
+  TNotifiable extends Notifiable,
+  TNotification extends Notification<TNotifiable, any>,
+> {
   notification: new (...args: any[]) => TNotification
-  notifiable: TNotification extends Notification<infer TNotifiable, any> ? TNotifiable : never
+  notifiable?: TNotifiable
   params?: TNotification extends Notification<any, infer P> ? P : never
-  via?: ChannelSpecificConfig<
-    TNotification extends Notification<infer TNotifiable, any> ? TNotifiable : never
-  >
+  via?: ChannelSpecificConfig<TNotifiable>
   tenantId?: Identifier
 }

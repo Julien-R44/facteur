@@ -1,6 +1,8 @@
 import { AssertionError } from 'node:assert'
 
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../src/types.js'
+import { FacteurDatabase } from '../../src/database/database.js'
+import type { GetPreferencesParams, Preferences } from '../../src/database/types.js'
 
 class TestProvider implements Channel<any, any, any, any> {
   name = 'test' as const;
@@ -59,4 +61,26 @@ class TestProvider implements Channel<any, any, any, any> {
 
 export function testProvider() {
   return new TestProvider()
+}
+
+export class FakeDatabase extends FacteurDatabase {
+  constructor(protected preferences?: Preferences) {
+    super(null as any, null as any)
+  }
+
+  override async getPreferences(_options: GetPreferencesParams): Promise<Preferences> {
+    if (this.preferences) return this.preferences
+
+    return {
+      global: {
+        notifications: [],
+        global: {
+          channels: {
+            email: true,
+            sms: true,
+          },
+        },
+      },
+    }
+  }
 }

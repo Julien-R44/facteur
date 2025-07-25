@@ -74,6 +74,6 @@ declare module '@facteurjs/core/types' {
     N extends Notifiable = Notifiable,
     Params extends Record<string, any> = any,
   > {
-    toFcmMessage(ctx: MessageCtx<N, Params>): FcmMessage
+    asFcmMessage(ctx: MessageCtx<N, Params>): FcmMessage
   }
 }
