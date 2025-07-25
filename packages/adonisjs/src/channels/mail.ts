@@ -3,6 +3,7 @@ import { Message, BaseMail } from '@adonisjs/mail'
 import type { MailService } from '@adonisjs/mail/types'
 
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types.js'
+import { errors } from '@facteurjs/core'
 
 export interface MailConfig {
   mailer: MailService
@@ -31,13 +32,10 @@ export class MailChannel implements Channel<MailConfig, PossibleMailMessage, any
   constructor(private config: MailConfig) {}
 
   async send(options: ChannelSendParams<PossibleMailMessage, MailTargets>) {
-    const targets = invoke<MailTargets>(() => {
-      if (options.notifiable?.[`notificationTargetForMail`]) {
-        return options.notifiable.notificationTargetForMail()
-      }
-
-      return options.targets
-    })
+    const targets = options.targets
+    if (!targets || !targets.email) {
+      throw new errors.E_UNAVAILABLE_TARGETS(['Mail'])
+    }
 
     if (options.message instanceof BaseMail) {
       options.message.message.to(targets.email)

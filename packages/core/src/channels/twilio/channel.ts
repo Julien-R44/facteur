@@ -1,9 +1,9 @@
 import Twilio from 'twilio'
-import { invoke } from '@julr/utils/functions'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { TwilioMessage } from './message.js'
 import type { TwilioConfig, TwilioTargets } from './types.js'
+import { errors } from '../../errors/index.js'
 
 export function twilioChannel(config: TwilioConfig) {
   return new TwilioChannel(config)
@@ -56,23 +56,9 @@ export class TwilioChannel implements Channel<TwilioConfig, TwilioMessage, any, 
   }
 
   #resolveTargets(options: ChannelSendParams<TwilioMessage, TwilioTargets>): TwilioTargets {
-    return invoke<TwilioTargets>(() => {
-      if (options.notifiable?.notificationTargetForTwilio) {
-        return options.notifiable.notificationTargetForTwilio()
-      }
+    if (options.targets) return options.targets
 
-      if (options.notifiable?.phoneNumber) {
-        return { to: options.notifiable.phoneNumber }
-      }
-
-      if (options.targets) {
-        return options.targets
-      }
-
-      throw new Error(
-        'Unable to determine Twilio targets. Provide targets or implement notificationTargetForTwilio() method.',
-      )
-    })
+    throw new errors.E_UNAVAILABLE_TARGETS(['Twilio'])
   }
 
   #resolveFrom(message: TwilioMessage, targets: TwilioTargets): string | undefined {

@@ -1,8 +1,8 @@
-import { invoke } from '@julr/utils/functions'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { DatabaseMessage } from './message.js'
 import type { DatabaseAdapter, DatabaseConfig, Identifier } from './types.js'
+import { errors } from '../errors/index.js'
 
 export { DatabaseMessage } from './message.js'
 
@@ -27,28 +27,18 @@ export class DatabaseChannel
     this.#adapter.setTableName(config.tableName || 'notifications')
   }
 
+  #resolveTargets(options: ChannelSendParams<DatabaseMessage, DatabaseTargets>): DatabaseTargets {
+    if (options.targets) return options.targets
+
+    throw new errors.E_UNAVAILABLE_TARGETS(['DATABASE'])
+  }
+
   async send(options: ChannelSendParams<DatabaseMessage, DatabaseTargets>) {
     const message = options.message.serialize()
+    const targets = this.#resolveTargets(options)
 
-    const notifiableId = invoke(() => {
-      if (message.notifiableId) return message.notifiableId
-
-      if (options.notifiable?.[`notificationTargetForDatabase`]) {
-        return options.notifiable.notificationTargetForDatabase().notifiableId
-      }
-
-      return options.targets?.notifiableId || options.notifiable.id
-    })
-
-    const tenantId = invoke(() => {
-      if (message.tenantId) return message.tenantId
-
-      if (options.notifiable?.[`notificationTargetForDatabase`]) {
-        return options.notifiable.notificationTargetForDatabase().tenantId
-      }
-
-      return options.targets?.tenantId || options.tenantId
-    })
+    const notifiableId = message.notifiableId || targets.notifiableId
+    const tenantId = message.tenantId || targets.tenantId
 
     if (!notifiableId) throw new Error('No notifiableId provided')
 

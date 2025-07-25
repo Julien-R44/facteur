@@ -1,12 +1,11 @@
 import ky, { HTTPError } from 'ky'
-import { invoke } from '@julr/utils/functions'
-import { capitalize } from '@julr/utils/string'
 
 import type { WebhookMessage } from './message.js'
 import { WebhookRequestException } from './exceptions.js'
 import { HTTPErrorExtractor } from '../../errors/http_error.js'
 import type { WebhookOptions, WebhookTargets } from './types.js'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types.js'
+import { errors } from '../../errors/index.js'
 
 export function webhookChannel<Options extends WebhookOptions<any>>(
   options: Options & { name: string },
@@ -74,16 +73,17 @@ export class WebhookChannel<T extends WebhookOptions<any>>
       .filter(Boolean)
   }
 
+  #resolveTargets(
+    options: ChannelSendParams<WebhookMessage, WebhookTargets<T>>,
+  ): WebhookTargets<T> {
+    if (options.targets) return options.targets
+
+    throw new errors.E_UNAVAILABLE_TARGETS([this.#name])
+  }
+
   async send(params: ChannelSendParams<WebhookMessage, WebhookTargets<T>>) {
-    const { notifiable, message } = params
-
-    const targets = invoke<WebhookTargets<any>>(() => {
-      if (notifiable?.[`notificationTargetFor${capitalize(this.#name)}`]) {
-        return notifiable[`notificationTargetFor${capitalize(this.#name)}`]()
-      }
-
-      return params.targets
-    })
+    const { message } = params
+    const targets = this.#resolveTargets(params)
 
     const normalizedTargets = this.#normalizeTargets(targets)
     for (const url of normalizedTargets) {

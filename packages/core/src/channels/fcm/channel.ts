@@ -1,10 +1,10 @@
-import { invoke } from '@julr/utils/functions'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 import type { FcmMessage } from './message.js'
 import type { FcmConfig, FcmTargets } from './types.js'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getMessaging, Messaging } from 'firebase-admin/messaging'
+import { errors } from '../../errors/index.js'
 
 export function fcmChannel(config: FcmConfig) {
   return new FcmChannel(config)
@@ -24,19 +24,9 @@ export class FcmChannel implements Channel<FcmConfig, FcmMessage, any, FcmTarget
   }
 
   #resolveTargets(options: ChannelSendParams<FcmMessage, FcmTargets>): FcmTargets {
-    return invoke<FcmTargets>(() => {
-      if (options.notifiable?.notificationTargetForFcm) {
-        return options.notifiable.notificationTargetForFcm()
-      }
+    if (options.targets) return options.targets
 
-      if (options.notifiable?.fcmToken) return { token: options.notifiable.fcmToken }
-
-      if (options.targets) return options.targets
-
-      throw new Error(
-        'Unable to determine FCM targets. Provide targets or implement notificationTargetForFcm() method.',
-      )
-    })
+    throw new errors.E_UNAVAILABLE_TARGETS(['FCM'])
   }
 
   #handleError(error: any): never {
