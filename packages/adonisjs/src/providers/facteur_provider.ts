@@ -35,6 +35,7 @@ export default class NotificationsProvider {
           databaseAdapter: dbAdapter ?? null,
           emitter: emitter as any,
           discoverer: { searchDirectory: new URL('./app', this.app.appRoot) },
+          notificationResolver: (notification) => this.app.container.make(notification),
         },
         router,
       )

@@ -10,6 +10,7 @@ import type {
   Channel,
   DefaultPreferences,
   ResolvedDefaultPreferences,
+  NotificationResolver,
 } from './types/index.js'
 import { invoke } from '@julr/utils/functions'
 
@@ -22,6 +23,7 @@ export class FacteurOptions<
   channels: KnownChannels
   queueAdapter: QueueAdapter
   databaseAdapter: DBAdapter | null = null
+  notificationResolver: NotificationResolver
   readonly defaultPreferences: ResolvedDefaultPreferences<KnownChannels>
 
   #resolveDefaultPreferences(
@@ -67,6 +69,8 @@ export class FacteurOptions<
     this.channels = config.channels
     this.databaseAdapter = config.databaseAdapter ?? null
     this.defaultPreferences = this.#resolveDefaultPreferences(config.preferences)
+    this.notificationResolver =
+      config.notificationResolver || ((notification) => new notification())
 
     const throwIfQueueNotSet = () => {
       throw new errors.E_QUEUE_NOT_SET()

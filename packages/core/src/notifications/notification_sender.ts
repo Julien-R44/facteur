@@ -13,6 +13,7 @@ import type {
   NotificationSendResult,
   ChannelSendResult,
   Emitter,
+  NotificationResolver,
 } from '../types/index.js'
 import { errors } from '../errors/index.js'
 
@@ -189,6 +190,7 @@ export class NotificationSender {
    */
   async send<N extends Notification>(
     options: SendOptions<any, N>,
+    notificationResolver: NotificationResolver,
   ): Promise<NotificationSendResult> {
     const { notifiable, via, params, tenantId } = options
     const resolvedChannels = await this.channelResolver.resolveChannels({
@@ -200,7 +202,7 @@ export class NotificationSender {
     })
 
     debug(`Resolved channels: %O`, resolvedChannels)
-    const notification = new options.notification()
+    const notification = await notificationResolver(options.notification)
     this.#emitNotificationSending(notification, resolvedChannels)
 
     /**

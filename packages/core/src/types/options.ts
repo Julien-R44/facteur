@@ -1,4 +1,6 @@
 import type { Logger } from '@julr/utils/logger'
+import type { Awaitable } from '@julr/utils/types'
+
 import type { DatabaseAdapter, Identifier } from '../database/types.js'
 import type { Emitter } from './events.js'
 import type { QueueAdapter } from './queue.js'
@@ -54,6 +56,13 @@ export interface FacteurConfiguration<
    * The default preferences for the users.
    */
   preferences?: DefaultPreferences<KnownChannels>
+
+  /**
+   * A callback that will be called to instantiate a notification class.
+   * Can be handy for using dependency injection or other custom instantiation logic.
+   * If not provided, the default constructor will be used.
+   */
+  notificationResolver?: NotificationResolver
 }
 
 export interface NotificationOptions<N extends Notifiable = Notifiable> {
@@ -142,3 +151,7 @@ export type ExtractChannelTargets<T> = T extends Channel<any, any, any, infer U>
 export type ProviderTarget<_N extends Notifiable, K extends ChannelName> = ExtractChannelTargets<
   NotificationChannels[K]
 >
+
+export type NotificationResolver = (
+  notification: new (...args: any[]) => Notification,
+) => Awaitable<Notification>

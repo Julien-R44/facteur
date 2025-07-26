@@ -94,6 +94,6 @@ export class Facteur<
   ): Promise<NotificationSendResult> {
     if (this.#fake) return this.#fake.recordSent(options)
 
-    return this.#sender.send(options)
+    return this.#sender.send(options, this.#options.notificationResolver)
   }
 }
