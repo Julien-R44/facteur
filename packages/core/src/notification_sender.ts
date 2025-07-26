@@ -119,7 +119,7 @@ export class NotificationSender {
       throw new errors.E_MISSING_MESSAGE_METHOD([capitalize(channelName)])
     }
 
-    const messageContent = messageBuilder({
+    const messageContent = messageBuilder.call(options.notification, {
       notifiable: sendOptions.notifiable,
       params: sendOptions.params,
       tenantId: sendOptions.tenantId,

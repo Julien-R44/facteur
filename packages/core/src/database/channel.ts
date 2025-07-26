@@ -38,7 +38,7 @@ export class DatabaseChannel
     const targets = this.#resolveTargets(options)
 
     const notifiableId = message.notifiableId || targets.notifiableId
-    const tenantId = message.tenantId || targets.tenantId
+    const tenantId = message.tenantId || targets.tenantId || options.tenantId
 
     if (!notifiableId) throw new Error('No notifiableId provided')
 
