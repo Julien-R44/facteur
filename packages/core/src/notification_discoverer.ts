@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url'
-import { Notification } from '@facteurjs/core/types'
+import { Notification } from './types/index.js'
 import { fsReadAll, isScriptFile } from '@poppinss/utils'
 
 import { errors } from './errors/index.js'

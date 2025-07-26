@@ -5,7 +5,7 @@ import type {
   Notifiable,
   NotificationOptions,
   ChannelSpecificConfig,
-} from './types.js'
+} from './types/index.js'
 import { mapEntries } from '@julr/utils/object'
 import { invoke } from '@julr/utils/functions'
 import { is } from '@julr/utils/is'

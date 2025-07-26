@@ -4,7 +4,7 @@ import type { WebhookMessage } from './message.js'
 import { WebhookRequestException } from './exceptions.js'
 import { HTTPErrorExtractor } from '../../errors/http_error.js'
 import type { WebhookOptions, WebhookTargets } from './types.js'
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 import { errors } from '../../errors/index.js'
 
 export function webhookChannel<Options extends WebhookOptions<any>>(

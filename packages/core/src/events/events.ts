@@ -1,4 +1,4 @@
-import type { ChannelName, Notification } from '../types.js'
+import type { ChannelName, Notification } from '../types/index.js'
 
 interface MessageEventOptions {
   notification: Notification<any, any>

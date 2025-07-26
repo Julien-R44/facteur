@@ -1,6 +1,6 @@
 import { AssertionError } from 'node:assert'
 
-import type { Notification, SendOptions, NotificationSendResult } from './types.js'
+import type { Notification, SendOptions, NotificationSendResult } from './types/index.js'
 
 export interface SentNotification<N extends Notification = Notification> {
   notification: N

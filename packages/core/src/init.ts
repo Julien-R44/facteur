@@ -1,4 +1,4 @@
-import type { Channel } from './types.js'
+import type { Channel } from './types/index.js'
 
 export function defineProvider<Name, Options, Message, Response, Targets>(
   name: Name,

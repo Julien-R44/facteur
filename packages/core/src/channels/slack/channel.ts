@@ -1,4 +1,4 @@
-import type { Channel } from '@facteurjs/core/types'
+import type { Channel, MessageCtx, Notifiable } from '../../types/index.js'
 
 import type { SlackMessage } from './message.js'
 import { WebhookChannel } from '../webhook/provider.js'

@@ -13,7 +13,7 @@ import type {
   NotificationSendResult,
   ChannelSendResult,
   Emitter,
-} from './types.js'
+} from './types/index.js'
 import { errors } from './errors/index.js'
 
 /**

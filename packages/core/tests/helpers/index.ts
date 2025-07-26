@@ -5,7 +5,7 @@ import {
   Notification,
   type Channel,
   type ChannelSendParams,
-} from '../../src/types.js'
+} from '../../src/types/index.js'
 import { FacteurDatabase } from '../../src/database/database.js'
 import type { GetPreferencesParams, Preferences } from '../../src/database/types.js'
 

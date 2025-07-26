@@ -1,6 +1,6 @@
 import type { Knex } from 'knex'
 import type { Kysely } from 'kysely'
-import type { ChannelName } from '@facteurjs/core/types'
+import type { ChannelName } from '../types/index.js'
 
 export type NotificationStatus = 'read' | 'seen' | 'unread' | 'unseen'
 export type Identifier = string | number

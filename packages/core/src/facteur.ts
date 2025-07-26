@@ -11,7 +11,7 @@ import type {
   SendOptions,
   Notification,
   NotificationSendResult,
-} from './types.js'
+} from './types/index.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
   return new Facteur(config)

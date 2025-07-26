@@ -24,7 +24,7 @@
     "./channels/fcm/types": "./src/channels/fcm/types.ts",
     "./api": "./src/api/index.ts",
     "./api/types": "./src/api/types.ts",
-    "./types": "./src/types.ts",
+    "./types": "./src/types/index.ts",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",

@@ -1,4 +1,4 @@
-import type { Channel } from '@facteurjs/core/types'
+import type { Channel, MessageCtx, Notifiable } from '../../types/index.js'
 
 import type { DiscordResponse } from './types.js'
 import type { DiscordMessage } from './message.js'

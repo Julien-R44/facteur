@@ -10,7 +10,7 @@ import type {
   Channel,
   DefaultPreferences,
   ResolvedDefaultPreferences,
-} from './types.js'
+} from './types/index.js'
 import { invoke } from '@julr/utils/functions'
 
 export class FacteurOptions<

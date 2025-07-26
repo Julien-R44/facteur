@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import { ChannelResolver } from '../src/channel_resolver.js'
-import { Notification, type NotificationOptions } from '@facteurjs/core/types'
+import { Notification, type NotificationOptions } from '../src/types/index.js'
 import { FakeDatabase } from './helpers/index.js'
 
 class NotifA extends Notification<any> {
