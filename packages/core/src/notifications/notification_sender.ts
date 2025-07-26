@@ -1,9 +1,9 @@
 import { capitalize } from '@julr/utils/string'
 
-import debug from './debug.js'
-import { facteurEvents } from './events/events.js'
+import debug from '../debug.js'
+import { facteurEvents } from '../events/events.js'
 import { ChannelResolver, type ResolvedChannel } from './channel_resolver.js'
-import type { Identifier } from './database/types.js'
+import type { Identifier } from '../database/types.js'
 import type {
   Channel,
   SendOptions,
@@ -13,8 +13,8 @@ import type {
   NotificationSendResult,
   ChannelSendResult,
   Emitter,
-} from './types/index.js'
-import { errors } from './errors/index.js'
+} from '../types/index.js'
+import { errors } from '../errors/index.js'
 
 /**
  * Responsible for sending notifications and messages

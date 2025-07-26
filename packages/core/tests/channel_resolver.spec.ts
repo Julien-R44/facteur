@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { ChannelResolver } from '../src/channel_resolver.js'
+import { ChannelResolver } from '../src/notifications/channel_resolver.js'
 import { Notification, type NotificationOptions } from '../src/types/index.js'
 import { FakeDatabase } from './helpers/index.js'
 

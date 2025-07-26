@@ -1,5 +1,5 @@
 import type { FacteurOptions } from '../options.js'
-import type { NotificationDiscoverer } from '../notification_discoverer.js'
+import type { NotificationDiscoverer } from '../notifications/notification_discoverer.js'
 import type {
   DatabaseAdapter,
   GetNotificationsParams,

@@ -1,10 +1,10 @@
 import { FacteurFake } from './fake.js'
 import { FacteurOptions } from './options.js'
 import { FacteurDatabase } from './database/database.js'
-import { NotificationSender } from './notification_sender.js'
-import { ChannelResolver } from './channel_resolver.js'
+import { NotificationSender } from './notifications/notification_sender.js'
+import { ChannelResolver } from './notifications/channel_resolver.js'
 import type { DatabaseAdapter } from './database/types.js'
-import { NotificationDiscoverer } from './notification_discoverer.js'
+import { NotificationDiscoverer } from './notifications/notification_discoverer.js'
 import type {
   FacteurConfiguration,
   Channel,

@@ -1,4 +1,15 @@
+import type { Channel } from './types/channel.js'
+
 export { errors } from './errors/index.js'
-export { defineProvider } from './init.js'
 export { createFacteur, Facteur } from './facteur.js'
 export * from './errors/index.js'
+
+/**
+ * Define a new provider
+ */
+export function defineProvider<Name, Options, Message, Response, Targets>(
+  name: Name,
+  factory: (options: Options) => Channel<Options, Message, Response, Targets>,
+) {
+  return (options: Options) => ({ name, provider: factory(options) })
+}
