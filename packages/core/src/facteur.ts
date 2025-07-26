@@ -7,6 +7,7 @@ import { FacteurDatabase } from './database/database.js'
 import { ChannelResolver, type ResolvedChannel } from './channel_resolver.js'
 import type { DatabaseAdapter, Identifier } from './database/types.js'
 import { NotificationDiscoverer } from './notification_discoverer.js'
+import { facteurEvents } from './events/events.js'
 import type {
   FacteurConfiguration,
   Channel,
@@ -127,17 +128,48 @@ export class Facteur<
      * Then send it
      */
     debug(`Sending message via ${channelName}: %O`, messageContent)
-
-    await channel.send({
-      tenantId: sendOptions.tenantId,
+    const sendingEvent = facteurEvents.messageSending({
+      channelName,
+      sendOptions,
       message: messageContent,
-      targets: channelConfig.target,
-      notifiable: sendOptions.notifiable,
+      notification: options.notification,
     })
 
-    debug(`Message sent via ${channelName}`)
+    this.#options.emitter.emit(sendingEvent.name, sendingEvent.data)
 
-    return { channel: channelName as never, status: 'success' }
+    try {
+      await channel.send({
+        tenantId: sendOptions.tenantId,
+        message: messageContent,
+        targets: channelConfig.target,
+        notifiable: sendOptions.notifiable,
+      })
+
+      debug(`Message sent via ${channelName}`)
+
+      // Emit sent event
+      const sentEvent = facteurEvents.messageSent({
+        notification: options.notification,
+        channelName,
+        message: messageContent,
+        sendOptions,
+      })
+      this.#options.emitter.emit(sentEvent.name, sentEvent.data)
+
+      return { channel: channelName as never, status: 'success' }
+    } catch (error) {
+      // Emit failed event
+      const failedEvent = facteurEvents.messageFailed({
+        notification: options.notification,
+        channelName,
+        message: messageContent,
+        sendOptions,
+        error: error as Error,
+      })
+      this.#options.emitter.emit(failedEvent.name, failedEvent.data)
+
+      throw error
+    }
   }
 
   /**
@@ -160,10 +192,19 @@ export class Facteur<
 
     debug(`Resolved channels: %O`, resolvedChannels)
 
+    const notification = new options.notification()
+
+    // Emit notification sending event
+    const sendingEvent = facteurEvents.notificationSending({
+      notification,
+      sendOptions: options,
+      resolvedChannels,
+    })
+    this.#options.emitter.emit(sendingEvent.name, sendingEvent.data)
+
     /**
      * Send messages for each resolved channel
      */
-    const notification = new options.notification()
     const promises = Object.entries(resolvedChannels).map(async ([name, config]) => {
       if (!config.shouldSend || !config.target) return null
 
@@ -186,8 +227,24 @@ export class Facteur<
     const successes = channelResults.filter((r) => r.status === 'success')
     const failures = channelResults.filter((r) => r.status === 'failed')
 
-    if (options.throwOnError !== false && failures.length > 0) {
-      throw new errors.E_SEND_NOTIFICATION_FAILED(failures.map((r) => r.error))
+    if (failures.length > 0) {
+      const failedEvent = facteurEvents.notificationFailed({
+        notification,
+        sendOptions: options,
+        errors: failures.map((r) => r.error),
+      })
+      this.#options.emitter.emit(failedEvent.name, failedEvent.data)
+
+      if (options.throwOnError !== false) {
+        throw new errors.E_SEND_NOTIFICATION_FAILED(failures.map((r) => r.error))
+      }
+    } else {
+      const sentEvent = facteurEvents.notificationSent({
+        notification,
+        sendOptions: options,
+        results: channelResults,
+      })
+      this.#options.emitter.emit(sentEvent.name, sentEvent.data)
     }
 
     return { failed: failures.length, success: successes.length, results: channelResults }

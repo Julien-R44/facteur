@@ -1,8 +1,10 @@
 import type { Logger } from '@julr/utils/logger'
-import type { Arrayable, Awaitable } from '@julr/utils/types'
+import type { Awaitable } from '@julr/utils/types'
 
 import type { Facteur } from './facteur.js'
 import type { DatabaseAdapter, Identifier } from './database/types.js'
+import type { Emitter } from './types/events.js'
+export type { FacteurEvents } from './types/events.js'
 
 export type FacteurChannelFactory = Channel<any, any, any, any>
 
@@ -59,17 +61,6 @@ export interface Channel<_Options = any, Message = any, Response = any, Targets 
   [kTargetSymbol]: Targets
   name: string
   send: (options: ChannelSendParams<Message, Targets>) => Awaitable<Response>
-}
-
-/**
- * Shape of the emitter accepted by facteur
- * Should be compatible with node's EventEmitter and Emittery
- */
-export interface Emitter {
-  on: (event: string, callback: (...values: any[]) => void) => void
-  once: (event: string, callback: (...values: any[]) => void) => void
-  off: (event: string, callback: (...values: any[]) => void) => void
-  emit: (event: string, ...values: any[]) => void
 }
 
 export type ChannelName = keyof NotificationChannels
