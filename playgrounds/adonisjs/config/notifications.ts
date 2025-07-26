@@ -28,6 +28,13 @@ const config = defineConfig({
       projectId: process.env.FCM_PROJECT_ID,
       debugToken: process.env.FCM_DEBUG_TOKEN,
     }),
+    webpush: channels.webpush({
+      vapidSubject: 'https://facteur.julr.dev',
+      vapidPublicKey: process.env.WEBPUSH_VAPID_PUBLIC_KEY!,
+      vapidPrivateKey: process.env.WEBPUSH_VAPID_PRIVATE_KEY!,
+      ttl: 60 * 60 * 24,
+      urgency: 'normal',
+    }),
   },
 
   preferences: {
@@ -40,6 +47,7 @@ const config = defineConfig({
         slack: true,
         discord: true,
         twilio: true,
+        webpush: true,
       },
     },
 
@@ -52,6 +60,7 @@ const config = defineConfig({
           twilio: true,
           fcm: false,
           discord: false,
+          webpush: false,
         },
       },
     },

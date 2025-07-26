@@ -3,7 +3,8 @@
 
 import '../css/app.css'
 
-import './fcm'
+// import './fcm'
+import './webpush'
 import { createRoot } from 'react-dom/client'
 import { createInertiaApp } from '@inertiajs/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'

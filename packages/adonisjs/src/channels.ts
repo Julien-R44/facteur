@@ -9,6 +9,7 @@ import type { SlackOptions } from '@facteurjs/core/channels/slack/types'
 import type { TwilioConfig } from '@facteurjs/core/channels/twilio/types'
 import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
 import type { FcmConfig } from '@facteurjs/core/channels/fcm/types'
+import type { WebpushConfig } from '@facteurjs/core/channels/webpush/types'
 
 import type { KyselyConfig } from './channels/database.js'
 
@@ -114,6 +115,17 @@ export const channels = {
       const { fcmChannel } = await import('@facteurjs/core/channels/fcm')
 
       return fcmChannel(config)
+    })
+  },
+
+  /**
+   * Web Push channel (VAPID)
+   */
+  webpush(config: WebpushConfig) {
+    return configProvider.create(async () => {
+      const { webpushChannel } = await import('@facteurjs/core/channels/webpush')
+
+      return webpushChannel(config)
     })
   },
 }

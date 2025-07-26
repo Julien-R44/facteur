@@ -41,6 +41,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
       mail: { email: this.email },
       twilio: { to: process.env.TWILIO_TO_DEBUG || '' },
       fcm: { token: process.env.FCM_DEBUG_TOKEN || '' },
+      webpush: { subscription: JSON.parse(process.env.WEBPUSH_DEBUG_SUBSCRIPTION || '{}') },
     }
   }
 }

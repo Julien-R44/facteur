@@ -22,6 +22,8 @@
     "./channels/twilio/types": "./src/channels/twilio/types.ts",
     "./channels/fcm": "./src/channels/fcm/index.ts",
     "./channels/fcm/types": "./src/channels/fcm/types.ts",
+    "./channels/webpush": "./src/channels/webpush/index.ts",
+    "./channels/webpush/types": "./src/channels/webpush/types.ts",
     "./api": "./src/api/index.ts",
     "./api/types": "./src/api/types.ts",
     "./types": "./src/types/index.ts",
@@ -44,10 +46,12 @@
   },
   "devDependencies": {
     "@boringnode/transmit": "^0.3.0",
+    "@types/web-push": "^3.6.4",
     "firebase-admin": "^13.4.0",
     "knex": "^3.1.0",
     "kysely": "^0.28.3",
     "p-event": "^6.0.1",
-    "twilio": "^5.8.0"
+    "twilio": "^5.8.0",
+    "web-push": "^3.6.7"
   }
 }

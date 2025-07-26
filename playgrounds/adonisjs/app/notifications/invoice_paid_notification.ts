@@ -11,6 +11,7 @@ import { FcmMessage } from '@facteurjs/adonisjs/channels/fcm'
 import type User from '#models/user'
 import InvoicePaidMail from '#mails/invoice_paid_notification'
 import { TwilioMessage } from '@facteurjs/adonisjs/channels/twilio'
+import { WebpushMessage } from '@facteurjs/adonisjs/channels/webpush'
 
 interface InvoicePaidParams {
   amount: number
@@ -23,6 +24,7 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     deliverBy: {
       database: true,
       transmit: true,
+      webpush: true,
       mail: true,
       slack: false,
       discord: false,
@@ -65,6 +67,25 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
 
   asDiscordMessage() {
     return DiscordMessage.create().setBotUsername('Test').setBody('Invoice paid')
+  }
+
+  asWebpushMessage(ctx: MessageCtx<User, InvoicePaidParams>): WebpushMessage {
+    return WebpushMessage.create()
+      .setTitle('Invoice Paid')
+      .setBody(`Your invoice of $${ctx.params.amount} has been successfully paid.`)
+      .setImage('/mailbox.png')
+      .setTag('invoice-paid')
+      .setData({
+        type: 'invoice_paid',
+        amount: ctx.params.amount.toString(),
+        organization: this.#getOrganizationName(ctx.tenantId),
+      })
+      .setTag('invoice-paid')
+      .setActions([
+        { action: 'view', title: 'View Invoice' },
+        { action: 'dismiss', title: 'Dismiss' },
+      ])
+      .setRequireInteraction(false)
   }
 
   asSlackMessage(): SlackMessage {
