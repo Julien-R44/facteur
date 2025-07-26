@@ -41,6 +41,16 @@ router.post('/send', async ({ request, response }) => {
 
   return response.ok({ message: 'Notification sent successfully' })
 })
+import webPush from 'web-push'
+
+const keys = webPush.generateVAPIDKeys()
+console.log(keys.publicKey, keys.privateKey)
 
 transmit.registerRoutes()
-facteur.registerRoutes()
+
+router.group(() => facteur.registerRoutes())
+// .use(async ({ params, response, auth }, next) => {
+//   if (params.notifiableId != auth.user?.id) return response.forbidden({ error: 'Forbidden' })
+
+//   return await next()
+// })

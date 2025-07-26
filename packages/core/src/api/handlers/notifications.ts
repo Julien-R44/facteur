@@ -5,9 +5,9 @@ import { defineRoute } from '../index.js'
  */
 export const getNotificationRoute = defineRoute(({ facteur }) => ({
   method: 'get',
-  route: '/notifications/notifiable/:id/notifications',
+  route: '/notifications/notifiable/:notifiableId/notifications',
   handler: async (request) => {
-    const userId = request.params.id
+    const userId = request.params.notifiableId
 
     const notifications = await facteur.db.getNotifications({
       notifiableId: userId,
@@ -26,7 +26,7 @@ export const getNotificationRoute = defineRoute(({ facteur }) => ({
  */
 export const markNotificationAsRoute = defineRoute(({ facteur }) => ({
   method: 'post',
-  route: '/notifications/notifiable/:id/mark-as',
+  route: '/notifications/notifiable/:notifiableId/mark-as',
   handler: async (request) => {
     const notificationId = request.body.notificationId
     const status = request.body.status
@@ -45,13 +45,13 @@ export const markNotificationAsRoute = defineRoute(({ facteur }) => ({
  */
 export const markAllNotificationsAsRoute = defineRoute(({ facteur }) => ({
   method: 'post',
-  route: '/notifications/notifiable/:id/mark-all',
+  route: '/notifications/notifiable/:notifiableId/mark-all',
   handler: async (request) => {
     const status = request.body.status
     if (!status) return { status: 400, body: { error: 'Status is required' } }
 
     await facteur.db.updateAllNotifications({
-      notifiableId: request.params.id,
+      notifiableId: request.params.notifiableId,
       tenantId: request.body.tenantId,
       status,
     })

@@ -2,9 +2,9 @@ import { defineRoute } from '../index.js'
 
 export const getPreferencesRoute = defineRoute(({ facteur }) => ({
   method: 'get',
-  route: '/notifications/notifiable/:id/preferences',
+  route: '/notifications/notifiable/:notifiableId/preferences',
   handler: async (request) => {
-    const userId = request.params.id
+    const userId = request.params.notifiableId
 
     const preferences = await facteur.db.getPreferences({
       notifiableId: userId,
@@ -17,9 +17,9 @@ export const getPreferencesRoute = defineRoute(({ facteur }) => ({
 
 export const updatePreferencesRoute = defineRoute(({ facteur }) => ({
   method: 'post',
-  route: '/notifications/notifiable/:id/preferences',
+  route: '/notifications/notifiable/:notifiableId/preferences',
   handler: async (request) => {
-    const userId = request.params.id
+    const userId = request.params.notifiableId
     const preferences = request.body.preferences
 
     if (!preferences) {

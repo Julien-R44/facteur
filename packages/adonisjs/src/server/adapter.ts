@@ -14,6 +14,7 @@ export class AdonisServerAdapter implements ServerAdapter {
           body: request.body(),
           params: request.params(),
           query: request.qs(),
+          headers: request.headers() as Record<string, string | undefined>,
         })
 
         return response.status(result.status).send(result.body)
