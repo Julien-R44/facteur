@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { Notification } from '@facteurjs/core/types'
 import { fsReadAll, isScriptFile } from '@poppinss/utils'
 
-import { DuplicateNotificationException } from './errors/duplicate_notification_exception.js'
+import { errors } from './errors/index.js'
 
 export interface NotificationDiscovererConfig {
   /**
@@ -84,7 +84,7 @@ export class NotificationDiscoverer {
       .map(([notificationName, notifications]) => ({ notificationName, notifications }))
 
     if (duplicates.length > 0) {
-      throw new DuplicateNotificationException(this.#config.searchDirectory, duplicates)
+      throw new errors.E_DUPLICATE_NOTIFICATION(this.#config.searchDirectory, duplicates)
     }
   }
 

@@ -176,4 +176,22 @@ export interface SendOptions<
   params?: TNotification extends Notification<any, infer P> ? P : never
   via?: ChannelSpecificConfig<TNotifiable>
   tenantId?: Identifier
+
+  /**
+   * Throw an error if at least one channel fails to send
+   * If false, the result will contain the details of each channel send attempt
+   */
+  throwOnError?: boolean
+}
+
+export interface ChannelSendResult {
+  channel: ChannelName
+  status: 'success' | 'failed'
+  error?: any
+}
+
+export interface NotificationSendResult {
+  success: number
+  failed: number
+  results: ChannelSendResult[]
 }

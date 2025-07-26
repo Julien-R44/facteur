@@ -5,7 +5,7 @@ interface DuplicateNotification {
   notifications: Array<{ notification: any; file: URL | string }> | undefined
 }
 
-export class DuplicateNotificationException extends Error {
+export class E_DUPLICATE_NOTIFICATION extends Error {
   constructor(appRoot: URL, duplicates: DuplicateNotification[]) {
     let errorMessage = 'Duplicate notification names detected:'
 

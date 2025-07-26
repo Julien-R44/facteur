@@ -4,7 +4,7 @@ import debug from './debug.js'
 import { FacteurFake } from './fake.js'
 import { FacteurOptions } from './options.js'
 import { FacteurDatabase } from './database/database.js'
-import { ChannelResolver, type ResolveChannelsOptions } from './channel_resolver.js'
+import { ChannelResolver, type ResolvedChannel } from './channel_resolver.js'
 import type { DatabaseAdapter, Identifier } from './database/types.js'
 import { NotificationDiscoverer } from './notification_discoverer.js'
 import type {
@@ -14,7 +14,10 @@ import type {
   ChannelName,
   Notification,
   MessageCtx,
+  NotificationSendResult,
+  ChannelSendResult,
 } from './types.js'
+import { errors } from './errors/index.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
   return new Facteur(config)
@@ -89,56 +92,104 @@ export class Facteur<
     this.#fake = null
   }
 
-  async send<N extends Notification>(options: SendOptions<N>) {
-    if (this.#fake) return this.#fake.recordSent(options)
+  /**
+   * Send a single message
+   */
+  async #sendMessage(options: {
+    notification: Notification<any, any>
+    channelName: ChannelName
+    options: SendOptions<any, any>
+    channelConfig: ResolvedChannel
+  }): Promise<ChannelSendResult | null> {
+    const { channelName, options: sendOptions, channelConfig } = options
 
+    /**
+     * First build the message content using the notification's
+     * `as<ChannelName>Message` method
+     */
+    const channel = this.#getProvider(channelName as ChannelName)
+    const channelMethodName = `as${capitalize(channelName)}Message` as const
+    const messageBuilder = (options.notification as any)[channelMethodName]
+
+    if (typeof messageBuilder !== 'function') {
+      throw new errors.E_MISSING_MESSAGE_METHOD([capitalize(channelName)])
+    }
+
+    const messageContent = messageBuilder({
+      notifiable: sendOptions.notifiable,
+      params: sendOptions.params,
+      tenantId: sendOptions.tenantId,
+    } as MessageCtx<any, any>)
+
+    if (!messageContent) return null
+
+    /**
+     * Then send it
+     */
+    debug(`Sending message via ${channelName}: %O`, messageContent)
+
+    await channel.send({
+      tenantId: sendOptions.tenantId,
+      message: messageContent,
+      targets: channelConfig.target,
+      notifiable: sendOptions.notifiable,
+    })
+
+    debug(`Message sent via ${channelName}`)
+
+    return { channel: channelName as never, status: 'success' }
+  }
+
+  /**
+   * Send a notification
+   */
+  async send<N extends Notification>(
+    options: SendOptions<any, N>,
+  ): Promise<NotificationSendResult> {
     const { notifiable, via, params, tenantId } = options
 
-    const notification = new options.notification()
-    const resolveOptions: ResolveChannelsOptions = {
-      notification,
+    if (this.#fake) return this.#fake.recordSent(options)
+
+    const resolvedChannels = await this.#channelResolver.resolveChannels({
+      notification: options.notification,
       notifiable,
       params,
       tenantId: tenantId as Identifier,
       ...(via ? { via } : {}),
-    }
-
-    const resolvedChannels = await this.#channelResolver.resolveChannels(resolveOptions)
+    })
 
     debug(`Resolved channels: %O`, resolvedChannels)
 
-    const sendPromises = Object.entries(resolvedChannels).map(
-      async ([channelName, channelConfig]) => {
-        if (!channelConfig.shouldSend || !channelConfig.target) return
+    /**
+     * Send messages for each resolved channel
+     */
+    const notification = new options.notification()
+    const promises = Object.entries(resolvedChannels).map(async ([name, config]) => {
+      if (!config.shouldSend || !config.target) return null
 
-        const channel = this.#getProvider(channelName as ChannelName)
-        const channelMethodName = `as${capitalize(channelName)}Message` as const
-        const messageBuilder = notification[channelMethodName]
+      return await this.#sendMessage({
+        options,
+        notification,
+        channelConfig: config,
+        channelName: name as ChannelName,
+      }).catch((error) => {
+        debug(`Failed to send notification via ${name}: %O`, error)
+        return { channel: name, status: 'failed' as const, error }
+      })
+    })
 
-        if (typeof messageBuilder !== 'function') return
+    /**
+     * Then create a result object with the results of each channel
+     */
+    const results = await Promise.all(promises)
+    const channelResults = results.filter((result): result is ChannelSendResult => result !== null)
+    const successes = channelResults.filter((r) => r.status === 'success')
+    const failures = channelResults.filter((r) => r.status === 'failed')
 
-        const messageContent = notification[channelMethodName]({
-          notifiable,
-          params: options.params,
-          tenantId: options.tenantId,
-        } as MessageCtx<any, any>)
+    if (options.throwOnError !== false && failures.length > 0) {
+      throw new errors.E_SEND_NOTIFICATION_FAILED(failures.map((r) => r.error))
+    }
 
-        if (!messageContent) return
-
-        debug(`Sending message via ${channelName}: %O`, messageContent)
-
-        await channel.send({
-          tenantId: options.tenantId,
-          message: messageContent,
-          targets: channelConfig.target,
-          notifiable,
-        })
-
-        debug(`Message sent via ${channelName}`)
-      },
-    )
-
-    // TODO: settled ?
-    await Promise.allSettled(sendPromises)
+    return { failed: failures.length, success: successes.length, results: channelResults }
   }
 }

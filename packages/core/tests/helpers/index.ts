@@ -1,6 +1,11 @@
 import { AssertionError } from 'node:assert'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../src/types.js'
+import {
+  kTargetSymbol,
+  Notification,
+  type Channel,
+  type ChannelSendParams,
+} from '../../src/types.js'
 import { FacteurDatabase } from '../../src/database/database.js'
 import type { GetPreferencesParams, Preferences } from '../../src/database/types.js'
 
@@ -9,9 +14,22 @@ class TestProvider implements Channel<any, any, any, any> {
   [kTargetSymbol] = null as any
   #sent: Array<ChannelSendParams<any, any>> = []
   #queued: Array<ChannelSendParams<any, any>> = []
+  #isThrowing = false
 
   send(options: ChannelSendParams<any, any>) {
+    if (this.#isThrowing) {
+      throw new Error('Test error')
+    }
+
     this.#sent.push(options)
+  }
+
+  throws() {
+    this.#isThrowing = true
+  }
+
+  restore() {
+    this.#isThrowing = false
   }
 
   getSentMessages() {
@@ -61,6 +79,30 @@ class TestProvider implements Channel<any, any, any, any> {
 
 export function testProvider() {
   return new TestProvider()
+}
+
+export class FakeNotification extends Notification {
+  static override options = {
+    name: 'FakeNotification',
+    tags: ['test'],
+    deliverBy: {
+      email: true,
+      sms: true,
+    },
+  }
+
+  asEmailMessage() {
+    return {
+      subject: 'Test Email',
+      body: 'This is a test email',
+    }
+  }
+
+  asSmsMessage() {
+    return {
+      body: 'This is a test SMS',
+    }
+  }
 }
 
 export class FakeDatabase extends FacteurDatabase {

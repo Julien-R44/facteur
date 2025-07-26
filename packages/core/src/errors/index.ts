@@ -1,5 +1,6 @@
-import { DuplicateNotificationException } from './duplicate_notification_exception.js'
 import { createError } from '@poppinss/exception'
+
+import { E_DUPLICATE_NOTIFICATION } from './duplicate_notification_exception.js'
 
 /**
  * Thrown when the notification targets for a channel cannot be determined
@@ -20,8 +21,34 @@ export const E_QUEUE_NOT_SET = createError(
   500,
 )
 
+/**
+ * Thrown when a `as<ChannelName>Message` method is not defined
+ */
+export const E_MISSING_MESSAGE_METHOD = createError<[channelName: string]>(
+  `Notification is missing "as%sMessage" method. Define it to build the message content for the channel.`,
+  'E_MISSING_MESSAGE_METHOD',
+  500,
+)
+
+/**
+ * Thrown when a send() operation fails. Could be due to one or more channels
+ * failing to send the notification.
+ */
+export class E_SEND_NOTIFICATION_FAILED extends AggregateError {
+  code = 'E_SEND_NOTIFICATION_FAILED'
+  status = 500
+
+  constructor(errors: Array<{ error: any }>) {
+    const message = 'Failed to send notification due to errors in one or more channels.'
+
+    super(errors, message)
+  }
+}
+
 export const errors = {
-  E_DUPLICATE_NOTIFICATION: DuplicateNotificationException,
-  E_UNAVAILABLE_TARGETS,
   E_QUEUE_NOT_SET,
+  E_UNAVAILABLE_TARGETS,
+  E_DUPLICATE_NOTIFICATION,
+  E_MISSING_MESSAGE_METHOD,
+  E_SEND_NOTIFICATION_FAILED,
 }

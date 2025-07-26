@@ -1,6 +1,6 @@
 import { AssertionError } from 'node:assert'
 
-import type { Notification, SendOptions } from './types.js'
+import type { Notification, SendOptions, NotificationSendResult } from './types.js'
 
 export interface SentNotification<N extends Notification = Notification> {
   notification: N
@@ -15,7 +15,7 @@ export class FacteurFake {
   /**
    * Record a notification as sent during fake mode
    */
-  recordSent(options: SendOptions<any, any>) {
+  recordSent(options: SendOptions<any, any>): NotificationSendResult {
     const notification = new options.notification()
 
     this.#sentNotifications.push({
@@ -24,6 +24,8 @@ export class FacteurFake {
       params: options.params,
       via: options.via,
     } as SentNotification)
+
+    return { success: 1, failed: 0, results: [{ channel: 'fake' as never, status: 'success' }] }
   }
 
   /**
