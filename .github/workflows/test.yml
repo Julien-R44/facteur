@@ -31,9 +31,7 @@ jobs:
           corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
-        run: |
-          pnpm install
-          pnpm -r build
+        run: pnpm install
 
       - name: Run tests
         env:

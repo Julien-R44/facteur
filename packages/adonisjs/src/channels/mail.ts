@@ -1,4 +1,3 @@
-import { invoke } from '@julr/utils/functions'
 import { Message, BaseMail } from '@adonisjs/mail'
 import type { MailService } from '@adonisjs/mail/types'
 
