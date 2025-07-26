@@ -9,7 +9,6 @@
     "build": "node ace build",
     "dev": "node ace serve --hmr",
     "quick:test": "node ace test",
-    "test": "node ace test",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },

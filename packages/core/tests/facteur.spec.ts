@@ -51,4 +51,22 @@ test.group('Facteur | send', () => {
     assert.equal(result.success, 0)
     assert.equal(result.results.length, 2)
   })
+
+  test('use custom notification resolver', async ({ assert }) => {
+    const provider = testProvider()
+
+    const facteur = new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+      notificationResolver: (notification) => {
+        assert.equal(notification, FakeNotification)
+        return new FakeNotification()
+      },
+    })
+
+    facteur.send({
+      notification: FakeNotification,
+      via: { email: { to: 'foo@ok.com' } },
+    })
+  })
 })
