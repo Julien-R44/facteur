@@ -4,7 +4,7 @@ import type { Awaitable } from '@julr/utils/types'
 import type { Facteur } from './facteur.js'
 import type { DatabaseAdapter, Identifier } from './database/types.js'
 import type { Emitter } from './types/events.js'
-export type { FacteurEvents } from './types/events.js'
+export type { FacteurEvents, Emitter } from './types/events.js'
 
 export type FacteurChannelFactory = Channel<any, any, any, any>
 

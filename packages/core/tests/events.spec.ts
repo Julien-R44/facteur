@@ -26,7 +26,6 @@ test.group('Facteur | Events', () => {
     assert.equal(event.channelName, 'email')
     assert.instanceOf(event.notification, FakeNotification)
     assert.isDefined(event.message)
-    assert.isDefined(event.sendOptions)
   })
 
   test('emit message sent event when message is successfully sent', async ({ assert }) => {
@@ -51,7 +50,6 @@ test.group('Facteur | Events', () => {
     assert.equal(event.channelName, 'email')
     assert.instanceOf(event.notification, FakeNotification)
     assert.isDefined(event.message)
-    assert.isDefined(event.sendOptions)
   })
 
   test('emit message failed event when message fails to send', async ({ assert }) => {
@@ -79,7 +77,7 @@ test.group('Facteur | Events', () => {
     assert.equal(event.channelName, 'email')
     assert.instanceOf(event.notification, FakeNotification)
     assert.isDefined(event.message)
-    assert.isDefined(event.sendOptions)
+
     assert.instanceOf(event.error, Error)
   })
 
@@ -104,7 +102,6 @@ test.group('Facteur | Events', () => {
     const event = await pEvent(emitter, 'facteur:notification:sending')
 
     assert.instanceOf(event.notification, FakeNotification)
-    assert.equal(event.sendOptions.params.test, 'value')
     assert.isDefined(event.resolvedChannels)
   })
 
@@ -131,7 +128,6 @@ test.group('Facteur | Events', () => {
     const event = await pEvent(emitter, 'facteur:notification:sent')
 
     assert.instanceOf(event.notification, FakeNotification)
-    assert.equal(event.sendOptions.params.test, 'value')
     assert.isArray(event.results)
     assert.equal(event.results.length, 1)
     assert.equal(event.results[0].status, 'success')
@@ -160,7 +156,7 @@ test.group('Facteur | Events', () => {
     const event = await pEvent(emitter, 'facteur:notification:failed')
 
     assert.instanceOf(event.notification, FakeNotification)
-    assert.isDefined(event.sendOptions)
+
     assert.isArray(event.errors)
     assert.equal(event.errors.length, 1)
     assert.instanceOf(event.errors[0], Error)

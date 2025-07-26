@@ -1,15 +1,13 @@
-import type { ChannelName, Notification, SendOptions } from '../types.js'
+import type { ChannelName, Notification } from '../types.js'
 
 interface MessageEventOptions {
   notification: Notification<any, any>
   channelName: ChannelName
   message: any
-  sendOptions: SendOptions<any, any>
 }
 
 interface NotificationEventOptions {
   notification: Notification<any, any>
-  sendOptions: SendOptions<any, any>
 }
 
 export class FacteurEvents {
@@ -18,14 +16,12 @@ export class FacteurEvents {
       notification: options.notification,
       channelName: options.channelName,
       message: options.message,
-      sendOptions: options.sendOptions,
     }
   }
 
   #buildNotificationEventData(options: NotificationEventOptions) {
     return {
       notification: options.notification,
-      sendOptions: options.sendOptions,
     }
   }
 
