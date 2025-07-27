@@ -1,0 +1,24 @@
+{
+  "name": "vanilla",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx --env-file .env index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "license": "ISC",
+  "dependencies": {
+    "@facteurjs/client": "workspace:*",
+    "@facteurjs/core": "workspace:*",
+    "@hono/node-server": "^1.17.1",
+    "hono": "^4.8.9"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "@adonisjs/tsconfig": "^1.4.1"
+  }
+}
