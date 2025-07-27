@@ -38,7 +38,7 @@ export class TransmitChannel
 
 declare module '@facteurjs/core/types' {
   interface Notification<
-    N extends Notifiable = Notifiable,
+    N extends Notifiable | undefined = Notifiable | undefined,
     Params extends Record<string, any> = any,
   > {
     asTransmitMessage(ctx: MessageCtx<N, Params>): TransmitMessage

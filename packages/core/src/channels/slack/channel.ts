@@ -18,7 +18,7 @@ export class SlackWebhookChannel<T extends SlackOptions<any>>
 
 declare module '@facteurjs/core/types' {
   interface Notification<
-    N extends Notifiable = Notifiable,
+    N extends Notifiable | undefined = Notifiable | undefined,
     Params extends Record<string, any> = any,
   > {
     asSlackMessage(ctx: MessageCtx<N, Params>): SlackMessage

@@ -12,7 +12,7 @@ import { is } from '@julr/utils/is'
 
 export interface ResolveChannelsOptions {
   notification: new () => Notification
-  notifiable: Notifiable
+  notifiable?: Notifiable | undefined
   params: any
   via?: ChannelSpecificConfig<any>
   tenantId?: Identifier

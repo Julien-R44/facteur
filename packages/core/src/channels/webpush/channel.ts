@@ -78,7 +78,7 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
 
 declare module '@facteurjs/core/types' {
   interface Notification<
-    N extends Notifiable = Notifiable,
+    N extends Notifiable | undefined = Notifiable | undefined,
     Params extends Record<string, any> = any,
   > {
     asWebpushMessage(ctx: MessageCtx<N, Params>): WebpushMessage

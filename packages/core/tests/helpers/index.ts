@@ -81,7 +81,7 @@ export function testProvider() {
   return new TestProvider()
 }
 
-export class FakeNotification extends Notification {
+export class FakeNotification extends Notification<undefined, any> {
   static override options = {
     name: 'FakeNotification',
     tags: ['test'],

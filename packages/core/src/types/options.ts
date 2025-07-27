@@ -5,7 +5,7 @@ import type { DatabaseAdapter, Identifier } from '../database/types.js'
 import type { Emitter } from './events.js'
 import type { QueueAdapter } from './queue.js'
 import type { DefaultPreferences } from './preferences.js'
-import type { Notifiable, Notification } from './index.js'
+import type { Notifiable, Notification, NotificationClass } from './index.js'
 import type { ChannelName, NotificationChannels } from './extend.js'
 import type { Channel } from './channel.js'
 
@@ -65,6 +65,13 @@ export interface FacteurConfiguration<
   notificationResolver?: NotificationResolver
 }
 
+/**
+ * Resolver function type for notifications
+ */
+export type NotificationResolver = (
+  notification: new (...args: any[]) => Notification,
+) => Awaitable<Notification>
+
 export interface NotificationOptions<N extends Notifiable = Notifiable> {
   /**
    * A human readable name for the notification.
@@ -114,7 +121,7 @@ export interface DeliverByOptions<N extends Notifiable = Notifiable> {
  * Parameters received by the `as*Message` methods of a notification.
  */
 export interface MessageCtx<
-  N extends Notifiable = Notifiable,
+  N extends Notifiable | undefined = Notifiable,
   Params extends Record<string, any> = {},
 > {
   notifiable: N
@@ -123,35 +130,66 @@ export interface MessageCtx<
 }
 
 /**
+ * Extract the parameters type from a notification class
+ */
+export type ExtractParams<T> = T extends NotificationClass<any, infer P> ? P : never
+
+/**
+ * Extract the notifiable type from a notification class
+ */
+export type ExtractNotifiable<T> = T extends NotificationClass<infer N, any> ? N : never
+
+/**
+ * Determine if a notification requires parameters or if they are optional
+ */
+export type NotificationParams<TNotificationClass extends NotificationClass<any, any>> =
+  ExtractParams<TNotificationClass> extends unknown
+    ? unknown extends ExtractParams<TNotificationClass>
+      ? { params?: ExtractParams<TNotificationClass> }
+      : { params: ExtractParams<TNotificationClass> }
+    : { params: ExtractParams<TNotificationClass> }
+
+/**
+ * Common options available for all send operations
+ */
+export type CommonSendOptions<TNotificationClass extends NotificationClass<any, any>> =
+  NotificationParams<TNotificationClass> & {
+    /**
+     * Throw an error if at least one channel fails to send
+     * If false, the result will contain the details of each channel send attempt
+     */
+    throwOnError?: boolean
+  }
+
+/**
+ * Helper type to determine if a notification is anonymous (notifiable is undefined)
+ */
+type IsAnonymousNotification<T> =
+  T extends NotificationClass<infer N, any> ? (N extends undefined ? true : false) : false
+
+/**
  * Options for the `send` method
  */
-export interface SendOptions<
-  TNotifiable extends Notifiable,
-  TNotification extends Notification<TNotifiable, any>,
-> {
-  notification: new (...args: any[]) => TNotification
-  notifiable?: TNotifiable
-  params?: TNotification extends Notification<any, infer P> ? P : never
-  via?: ChannelSpecificConfig<TNotifiable>
-  tenantId?: Identifier
+export type SendOptions<TNotificationClass extends NotificationClass<any, any>> =
+  IsAnonymousNotification<TNotificationClass> extends true
+    ? CommonSendOptions<TNotificationClass> & {
+        notification: TNotificationClass
+        via: { [K in ChannelName]?: ProviderTarget<any, K> }
+        tenantId?: Identifier
+      }
+    : CommonSendOptions<TNotificationClass> & {
+        notification: TNotificationClass
+        notifiable: NonNullable<ExtractNotifiable<TNotificationClass>>
+        via?: ChannelSpecificConfig<ExtractNotifiable<TNotificationClass>>
+        tenantId?: Identifier
+      }
 
-  /**
-   * Throw an error if at least one channel fails to send
-   * If false, the result will contain the details of each channel send attempt
-   */
-  throwOnError?: boolean
+export type ChannelSpecificConfig<N extends Notifiable> = {
+  [K in ChannelName]?: boolean | ProviderTarget<N, K>
 }
-
-export type ChannelSpecificConfig<N extends Notifiable> = N extends never
-  ? { [K in ChannelName]?: ProviderTarget<never, K> }
-  : { [K in ChannelName]?: boolean | ProviderTarget<N, K> }
 
 export type ExtractChannelTargets<T> = T extends Channel<any, any, any, infer U> ? U : never
 
 export type ProviderTarget<_N extends Notifiable, K extends ChannelName> = ExtractChannelTargets<
   NotificationChannels[K]
 >
-
-export type NotificationResolver = (
-  notification: new (...args: any[]) => Notification,
-) => Awaitable<Notification>

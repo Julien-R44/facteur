@@ -73,7 +73,7 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     return WebpushMessage.create()
       .setTitle('Invoice Paid')
       .setBody(`Your invoice of $${ctx.params.amount} has been successfully paid.`)
-      .setImage('/mailbox.png')
+      .setIcon('/mailbox.png')
       .setTag('invoice-paid')
       .setData({
         type: 'invoice_paid',

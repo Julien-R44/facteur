@@ -95,7 +95,7 @@ export class TwilioChannel implements Channel<TwilioConfig, TwilioMessage, any, 
 
 declare module '@facteurjs/core/types' {
   interface Notification<
-    N extends Notifiable = Notifiable,
+    N extends Notifiable | undefined = Notifiable | undefined,
     Params extends Record<string, any> = any,
   > {
     asTwilioMessage(ctx: MessageCtx<N, Params>): TwilioMessage

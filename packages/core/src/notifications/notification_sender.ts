@@ -14,6 +14,7 @@ import type {
   ChannelSendResult,
   Emitter,
   NotificationResolver,
+  NotificationClass,
 } from '../types/index.js'
 import { errors } from '../errors/index.js'
 
@@ -103,7 +104,7 @@ export class NotificationSender {
   async #sendMessage(options: {
     notification: Notification<any, any>
     channelName: ChannelName
-    options: SendOptions<any, any>
+    options: SendOptions<any>
     channelConfig: ResolvedChannel
   }): Promise<ChannelSendResult | null> {
     const { channelName, options: sendOptions, channelConfig } = options
@@ -188,13 +189,13 @@ export class NotificationSender {
   /**
    * Send a notification through all resolved channels
    */
-  async send<N extends Notification>(
-    options: SendOptions<any, N>,
+  async send<N extends NotificationClass<any, any>>(
+    options: SendOptions<N>,
     notificationResolver: NotificationResolver,
   ): Promise<NotificationSendResult> {
-    const { notifiable, via, params, tenantId } = options
+    const { via, params, tenantId } = options
     const resolvedChannels = await this.channelResolver.resolveChannels({
-      notifiable,
+      notifiable: 'notifiable' in options ? options.notifiable : undefined,
       params,
       tenantId: tenantId as Identifier,
       notification: options.notification,
@@ -212,10 +213,10 @@ export class NotificationSender {
       if (!config.shouldSend || !config.target) return null
 
       return await this.#sendMessage({
-        options,
         notification,
         channelConfig: config,
         channelName: name as ChannelName,
+        options: options as SendOptions<any>,
       }).catch((error) => {
         debug(`Failed to send notification via ${name}: %O`, error)
         return { channel: name, status: 'failed' as const, error } as ChannelSendResult

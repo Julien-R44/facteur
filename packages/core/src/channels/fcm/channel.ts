@@ -67,7 +67,7 @@ export class FcmChannel implements Channel<FcmConfig, FcmMessage, any, FcmTarget
 
 declare module '@facteurjs/core/types' {
   interface Notification<
-    N extends Notifiable = Notifiable,
+    N extends Notifiable | undefined = Notifiable | undefined,
     Params extends Record<string, any> = any,
   > {
     asFcmMessage(ctx: MessageCtx<N, Params>): FcmMessage

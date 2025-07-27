@@ -68,8 +68,8 @@ export class DiscordMessage extends WebhookMessage {
       body: {
         tts: this.#tts,
         content: this.#body,
-        username: this.#username,
-        avatar_url: this.#avatarUrl,
+        ...(this.#username ? { username: this.#username } : {}),
+        ...(this.#avatarUrl ? { avatar_url: this.#avatarUrl } : {}),
         embeds: this.#embeds.map((embed) => embed.serialize()),
       },
     }

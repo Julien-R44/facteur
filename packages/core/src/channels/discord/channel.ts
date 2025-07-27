@@ -18,7 +18,7 @@ class DiscordProvider<T extends WebhookOptions<any>>
 
 declare module '@facteurjs/core/types' {
   interface Notification<
-    N extends Notifiable = Notifiable,
+    N extends Notifiable | undefined = Notifiable | undefined,
     Params extends Record<string, any> = any,
   > {
     asDiscordMessage(ctx: MessageCtx<N, Params>): DiscordMessage

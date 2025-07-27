@@ -5,12 +5,12 @@ import { NotificationSender } from './notifications/notification_sender.js'
 import { ChannelResolver } from './notifications/channel_resolver.js'
 import type { DatabaseAdapter } from './database/types.js'
 import { NotificationDiscoverer } from './notifications/notification_discoverer.js'
-import type {
-  FacteurConfiguration,
-  Channel,
-  SendOptions,
-  Notification,
-  NotificationSendResult,
+import {
+  type FacteurConfiguration,
+  type Channel,
+  type SendOptions,
+  type NotificationSendResult,
+  type NotificationClass,
 } from './types/index.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
@@ -89,10 +89,10 @@ export class Facteur<
   /**
    * Send a notification
    */
-  async send<N extends Notification>(
-    options: SendOptions<any, N>,
+  async send<TNotificationClass extends NotificationClass<any, any>>(
+    options: SendOptions<TNotificationClass>,
   ): Promise<NotificationSendResult> {
-    if (this.#fake) return this.#fake.recordSent(options)
+    if (this.#fake) return this.#fake.recordSent(options as SendOptions<any>)
 
     return this.#sender.send(options, this.#options.notificationResolver)
   }
