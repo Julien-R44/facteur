@@ -4,5 +4,83 @@
     "title": "Introduction",
     "contentPath": "./introduction.md",
     "category": "Guides"
+  },
+  {
+    "permalink": "quick-start",
+    "title": "Quick Start",
+    "contentPath": "./quick-start.md",
+    "category": "Guides"
+  },
+  {
+    "permalink": "database",
+    "title": "Database",
+    "contentPath": "./database.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "transmit",
+    "title": "Transmit",
+    "contentPath": "./transmit.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "slack",
+    "title": "Slack",
+    "contentPath": "./slack.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "discord",
+    "title": "Discord",
+    "contentPath": "./discord.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "whatsapp",
+    "title": "WhatsApp",
+    "contentPath": "./whatsapp.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "teams",
+    "title": "Microsoft Teams",
+    "contentPath": "./teams.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "twilio",
+    "title": "Twilio SMS",
+    "contentPath": "./twilio.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "expo-notifications",
+    "title": "Expo Notifications",
+    "contentPath": "./expo-notifications.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "webpush",
+    "title": "Web Push",
+    "contentPath": "./webpush.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "fcm",
+    "title": "Firebase Cloud Messaging",
+    "contentPath": "./fcm.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "webhook",
+    "title": "Webhook",
+    "contentPath": "./webhook.md",
+    "category": "Channels"
+  },
+  {
+    "permalink": "mail",
+    "title": "AdonisJS Mail",
+    "contentPath": "./mail.md",
+    "category": "Channels"
   }
 ]

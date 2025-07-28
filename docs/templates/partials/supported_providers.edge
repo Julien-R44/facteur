@@ -1,0 +1,22 @@
+@let(providers = await getProviders())
+
+<section class="supported-providers">
+  @each(category in providers.categories)
+    <div class="provider-category">
+      <h3 class="category-title">{{ category.title }}</h3>
+      <div class="providers-grid">
+        @each(provider in category.providers)
+          <div class="provider-card">
+            <div class="provider-icon">
+              @svg(provider.icon)
+            </div>
+            <div class="provider-content">
+              <h4>{{ provider.name }}</h4>
+              <p>{{ provider.description }}</p>
+            </div>
+          </div>
+        @end
+      </div>
+    </div>
+  @end
+</section>

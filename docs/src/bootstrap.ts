@@ -16,14 +16,18 @@ import { Renderer } from '@dimerapp/content'
 import type { Collection } from '@dimerapp/content'
 import { dimer, RenderingPipeline } from '@dimerapp/edge'
 import { docsHook, docsTheme } from '@dimerapp/docs-theme'
+import { edgeIconify, addCollection } from 'edge-iconify'
+import { icons as tablerIcons } from '@iconify-json/tabler'
 
 import grammars from '../vscode_grammars/main.js'
 
 type CollectionEntry = Exclude<ReturnType<Collection['findByPermalink']>, undefined>
 
+addCollection(tablerIcons)
 edge.use(dimer)
 edge.use(docsTheme)
 edge.use(uiKit)
+edge.use(edgeIconify)
 
 /**
  * Globally loads the config file
@@ -37,6 +41,13 @@ edge.global('getConfig', async () =>
  */
 edge.global('getSponsors', async () =>
   JSON.parse(await readFile(new URL('../content/sponsors.json', import.meta.url), 'utf-8')),
+)
+
+/**
+ * Globally loads the providers file
+ */
+edge.global('getProviders', async () =>
+  JSON.parse(await readFile(new URL('../content/providers.json', import.meta.url), 'utf-8')),
 )
 
 /**

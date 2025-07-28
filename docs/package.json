@@ -17,8 +17,11 @@
   "dependencies": {
     "@adonisjs/core": "^6.19.0",
     "@adonisjs/static": "^1.1.1",
+    "@iconify-icons/tabler": "^1.2.95",
+    "@iconify-json/tabler": "^1.2.20",
     "@radix-ui/colors": "^3.0.0",
     "@ryangjchandler/alpine-tooltip": "^2.0.1",
+    "edge-iconify": "^2.0.1",
     "edge.js": "6.2.0",
     "tippy.js": "^6.3.7"
   },
