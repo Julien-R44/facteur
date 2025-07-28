@@ -171,6 +171,7 @@ export class NotificationSender {
      */
     if (!failures.length) {
       this.#emitNotificationSent(notification, channelResults)
+      await notification.afterSend()
       return { failed: failures.length, success: successes.length, results: channelResults }
     }
 
@@ -179,6 +180,8 @@ export class NotificationSender {
      */
     const failureReasons = failures.map((r) => r.error)
     this.#emitNotificationFailed(notification, failureReasons)
+
+    await notification.afterSend()
 
     if (throwOnError !== false) throw new errors.E_SEND_NOTIFICATION_FAILED(failureReasons)
 

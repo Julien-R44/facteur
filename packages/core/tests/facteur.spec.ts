@@ -123,7 +123,7 @@ test.group('Facteur | send', () => {
         },
       }
 
-      override async prepare() {
+      override async beforeSend() {
         assert.isTrue(true)
       }
     }

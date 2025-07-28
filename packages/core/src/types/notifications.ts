@@ -39,7 +39,7 @@ export abstract class Notification<
   /**
    * Determine if the notification should be sent or not
    */
-  shouldSend(): boolean {
+  shouldSend(): Awaitable<boolean> {
     return true
   }
 
@@ -47,7 +47,15 @@ export abstract class Notification<
    * Method invoked before sending the notification.
    * Can be used to perform any pre-send logic.
    */
-  prepare(): Awaitable<void> {
+  beforeSend(): Awaitable<void> {
+    // No-op by default
+  }
+
+  /**
+   * Method invoked after the notification has been sent.
+   * Can be used to perform any post-send logic.
+   */
+  afterSend(): Awaitable<void> {
     // No-op by default
   }
 }
