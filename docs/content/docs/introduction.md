@@ -68,7 +68,7 @@ That's it. This notification gets sent through all the channels you specified in
 
 ### In-App Notifications
 
-We just saw how to send notifications to external services. Now let's look at in-app notifications – think Twitter or Facebook notifications that appear in real-time and get stored in your database with read/unread status.
+We just saw how to send notifications to external services. Now let's look at in-app notifications, think Twitter or Facebook notifications that appear in real-time and get stored in your database with read/unread status.
 
 Facteur handles this elegantly too.
 
@@ -142,7 +142,7 @@ await facteur.preferences.update({
 })
 ```
 
-There's plenty more to explore – we'll cover it all in the following sections.
+There's plenty more to explore, we'll cover it all in the following sections.
 
 ## What's Coming
 
@@ -150,13 +150,13 @@ Facteur is actively being developed. Here's what's on the roadmap:
 - Notification queuing support
 - Debouncing and batching system
 - Diagnostic channels for tracing and monitoring
-- Topics for organizing notifications by subject
-- Headless React/Vue components for even easier integration (TanStack Query hooks? Headless UI components?)
-- Even more notification channels
+- Topics. 
+- Headless React/Vue components for even easier integration (TanStack Query hooks? Headless UI components? Shadcn registry ?)
+- Even more notification channels !
 
 If you're interested in a specific feature, feel free to open an issue on GitHub or contribute to the project.
 
-Our goal is to make Facteur the go-to notification solution for the Node.js ecosystem – a central hub for every notification channel you can think of. We need your help to make that happen!
+Our goal is to make Facteur the go-to notification solution for the Node.js ecosystem, a central hub for every notification channel you can think of. We need your help to make that happen!
 
 ## Sponsor
 
