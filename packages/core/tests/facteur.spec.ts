@@ -70,6 +70,39 @@ test.group('Facteur | send', () => {
       via: { email: { to: 'foo@ok.com' } },
     })
   })
+
+  test('take shouldSend into account', async ({ assert }) => {
+    const provider = testProvider()
+
+    const facteur = new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    class CustomNotification extends Notification<undefined> {
+      static override options: any = {
+        name: 'CustomNotification',
+        tags: ['test'],
+        deliverBy: {
+          email: true,
+        },
+      }
+
+      override shouldSend() {
+        return false
+      }
+    }
+
+    const result = await facteur.send({
+      notification: CustomNotification,
+      via: { email: { to: 'foo@ok.com' } },
+      throwOnError: false,
+    })
+
+    assert.equal(result.failed, 0)
+    assert.equal(result.success, 0)
+    assert.equal(result.results.length, 0)
+  })
 })
 
 test.group('Facteur | send typings', (group) => {

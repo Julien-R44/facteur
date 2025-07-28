@@ -1,2 +1,2 @@
 export { TransmitMessage } from './message.js'
-export { transmitChannel } from './channel.js'
+export { transmitChannel, TransmitChannel } from './channel.js'

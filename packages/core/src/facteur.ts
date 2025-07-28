@@ -92,8 +92,18 @@ export class Facteur<
   async send<TNotificationClass extends NotificationClass<any, any>>(
     options: SendOptions<TNotificationClass>,
   ): Promise<NotificationSendResult> {
+    const notification = await this.#options.notificationResolver(options.notification, {
+      notifiable: 'notifiable' in options ? options.notifiable : undefined,
+      params: options.params,
+      tenantId: options.tenantId,
+    })
+
+    if (notification.shouldSend() === false) {
+      return { success: 0, failed: 0, results: [] }
+    }
+
     if (this.#fake) return this.#fake.recordSent(options as SendOptions<any>)
 
-    return this.#sender.send(options, this.#options.notificationResolver)
+    return this.#sender.send(options, notification)
   }
 }

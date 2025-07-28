@@ -34,6 +34,13 @@ export abstract class Notification<
     tags: [],
     deliverBy: {},
   }
+
+  /**
+   * Determine if the notification should be sent or not
+   */
+  shouldSend(): boolean {
+    return true
+  }
 }
 
 /**
