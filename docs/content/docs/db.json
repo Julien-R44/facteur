@@ -3,12 +3,36 @@
     "permalink": "introduction",
     "title": "Introduction",
     "contentPath": "./introduction.md",
-    "category": "Guides"
+    "category": "Getting Started"
   },
   {
     "permalink": "quick-start",
     "title": "Quick Start",
     "contentPath": "./quick-start.md",
+    "category": "Getting Started"
+  },
+  {
+    "permalink": "in-app-notifications",
+    "title": "In-App Notifications",
+    "contentPath": "./in-app-notifications.md",
+    "category": "Guides"
+  },
+  {
+    "permalink": "preferences",
+    "title": "Preferences",
+    "contentPath": "./user-preferences.md",
+    "category": "Guides"
+  },
+  {
+    "permalink": "frontend-sdk",
+    "title": "Frontend SDK",
+    "contentPath": "./frontend-sdk.md",
+    "category": "Guides"
+  },
+  {
+    "permalink": "Multi-tenancy",
+    "title": "Multi-tenancy",
+    "contentPath": "./multi-tenancy.md",
     "category": "Guides"
   },
   {
@@ -82,5 +106,17 @@
     "title": "AdonisJS Mail",
     "contentPath": "./mail.md",
     "category": "Channels"
+  },
+  {
+    "permalink": "events",
+    "title": "Events",
+    "contentPath": "./events.md",
+    "category": "Digging Deeper"
+  },
+  {
+    "permalink": "custom-providers",
+    "title": "Custom Providers",
+    "contentPath": "./custom-providers.md",
+    "category": "Digging Deeper"
   }
 ]
