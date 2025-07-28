@@ -12,9 +12,7 @@ export interface AdonisFacteurConfiguration<
   databaseAdapter?: ConfigProvider<DatabaseAdapter>
   api?: { guard?: (ctx: HttpContext) => Promise<boolean> | boolean }
   preferences?: DefaultPreferences<
-    Channels extends Record<string, ConfigProvider<infer Channel>>
-      ? Record<keyof Channels, boolean>
-      : never
+    Channels extends Record<string, ConfigProvider<Channel>> ? Record<keyof Channels, any> : never
   >
 }
 

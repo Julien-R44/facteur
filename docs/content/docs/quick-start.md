@@ -108,12 +108,14 @@ import type { Notifiable, NotifiableTargets } from '@facteurjs/core/types'
 
 export class User implements Notifiable {
   phoneNumber: string
-  webpushSubscription: Record<string, any> // WebPush subscription object
+  webpushSubscription: Record<string, any>
+  email: string
 
   notificationTargets(): NotifiableTargets {
     return {
       twilio: { to: this.phoneNumber },
-      webpush:  { subscription: this.webpushSubscription }, 
+      webpush: { subscription: this.webpushSubscription },
+      email: { to: this.email },
     }
   }
 }
