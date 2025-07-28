@@ -1,5 +1,6 @@
 // oxlint-disable no-unused-vars
 
+import type { Awaitable } from '@julr/utils/types'
 import type { Identifier } from '../database/types.js'
 import type { ChannelName, NotificationChannels } from './index.js'
 import type { ExtractChannelTargets, MessageCtx, NotificationOptions } from './options.js'
@@ -40,6 +41,14 @@ export abstract class Notification<
    */
   shouldSend(): boolean {
     return true
+  }
+
+  /**
+   * Method invoked before sending the notification.
+   * Can be used to perform any pre-send logic.
+   */
+  prepare(): Awaitable<void> {
+    // No-op by default
   }
 }
 

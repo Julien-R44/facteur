@@ -98,9 +98,9 @@ export class Facteur<
       tenantId: options.tenantId,
     })
 
-    if (notification.shouldSend() === false) {
-      return { success: 0, failed: 0, results: [] }
-    }
+    await notification.prepare()
+
+    if (notification.shouldSend() === false) return { success: 0, failed: 0, results: [] }
 
     if (this.#fake) return this.#fake.recordSent(options as SendOptions<any>)
 

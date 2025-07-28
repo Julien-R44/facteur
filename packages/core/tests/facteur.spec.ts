@@ -103,6 +103,37 @@ test.group('Facteur | send', () => {
     assert.equal(result.success, 0)
     assert.equal(result.results.length, 0)
   })
+
+  test('should call prepare method before sending', async ({ assert }) => {
+    assert.plan(1)
+
+    const provider = testProvider()
+
+    const facteur = new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    class CustomNotification extends Notification<undefined> {
+      static override options: any = {
+        name: 'CustomNotification',
+        tags: ['test'],
+        deliverBy: {
+          email: true,
+        },
+      }
+
+      override async prepare() {
+        assert.isTrue(true)
+      }
+    }
+
+    await facteur.send({
+      notification: CustomNotification,
+      via: { email: { to: 'foo@ok.com' } },
+      throwOnError: false,
+    })
+  })
 })
 
 test.group('Facteur | send typings', (group) => {
