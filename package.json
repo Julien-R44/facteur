@@ -31,7 +31,8 @@
     "prettier": "^3.6.2",
     "tsdown": "^0.13.0",
     "tsx": "^4.20.3",
-    "typescript": "^5.9.1-rc"
+    "typescript": "^5.9.1-rc",
+    "wrangler": "^4.26.0"
   },
   "prettier": "@julr/tooling-configs/prettier",
   "pnpm": {
