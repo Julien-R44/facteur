@@ -9,7 +9,7 @@ export function discordWebhookChannel<Options extends WebhookOptions<any>>(optio
   return new DiscordProvider({ name: 'discord', ...options })
 }
 
-class DiscordProvider<T extends WebhookOptions<any>>
+export class DiscordProvider<T extends WebhookOptions<any>>
   extends WebhookChannel<T>
   implements Channel<T, DiscordMessage, DiscordResponse, WebhookTargets<T>>
 {

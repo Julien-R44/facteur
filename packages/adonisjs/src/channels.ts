@@ -12,8 +12,30 @@ import type { FcmConfig } from '@facteurjs/core/channels/fcm/types'
 import type { WebpushConfig } from '@facteurjs/core/channels/webpush/types'
 
 import type { KyselyConfig } from './channels/database.js'
+import type { ConfigProvider } from '@adonisjs/core/types'
+import type { DiscordProvider } from './channels/discord.js'
+import type { DatabaseChannel } from './channels/database.js'
+import type { TwilioChannel } from './channels/twilio.js'
+import type { TransmitChannel } from './channels/transmit.js'
+import type { MailChannel } from './channels/mail.js'
+import type { FcmChannel } from './channels/fcm.js'
+import type { WebpushChannel } from './channels/webpush.js'
 
-export const channels = {
+export const channels: {
+  discordWebhook<Options extends DiscordOptions<any>>(
+    config: Options,
+  ): ConfigProvider<DiscordProvider<Options>>
+  slackWebhook<Options extends SlackOptions<any>>(
+    config: Options,
+  ): ConfigProvider<DiscordProvider<Options>>
+  database(config: { connectionName?: string }): ConfigProvider<DatabaseChannel>
+  kysely(config: KyselyConfig): ConfigProvider<DatabaseChannel>
+  twilio(config: TwilioConfig): ConfigProvider<TwilioChannel>
+  transmit(): ConfigProvider<TransmitChannel>
+  mail(): ConfigProvider<MailChannel>
+  fcm(config: FcmConfig): ConfigProvider<FcmChannel>
+  webpush(config: WebpushConfig): ConfigProvider<WebpushChannel>
+} = {
   /**
    * Discord channel
    */

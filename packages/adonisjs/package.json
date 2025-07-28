@@ -6,22 +6,20 @@
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "MIT",
   "keywords": [],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": "./src/index.ts",
-    "./types": "./src/types.ts",
-    "./database": "./src/database/index.ts",
-    "./database/adapters/knex": "./src/database/adapters/knex.ts",
-    "./database/adapters/kysely": "./src/database/adapters/kysely.ts",
-    "./channels/database": "./src/channels/database.ts",
-    "./channels/slack": "./src/channels/slack.ts",
     "./channels/discord": "./src/channels/discord.ts",
-    "./channels/transmit": "./src/channels/transmit.ts",
-    "./channels/twilio": "./src/channels/twilio.ts",
-    "./channels/mail": "./src/channels/mail.ts",
-    "./channels/fcm": "./src/channels/fcm.ts",
-    "./channels/webpush": "./src/channels/webpush.ts",
-    "./facteur_provider": "./src/providers/facteur_provider.ts",
-    "./package.json": "./package.json"
+    "./channels/slack": "./src/channels/slack.ts",
+    "./channels/webhook": "./src/channels/webhook.ts",
+    "./database": "./src/database/index.ts",
+    "./providers/facteur_provider": "./src/providers/facteur_provider.ts",
+    "./services/main": "./src/services/main.ts",
+    "./types": "./src/types.ts",
+    "./package.json": "./package.json",
+    "./facteur_provider": "./src/providers/facteur_provider.js"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -40,6 +38,20 @@
     "@adonisjs/redis": "^9.2.0",
     "@adonisjs/transmit": "^2.0.2"
   },
+  "peerDependenciesMeta": {
+    "@adonisjs/lucid": {
+      "optional": true
+    },
+    "@adonisjs/mail": {
+      "optional": true
+    },
+    "@adonisjs/redis": {
+      "optional": true
+    },
+    "@adonisjs/transmit": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@facteurjs/core": "workspace:",
     "@julr/utils": "catalog:",
@@ -52,5 +64,19 @@
     "@adonisjs/redis": "^9.2.0",
     "@adonisjs/transmit": "^2.0.2",
     "p-event": "^6.0.1"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./channels/discord": "./dist/channels/discord.js",
+      "./channels/slack": "./dist/channels/slack.js",
+      "./channels/webhook": "./dist/channels/webhook.js",
+      "./database": "./dist/database/index.js",
+      "./providers/facteur_provider": "./dist/providers/facteur_provider.js",
+      "./services/main": "./dist/services/main.js",
+      "./types": "./dist/types.js",
+      "./package.json": "./package.json",
+      "./facteur_provider": "./src/providers/facteur_provider.js"
+    }
   }
 }

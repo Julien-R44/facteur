@@ -1,2 +1,2 @@
 export { DiscordMessage } from './message.js'
-export { discordWebhookChannel } from './channel.js'
+export { discordWebhookChannel, DiscordProvider } from './channel.js'
