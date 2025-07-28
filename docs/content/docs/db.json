@@ -38,85 +38,85 @@
   {
     "permalink": "database",
     "title": "Database",
-    "contentPath": "./database.md",
+    "contentPath": "./channels/database.md",
     "category": "Channels"
   },
   {
     "permalink": "transmit",
     "title": "Transmit",
-    "contentPath": "./transmit.md",
+    "contentPath": "./channels/transmit.md",
     "category": "Channels"
   },
   {
     "permalink": "slack",
     "title": "Slack",
-    "contentPath": "./slack.md",
+    "contentPath": "./channels/slack.md",
     "category": "Channels"
   },
   {
     "permalink": "discord",
     "title": "Discord",
-    "contentPath": "./discord.md",
+    "contentPath": "./channels/discord.md",
     "category": "Channels"
   },
   {
     "permalink": "whatsapp",
     "title": "WhatsApp",
-    "contentPath": "./whatsapp.md",
+    "contentPath": "./channels/whatsapp.md",
     "category": "Channels"
   },
   {
     "permalink": "teams",
     "title": "Microsoft Teams",
-    "contentPath": "./teams.md",
+    "contentPath": "./channels/teams.md",
     "category": "Channels"
   },
   {
     "permalink": "twilio",
     "title": "Twilio SMS",
-    "contentPath": "./twilio.md",
+    "contentPath": "./channels/twilio.md",
     "category": "Channels"
   },
   {
     "permalink": "expo-notifications",
     "title": "Expo Notifications",
-    "contentPath": "./expo-notifications.md",
+    "contentPath": "./channels/expo-notifications.md",
     "category": "Channels"
   },
   {
     "permalink": "webpush",
     "title": "Web Push",
-    "contentPath": "./webpush.md",
+    "contentPath": "./channels/webpush.md",
     "category": "Channels"
   },
   {
     "permalink": "fcm",
     "title": "Firebase Cloud Messaging",
-    "contentPath": "./fcm.md",
+    "contentPath": "./channels/fcm.md",
     "category": "Channels"
   },
   {
     "permalink": "webhook",
     "title": "Webhook",
-    "contentPath": "./webhook.md",
+    "contentPath": "./channels/webhook.md",
     "category": "Channels"
   },
   {
     "permalink": "mail",
     "title": "AdonisJS Mail",
-    "contentPath": "./mail.md",
+    "contentPath": "./channels/mail.md",
     "category": "Channels"
   },
   {
     "permalink": "events",
     "title": "Events",
-    "contentPath": "./events.md",
+    "contentPath": "./deep/events.md",
     "category": "Digging Deeper"
   },
   {
     "permalink": "custom-providers",
     "title": "Custom Providers",
-    "contentPath": "./custom-providers.md",
+    "contentPath": "./deep/custom-providers.md",
     "category": "Digging Deeper"
   }
 ]

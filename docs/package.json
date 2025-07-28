@@ -40,6 +40,7 @@
     "alpinejs": "^3.14.9",
     "collect.js": "^4.36.1",
     "concurrently": "^9.2.0",
+    "copyfiles": "^2.4.1",
     "edge-uikit": "^1.0.0-1",
     "medium-zoom": "^1.1.0",
     "reflect-metadata": "^0.2.2",
