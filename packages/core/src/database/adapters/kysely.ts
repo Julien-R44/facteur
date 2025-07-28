@@ -25,6 +25,8 @@ class KyselyAdapter implements DatabaseAdapter {
 
   constructor(config: KyselyConfig) {
     this.#connection = config.connection
+    this.#tableName = config.tableNames?.notifications || 'notifications'
+    this.#preferencesTableName = config.tableNames?.preferences || 'notification_preferences'
   }
 
   setTableName(tableName: string) {

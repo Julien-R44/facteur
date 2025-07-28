@@ -1,10 +1,10 @@
 import { configProvider } from '@adonisjs/core'
 import { RuntimeException } from '@adonisjs/core/exceptions'
 
-import type { KyselyConfig } from '../channels/database.js'
+import type { DatabaseAdapterCommonOptions, KyselyConfig } from '../channels/database.js'
 
 export const databases = {
-  lucid(config: { connectionName?: string }) {
+  lucid(config: DatabaseAdapterCommonOptions & { connectionName?: string }) {
     return configProvider.create(async (app) => {
       const db = await app.container.make('lucid.db')
       const connectionName = config?.connectionName || db.primaryConnectionName
@@ -21,7 +21,13 @@ export const databases = {
       }
 
       const { knexAdapter } = await import('@facteurjs/core/database/adapters/knex')
-      return knexAdapter({ connection: db.connection(connectionName).getWriteClient() })
+      return knexAdapter({
+        connection: db.connection(connectionName).getWriteClient(),
+        tableNames: {
+          notifications: config?.tableNames?.notifications,
+          preferences: config?.tableNames?.preferences,
+        },
+      })
     })
   },
 

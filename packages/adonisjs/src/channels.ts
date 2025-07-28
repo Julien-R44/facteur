@@ -21,6 +21,14 @@ import type { MailChannel } from './channels/mail.js'
 import type { FcmChannel } from './channels/fcm.js'
 import type { WebpushChannel } from './channels/webpush.js'
 
+export interface DatabaseConfig {
+  connectionName?: string
+  tableNames?: {
+    notifications?: string
+    preferences?: string
+  }
+}
+
 export const channels: {
   discordWebhook<Options extends DiscordOptions<any>>(
     config: Options,
@@ -28,7 +36,7 @@ export const channels: {
   slackWebhook<Options extends SlackOptions<any>>(
     config: Options,
   ): ConfigProvider<DiscordProvider<Options>>
-  database(config: { connectionName?: string }): ConfigProvider<DatabaseChannel>
+  database(config: DatabaseConfig): ConfigProvider<DatabaseChannel>
   kysely(config: KyselyConfig): ConfigProvider<DatabaseChannel>
   twilio(config: TwilioConfig): ConfigProvider<TwilioChannel>
   transmit(): ConfigProvider<TransmitChannel>
@@ -59,7 +67,7 @@ export const channels: {
   /**
    * Database channel
    */
-  database(config: { connectionName?: string }) {
+  database(config: DatabaseConfig) {
     return configProvider.create(async (app) => {
       const db = await app.container.make('lucid.db')
       const connectionName = config?.connectionName || db.primaryConnectionName
@@ -78,7 +86,13 @@ export const channels: {
       const { databaseChannel } = await import('@facteurjs/core/database')
       const { knexAdapter } = await import('@facteurjs/core/database/adapters/knex')
       return databaseChannel({
-        adapter: knexAdapter({ connection: db.connection(connectionName).getWriteClient() }),
+        adapter: knexAdapter({
+          connection: db.connection(connectionName).getWriteClient(),
+          tableNames: {
+            notifications: config?.tableNames?.notifications || 'notifications',
+            preferences: config?.tableNames?.preferences || 'notification_preferences',
+          },
+        }),
       })
     })
   },

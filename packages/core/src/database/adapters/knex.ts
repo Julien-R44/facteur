@@ -25,6 +25,8 @@ class KnexAdapter implements DatabaseAdapter {
 
   constructor(config: KnexConfig) {
     this.#connection = config.connection
+    this.#tableName = config.tableNames?.notifications || 'notifications'
+    this.#preferencesTableName = config.tableNames?.preferences || 'notification_preferences'
   }
 
   setTableName(tableName: string) {

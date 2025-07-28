@@ -59,25 +59,35 @@ export interface PruneNotificationsParams {
  */
 export interface DatabaseConfig {
   adapter: DatabaseAdapter
+}
 
-  /**
-   * The table name to use for storing notifications
-   * @default 'notifications'
-   */
-  tableName?: string
+export interface DatabaseAdapterCommonOptions {
+  tableNames?: {
+    /**
+     * The table name to use for storing notifications
+     * @default 'notifications'
+     */
+    notifications?: string | undefined
+
+    /**
+     * The table name to use for storing notification preferences
+     * @default 'notification_preferences'
+     */
+    preferences?: string | undefined
+  }
 }
 
 /**
  * Options accepted by the Kysely adapter
  */
-export interface KyselyConfig {
+export interface KyselyConfig extends DatabaseAdapterCommonOptions {
   connection: Kysely<any>
 }
 
 /**
  * Options accepted by the Knex adapter
  */
-export interface KnexConfig {
+export interface KnexConfig extends DatabaseAdapterCommonOptions {
   connection: Knex
 }
 
@@ -143,7 +153,6 @@ export interface UpdatePreferencesParams {
  */
 export interface DatabaseAdapter {
   save: (options: SaveToDatabaseParams) => Promise<void>
-  setTableName: (tableName: string) => void
   getNotifications: (options: AdapterGetNotificationsParams) => Promise<Notification[]>
   updateNotification: (options: UpdateNotificationParams) => Promise<void>
   updateAllNotifications: (options: UpdateAllNotificationsParams) => Promise<void>
