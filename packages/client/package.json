@@ -7,7 +7,8 @@
   "license": "ISC",
   "keywords": [],
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -21,5 +22,11 @@
   },
   "dependencies": {
     "ky": "^1.8.2"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    }
   }
 }

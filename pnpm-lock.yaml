@@ -232,6 +232,22 @@ importers:
         specifier: ^3.6.7
         version: 3.6.7
 
+  packages/react:
+    dependencies:
+      '@facteurjs/client':
+        specifier: workspace:*
+        version: link:../client
+    devDependencies:
+      '@tanstack/react-query':
+        specifier: ^5.83.0
+        version: 5.83.0(react@19.1.0)
+      '@types/react':
+        specifier: ^19.1.8
+        version: 19.1.8
+      react:
+        specifier: ^19.1.0
+        version: 19.1.0
+
   playgrounds/adonisjs:
     dependencies:
       '@adonisjs/auth':

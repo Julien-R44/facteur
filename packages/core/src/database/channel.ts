@@ -24,7 +24,6 @@ export class DatabaseChannel
 
   constructor(config: DatabaseConfig) {
     this.#adapter = config.adapter
-    this.#adapter.setTableName(config.tableName || 'notifications')
   }
 
   #resolveTargets(options: ChannelSendParams<DatabaseMessage, DatabaseTargets>): DatabaseTargets {

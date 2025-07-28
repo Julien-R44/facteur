@@ -10,6 +10,7 @@ export default defineConfig({
     './channels/discord': './src/channels/discord.ts',
     './channels/slack': './src/channels/slack.ts',
     './channels/webhook': './src/channels/webhook.ts',
+    './channels/database': './src/channels/database.ts',
     './services/main': './src/services/main.ts',
   },
   unbundle: true,

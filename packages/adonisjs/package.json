@@ -11,6 +11,7 @@
   ],
   "exports": {
     ".": "./src/index.ts",
+    "./channels/database": "./src/channels/database.ts",
     "./channels/discord": "./src/channels/discord.ts",
     "./channels/slack": "./src/channels/slack.ts",
     "./channels/webhook": "./src/channels/webhook.ts",
@@ -68,6 +69,7 @@
   "publishConfig": {
     "exports": {
       ".": "./dist/index.js",
+      "./channels/database": "./dist/channels/database.js",
       "./channels/discord": "./dist/channels/discord.js",
       "./channels/slack": "./dist/channels/slack.js",
       "./channels/webhook": "./dist/channels/webhook.js",
