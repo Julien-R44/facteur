@@ -5,7 +5,7 @@ import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
 import type { Identifier } from '@facteurjs/adonisjs/channels/database'
 import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
 import type { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
-import type { MessageCtx, NotificationOptions } from '@facteurjs/adonisjs/types'
+import type { NotificationOptions } from '@facteurjs/adonisjs/types'
 import { FcmMessage } from '@facteurjs/adonisjs/channels/fcm'
 
 import type User from '#models/user'

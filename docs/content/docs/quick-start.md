@@ -73,15 +73,15 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     }
   }
 
-  asTwilioMessage({ params }: NotificationContext<User, InvoicePaidParams>): TwilioMessage {
+  asTwilioMessage() {
     return TwilioMessage.create()
-      .setBody(`Your invoice of $${params.amount} has been paid!`)
+      .setBody(`Your invoice of $${this.params.amount} has been paid!`)
   }
 
-  asWebPushMessage({ params }: NotificationContext<User, InvoicePaidParams>): WebPushMessage {
+  asWebPushMessage() {
     return WebPushMessage.create()
       .setTitle('Invoice Paid')
-      .setBody(`Your invoice of $${params.amount} has been paid!`)
+      .setBody(`Your invoice of $${this.params.amount} has been paid!`)
       .setIcon('https://example.com/icon.png')
       .setActions([
         { action: 'view', title: 'View Invoice' },
