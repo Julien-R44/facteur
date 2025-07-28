@@ -70,7 +70,7 @@ export class FacteurOptions<
     this.databaseAdapter = config.databaseAdapter ?? null
     this.defaultPreferences = this.#resolveDefaultPreferences(config.preferences)
     this.notificationResolver =
-      config.notificationResolver || ((notification) => new notification())
+      config.notificationResolver || ((notification, ctx) => new notification(ctx))
 
     const throwIfQueueNotSet = () => {
       throw new errors.E_QUEUE_NOT_SET()

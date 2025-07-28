@@ -1,4 +1,4 @@
-import type { Channel, MessageCtx, Notifiable } from '../../types/index.js'
+import type { Channel } from '../../types/index.js'
 
 import type { DiscordResponse } from './types.js'
 import type { DiscordMessage } from './message.js'
@@ -17,10 +17,7 @@ class DiscordProvider<T extends WebhookOptions<any>>
 }
 
 declare module '@facteurjs/core/types' {
-  interface Notification<
-    N extends Notifiable | undefined = Notifiable | undefined,
-    Params extends Record<string, any> = any,
-  > {
-    asDiscordMessage(ctx: MessageCtx<N, Params>): DiscordMessage
+  interface Notification {
+    asDiscordMessage(): DiscordMessage
   }
 }

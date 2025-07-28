@@ -1,10 +1,4 @@
-import {
-  kTargetSymbol,
-  type Channel,
-  type ChannelSendParams,
-  type MessageCtx,
-  type Notifiable,
-} from '../types/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types/index.js'
 
 import type { DatabaseMessage } from './message.js'
 import type { DatabaseAdapter, DatabaseConfig, Identifier } from './types.js'
@@ -64,10 +58,7 @@ export class DatabaseChannel
 }
 
 declare module '@facteurjs/core/types' {
-  interface Notification<
-    N extends Notifiable | undefined = Notifiable | undefined,
-    Params extends Record<string, any> = any,
-  > {
-    asDatabaseMessage(ctx: MessageCtx<N, Params>): DatabaseMessage
+  interface Notification {
+    asDatabaseMessage(): DatabaseMessage
   }
 }

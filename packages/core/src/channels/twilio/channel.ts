@@ -1,11 +1,5 @@
 import Twilio from 'twilio'
-import {
-  kTargetSymbol,
-  type Channel,
-  type ChannelSendParams,
-  type MessageCtx,
-  type Notifiable,
-} from '../../types/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 
 import type { TwilioMessage } from './message.js'
 import type { TwilioConfig, TwilioTargets } from './types.js'
@@ -94,10 +88,7 @@ export class TwilioChannel implements Channel<TwilioConfig, TwilioMessage, any, 
 }
 
 declare module '@facteurjs/core/types' {
-  interface Notification<
-    N extends Notifiable | undefined = Notifiable | undefined,
-    Params extends Record<string, any> = any,
-  > {
-    asTwilioMessage(ctx: MessageCtx<N, Params>): TwilioMessage
+  interface Notification {
+    asTwilioMessage(): TwilioMessage
   }
 }

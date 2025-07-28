@@ -69,7 +69,8 @@ export interface FacteurConfiguration<
  * Resolver function type for notifications
  */
 export type NotificationResolver = (
-  notification: new (...args: any[]) => Notification,
+  notification: new (ctx: MessageCtx<any, any>, ...args: any[]) => Notification,
+  ctx: MessageCtx<any, any>,
 ) => Awaitable<Notification>
 
 export interface NotificationOptions<N extends Notifiable = Notifiable> {
@@ -126,7 +127,7 @@ export interface MessageCtx<
 > {
   notifiable: N
   params: Params
-  tenantId?: Identifier
+  tenantId?: Identifier | undefined
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { Channel, MessageCtx, Notifiable } from '../../types/index.js'
+import type { Channel } from '../../types/index.js'
 
 import type { SlackMessage } from './message.js'
 import { WebhookChannel } from '../webhook/provider.js'
@@ -17,10 +17,7 @@ export class SlackWebhookChannel<T extends SlackOptions<any>>
 }
 
 declare module '@facteurjs/core/types' {
-  interface Notification<
-    N extends Notifiable | undefined = Notifiable | undefined,
-    Params extends Record<string, any> = any,
-  > {
-    asSlackMessage(ctx: MessageCtx<N, Params>): SlackMessage
+  interface Notification {
+    asSlackMessage(): SlackMessage
   }
 }

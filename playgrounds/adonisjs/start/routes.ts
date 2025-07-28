@@ -41,10 +41,6 @@ router.post('/send', async ({ request, response }) => {
 
   return response.ok({ message: 'Notification sent successfully' })
 })
-import webPush from 'web-push'
-
-const keys = webPush.generateVAPIDKeys()
-console.log(keys.publicKey, keys.privateKey)
 
 transmit.registerRoutes()
 

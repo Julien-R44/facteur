@@ -1,7 +1,8 @@
 // oxlint-disable no-unused-vars
 
+import type { Identifier } from '../database/types.js'
 import type { ChannelName, NotificationChannels } from './index.js'
-import type { ExtractChannelTargets, NotificationOptions } from './options.js'
+import type { ExtractChannelTargets, MessageCtx, NotificationOptions } from './options.js'
 
 /**
  * Constructor type for notification classes
@@ -18,7 +19,15 @@ export abstract class Notification<
   N extends Notifiable | undefined = Notifiable | undefined,
   Params extends Record<string, any> = any,
 > {
-  _notifiable?: N
+  protected notifiable: N
+  protected params: Params
+  protected tenantId: Identifier | undefined
+
+  constructor(ctx: MessageCtx<N, Params>) {
+    this.notifiable = ctx.notifiable
+    this.params = ctx.params
+    this.tenantId = ctx.tenantId
+  }
 
   static options: NotificationOptions<any> = {
     name: '',

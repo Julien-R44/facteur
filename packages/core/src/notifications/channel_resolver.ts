@@ -11,7 +11,7 @@ import { invoke } from '@julr/utils/functions'
 import { is } from '@julr/utils/is'
 
 export interface ResolveChannelsOptions {
-  notification: new () => Notification
+  notification: new (...args: any[]) => Notification<any, any>
   notifiable?: Notifiable | undefined
   params: any
   via?: ChannelSpecificConfig<any>

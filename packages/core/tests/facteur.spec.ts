@@ -59,9 +59,9 @@ test.group('Facteur | send', () => {
     const facteur = new Facteur({
       channels: { email: provider },
       discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
-      notificationResolver: (notification) => {
+      notificationResolver: (notification, ctx) => {
         assert.equal(notification, FakeNotification)
-        return new FakeNotification()
+        return new FakeNotification(ctx)
       },
     })
 

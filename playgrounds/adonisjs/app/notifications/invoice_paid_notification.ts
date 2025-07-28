@@ -24,7 +24,7 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     deliverBy: {
       database: true,
       transmit: true,
-      webpush: true,
+      webpush: false,
       mail: true,
       slack: false,
       discord: false,
@@ -55,12 +55,12 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     })
   }
 
-  asDatabaseMessage({ params, tenantId }: MessageCtx<User, InvoicePaidParams>): DatabaseMessage {
+  asDatabaseMessage(): DatabaseMessage {
     return DatabaseMessage.create()
       .setContent({
         title: 'Invoice Paid',
-        body: `Your invoice of $${params.amount} has been successfully paid.`,
-        organization: this.#getOrganizationName(tenantId),
+        body: `Your invoice of $${this.params.amount} has been successfully paid.`,
+        organization: this.#getOrganizationName(this.tenantId),
       })
       .setType('invoice_paid')
   }
@@ -69,16 +69,16 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     return DiscordMessage.create().setBotUsername('Test').setBody('Invoice paid')
   }
 
-  asWebpushMessage(ctx: MessageCtx<User, InvoicePaidParams>): WebpushMessage {
+  asWebpushMessage(): WebpushMessage {
     return WebpushMessage.create()
       .setTitle('Invoice Paid')
-      .setBody(`Your invoice of $${ctx.params.amount} has been successfully paid.`)
+      .setBody(`Your invoice of $${this.params.amount} has been successfully paid.`)
       .setIcon('/mailbox.png')
       .setTag('invoice-paid')
       .setData({
         type: 'invoice_paid',
-        amount: ctx.params.amount.toString(),
-        organization: this.#getOrganizationName(ctx.tenantId),
+        amount: this.params.amount.toString(),
+        organization: this.#getOrganizationName(this.tenantId),
       })
       .setTag('invoice-paid')
       .setActions([
@@ -100,14 +100,14 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     return TwilioMessage.create().setBody('Post liked!!')
   }
 
-  asFcmMessage(ctx: MessageCtx<User, InvoicePaidParams>): FcmMessage {
+  asFcmMessage(): FcmMessage {
     return FcmMessage.create()
       .setTitle('Yo! Invoice Paid')
-      .setBody(`Your invoice of $${ctx.params.amount} has been successfully paid....`)
+      .setBody(`Your invoice of $${this.params.amount} has been successfully paid....`)
       .setData({
         type: 'invoice_paid',
-        amount: ctx.params.amount.toString(),
-        organization: this.#getOrganizationName(ctx.tenantId),
+        amount: this.params.amount.toString(),
+        organization: this.#getOrganizationName(this.tenantId),
       })
   }
 }

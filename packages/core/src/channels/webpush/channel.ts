@@ -1,10 +1,4 @@
-import {
-  kTargetSymbol,
-  type Channel,
-  type ChannelSendParams,
-  type MessageCtx,
-  type Notifiable,
-} from '../../types/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 
 import type { WebpushMessage } from './message.js'
 import type { WebpushConfig, WebpushTargets } from './types.js'
@@ -77,10 +71,7 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
 }
 
 declare module '@facteurjs/core/types' {
-  interface Notification<
-    N extends Notifiable | undefined = Notifiable | undefined,
-    Params extends Record<string, any> = any,
-  > {
-    asWebpushMessage(ctx: MessageCtx<N, Params>): WebpushMessage
+  interface Notification {
+    asWebpushMessage(): WebpushMessage
   }
 }

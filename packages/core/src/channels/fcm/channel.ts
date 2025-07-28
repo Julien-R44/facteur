@@ -1,10 +1,4 @@
-import {
-  kTargetSymbol,
-  type Channel,
-  type ChannelSendParams,
-  type MessageCtx,
-  type Notifiable,
-} from '../../types/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 
 import type { FcmMessage } from './message.js'
 import type { FcmConfig, FcmTargets } from './types.js'
@@ -66,10 +60,7 @@ export class FcmChannel implements Channel<FcmConfig, FcmMessage, any, FcmTarget
 }
 
 declare module '@facteurjs/core/types' {
-  interface Notification<
-    N extends Notifiable | undefined = Notifiable | undefined,
-    Params extends Record<string, any> = any,
-  > {
-    asFcmMessage(ctx: MessageCtx<N, Params>): FcmMessage
+  interface Notification {
+    asFcmMessage(): FcmMessage
   }
 }

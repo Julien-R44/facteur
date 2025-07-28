@@ -194,8 +194,10 @@ export class NotificationSender {
     notificationResolver: NotificationResolver,
   ): Promise<NotificationSendResult> {
     const { via, params, tenantId } = options
+
+    const notifiable = 'notifiable' in options ? options.notifiable : undefined
     const resolvedChannels = await this.channelResolver.resolveChannels({
-      notifiable: 'notifiable' in options ? options.notifiable : undefined,
+      notifiable,
       params,
       tenantId: tenantId as Identifier,
       notification: options.notification,
@@ -203,7 +205,12 @@ export class NotificationSender {
     })
 
     debug(`Resolved channels: %O`, resolvedChannels)
-    const notification = await notificationResolver(options.notification)
+    const notification = await notificationResolver(options.notification, {
+      notifiable,
+      params: options.params,
+      tenantId: options.tenantId,
+    })
+
     this.#emitNotificationSending(notification, resolvedChannels)
 
     /**
