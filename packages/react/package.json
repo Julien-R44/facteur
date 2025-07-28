@@ -1,0 +1,37 @@
+{
+  "name": "@facteurjs/react",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "React package for facteur",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "license": "ISC",
+  "keywords": [],
+  "exports": {
+    ".": "./src/index.tsx",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsdown",
+    "stub": "tsdown",
+    "test": "tsx tests/index.ts",
+    "typecheck": "tsc --noEmit",
+    "quick:test": "tsx tests/index.ts"
+  },
+  "dependencies": {
+    "@facteurjs/client": "workspace:*"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.js",
+      "./package.json": "./package.json"
+    }
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.83.0",
+    "@types/react": "^19.1.8",
+    "react": "^19.1.0"
+  }
+}
