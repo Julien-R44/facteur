@@ -2,7 +2,7 @@ import type { Awaitable } from '@julr/utils/types'
 import type { Identifier } from '../database/types.js'
 
 export type ChannelSendParams<Message, Targets> = {
-  notifiable?: any
+  to?: any
   message: Message
   targets?: Targets
   tenantId?: Identifier | undefined

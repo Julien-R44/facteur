@@ -210,13 +210,13 @@ test.group('Facteur | send typings', (group) => {
 
     facteur.send({
       notification: NoAnonymousNotification,
-      notifiable: { id: '1', type: 'user', notificationTargets: {} as any },
+      to: { id: '1', type: 'user', notificationTargets: {} as any },
     })
 
     facteur.send({
       notification: NoAnonymousNotification,
-      // @ts-expect-error Should throw error because notifiable doesnt match notification typing
-      notifiable: { notificationTargets: {} as any },
+      // @ts-expect-error Should throw error because to doesnt match notification typing
+      to: { notificationTargets: {} as any },
       via: { email: { to: 'foo@ok.com' } },
       tenantId: 'tenant-id',
     })

@@ -93,7 +93,7 @@ export class Facteur<
     options: SendOptions<TNotificationClass>,
   ): Promise<NotificationSendResult> {
     const notification = await this.#options.notificationResolver(options.notification, {
-      notifiable: 'notifiable' in options ? options.notifiable : undefined,
+      to: 'to' in options ? options.to : undefined,
       params: options.params,
       tenantId: options.tenantId,
     })

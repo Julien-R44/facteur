@@ -112,7 +112,7 @@ export interface NotificationOptions<N extends Notifiable = Notifiable> {
 
 export interface DeliverByOptions<N extends Notifiable = Notifiable> {
   if: (options: {
-    notifiable: N
+    to: N
     params?: any
     preferences?: Record<string, boolean | undefined>
   }) => boolean
@@ -125,7 +125,7 @@ export interface MessageCtx<
   N extends Notifiable | undefined = Notifiable,
   Params extends Record<string, any> = {},
 > {
-  notifiable: N
+  to: N
   params: Params
   tenantId?: Identifier | undefined
 }
@@ -180,7 +180,7 @@ export type SendOptions<TNotificationClass extends NotificationClass<any, any>> 
       }
     : CommonSendOptions<TNotificationClass> & {
         notification: TNotificationClass
-        notifiable: NonNullable<ExtractNotifiable<TNotificationClass>>
+        to: NonNullable<ExtractNotifiable<TNotificationClass>>
         via?: ChannelSpecificConfig<ExtractNotifiable<TNotificationClass>>
         tenantId?: Identifier
       }

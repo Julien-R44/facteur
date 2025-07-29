@@ -12,7 +12,7 @@ import { is } from '@julr/utils/is'
 
 export interface ResolveChannelsOptions {
   notification: new (...args: any[]) => Notification<any, any>
-  notifiable?: Notifiable | undefined
+  to?: Notifiable | undefined
   params: any
   via?: ChannelSpecificConfig<any>
   tenantId?: Identifier
@@ -36,7 +36,7 @@ export class ChannelResolver {
    * Resolve channels and targets provided by via
    */
   #resolveVia(options: ResolveChannelsOptions): ResolvedChannels {
-    const notifiableTargets = options.notifiable?.notificationTargets?.()
+    const notifiableTargets = options.to?.notificationTargets?.()
 
     return mapEntries(options.via!, (channelName, channelConfig) => {
       const shouldSend = typeof channelConfig === 'boolean' ? channelConfig : true
@@ -51,11 +51,11 @@ export class ChannelResolver {
   }
 
   async resolveChannels(options: ResolveChannelsOptions): Promise<ResolvedChannels> {
-    const { notification, notifiable, params, via, tenantId } = options
+    const { notification, to, params, via, tenantId } = options
 
     const notificationOptions = (notification as any).options as NotificationOptions<any>
     const notificationIdentifier = notificationOptions.identifier || notification.name
-    const notifiableTargets = options.notifiable?.notificationTargets?.()
+    const notifiableTargets = options.to?.notificationTargets?.()
 
     /**
      * First, if via is provided it should override everything.
@@ -67,7 +67,7 @@ export class ChannelResolver {
      */
     const preferences = await this.#database?.getPreferences({
       // @ts-ignore Maybe this .id should be configurable ?
-      notifiableId: notifiable.id as Identifier,
+      notifiableId: to.id as Identifier,
       tenantId: tenantId as Identifier,
     })
 
@@ -79,7 +79,7 @@ export class ChannelResolver {
         if (typeof deliverBy === 'boolean') return deliverBy
 
         // @ts-ignore
-        return deliverBy.if({ notifiable, params, preferences })
+        return deliverBy.if({ to, params, preferences })
       })
 
       const target = notifiableTargets?.[channelName] || null

@@ -4,7 +4,7 @@ import type { Notification, SendOptions, NotificationSendResult } from './types/
 
 export interface SentNotification<N extends Notification = Notification> {
   notification: N
-  notifiable: N extends Notification<infer TNotifiable, any> ? TNotifiable : never
+  to: N extends Notification<infer TNotifiable, any> ? TNotifiable : never
   params?: N extends Notification<any, infer P> ? P : never
   via?: any
 }
@@ -20,7 +20,7 @@ export class FacteurFake {
 
     this.#sentNotifications.push({
       notification,
-      notifiable: options.notifiable,
+      to: options.to,
       params: options.params,
       via: options.via,
     } as SentNotification)

@@ -25,7 +25,7 @@ export abstract class Notification<
   protected tenantId: Identifier | undefined
 
   constructor(ctx: MessageCtx<N, Params>) {
-    this.notifiable = ctx.notifiable
+    this.notifiable = ctx.to
     this.params = ctx.params
     this.tenantId = ctx.tenantId
   }

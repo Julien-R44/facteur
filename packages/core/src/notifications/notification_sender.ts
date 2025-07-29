@@ -121,7 +121,7 @@ export class NotificationSender {
     }
 
     const messageContent = messageBuilder.call(options.notification, {
-      notifiable: sendOptions.notifiable,
+      to: sendOptions.to,
       params: sendOptions.params,
       tenantId: sendOptions.tenantId,
     } as MessageCtx<any, any>)
@@ -140,7 +140,7 @@ export class NotificationSender {
         tenantId: sendOptions.tenantId,
         message: messageContent,
         targets: channelConfig.target,
-        notifiable: sendOptions.notifiable,
+        to: sendOptions.to,
       })
 
       debug(`Message sent via ${channelName}`)
@@ -197,9 +197,9 @@ export class NotificationSender {
   ): Promise<NotificationSendResult> {
     const { via, params, tenantId } = options
 
-    const notifiable = 'notifiable' in options ? options.notifiable : undefined
+    const to = 'to' in options ? options.to : undefined
     const resolvedChannels = await this.channelResolver.resolveChannels({
-      notifiable,
+      to,
       params,
       tenantId: tenantId as Identifier,
       notification: options.notification,

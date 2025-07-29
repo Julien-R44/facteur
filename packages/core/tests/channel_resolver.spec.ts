@@ -13,7 +13,7 @@ class NotifA extends Notification<any> {
 test.group('Channel Resolver | via', () => {
   test('should only use "via" channels when provided', async ({ assert }) => {
     const result = await new ChannelResolver().resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
       via: { sms: { to: '1234567890' } },
@@ -26,7 +26,7 @@ test.group('Channel Resolver | via', () => {
 
   test('should use notifiable targets if present', async ({ assert }) => {
     const result = await new ChannelResolver().resolveChannels({
-      notifiable: {
+      to: {
         id: 'user-123',
         notificationTargets: () => ({ email: { to: 'foo@ok.com' } }),
       } as any,
@@ -42,7 +42,7 @@ test.group('Channel Resolver | via', () => {
 
   test('ignore notifiable targets if via include it', async ({ assert }) => {
     const result = await new ChannelResolver().resolveChannels({
-      notifiable: {
+      to: {
         id: 'user-123',
         notificationTargets: () => ({ email: { to: 'foo@ok.com' } }),
       } as any,
@@ -58,7 +58,7 @@ test.group('Channel Resolver | via', () => {
 
   test('ignore preferences if via is provided', async ({ assert }) => {
     const result = await new ChannelResolver(new FakeDatabase()).resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
       via: { email: true },
@@ -73,7 +73,7 @@ test.group('Channel Resolver | via', () => {
 test.group('Channel resolver | deliverBy', () => {
   test('use deliverBy and notificationTargets', async ({ assert }) => {
     const result = await new ChannelResolver().resolveChannels({
-      notifiable: {
+      to: {
         id: 'user-123',
         notificationTargets: () => ({ email: { to: 'foo@ok.com' }, sms: { to: '1234567890' } }),
       } as any,
@@ -93,7 +93,7 @@ test.group('Channel resolver | deliverBy', () => {
         name: 'FakeNotification',
         deliverBy: {
           email: {
-            if: ({ notifiable }: any) => notifiable.hasEmail,
+            if: ({ to }: any) => to.hasEmail,
           },
           sms: true,
         },
@@ -101,7 +101,7 @@ test.group('Channel resolver | deliverBy', () => {
     }
 
     const result = await new ChannelResolver().resolveChannels({
-      notifiable: {
+      to: {
         id: 'user-123',
         hasEmail: false,
         notificationTargets: () => ({ email: null, sms: '1212' }),
@@ -122,14 +122,14 @@ test.group('Channel resolver | deliverBy', () => {
         name: 'FakeNotification',
         deliverBy: {
           email: {
-            if: ({ notifiable, params }: any) => notifiable.id === params.userId,
+            if: ({ to, params }: any) => to.id === params.userId,
           },
         },
       }
     }
 
     const result = await new ChannelResolver().resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifC,
       params: { userId: 'user-123' },
     })
@@ -151,7 +151,7 @@ test.group('Channel resolver | preferences', () => {
       },
     })
     const result = await new ChannelResolver(db).resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
     })
@@ -176,7 +176,7 @@ test.group('Channel resolver | preferences', () => {
     })
 
     const result = await new ChannelResolver(db).resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
     })
@@ -202,7 +202,7 @@ test.group('Channel resolver | preferences', () => {
     })
 
     const result = await new ChannelResolver(db).resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
       tenantId: 'tenant-123',
@@ -234,7 +234,7 @@ test.group('Channel resolver | preferences', () => {
     })
 
     const result = await new ChannelResolver(db).resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
       tenantId: 'tenant-123',
@@ -261,7 +261,7 @@ test.group('Channel resolver | preferences', () => {
     })
 
     const result = await new ChannelResolver(db).resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
       tenantId: 'tenant-123',
@@ -300,7 +300,7 @@ test.group('Channel resolver | preferences', () => {
     })
 
     const result = await new ChannelResolver(db).resolveChannels({
-      notifiable: { id: 'user-123' } as any,
+      to: { id: 'user-123' } as any,
       notification: NotifA,
       params: {},
       tenantId: 'tenant-123',
