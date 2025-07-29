@@ -1,7 +1,7 @@
 {
   "name": "@facteurjs/adonisjs",
   "type": "module",
-  "version": "0.0.0",
+  "version": "1.0.0-beta.0",
   "description": "AdonisJS integration for Facteur",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "MIT",
@@ -54,7 +54,7 @@
     }
   },
   "dependencies": {
-    "@facteurjs/core": "workspace:",
+    "@facteurjs/core": "workspace:1.0.0-beta.0",
     "@julr/utils": "catalog:",
     "@poppinss/exception": "catalog:"
   },

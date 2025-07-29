@@ -1,0 +1,13 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@facteurjs/adonisjs": "0.0.0",
+    "@facteurjs/client": "0.0.0",
+    "@facteurjs/core": "0.0.0",
+    "@facteurjs/react": "0.0.0"
+  },
+  "changesets": [
+    "real-wasps-lay"
+  ]
+}

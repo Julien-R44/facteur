@@ -1,9 +1,9 @@
 {
-  "name": "vanilla",
-  "version": "1.0.0",
+  "name": "@facteurjs/adonisjs-playground",
   "description": "",
   "type": "module",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "dev": "tsx --env-file .env index.ts"
   },
