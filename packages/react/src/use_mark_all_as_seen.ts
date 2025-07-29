@@ -1,12 +1,11 @@
-import type { FacteurClient } from '@facteurjs/client'
-import { useFacteur } from './index.js'
+import { useFacteur, type TypedFacteurClient } from './index.js'
 import { useMutation, mutationOptions, useQueryClient } from '@tanstack/react-query'
 
 interface UseMarkAllAsSeenOptions {
   tenantId?: string
 }
 
-export const markAllAsSeenMutationOptions = (client: FacteurClient) =>
+export const markAllAsSeenMutationOptions = (client: TypedFacteurClient) =>
   mutationOptions({
     mutationFn: async (options: UseMarkAllAsSeenOptions = {}) => {
       return await client.notifications.markAllAsSeen(options)

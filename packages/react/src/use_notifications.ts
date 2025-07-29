@@ -1,12 +1,12 @@
-import type { NotificationFilter, FacteurClient } from '@facteurjs/client'
-import { useFacteur } from './index.js'
+import type { NotificationFilter } from '@facteurjs/client'
+import { useFacteur, type TypedFacteurClient } from './index.js'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 interface UseNotificationsOptions extends NotificationFilter {}
 
 export const listNotificationsQueryOptions = (
   options: UseNotificationsOptions,
-  client: FacteurClient,
+  client: TypedFacteurClient,
 ) =>
   queryOptions({
     queryKey: ['facteur', 'notifications', client.notifiableId, options.status],

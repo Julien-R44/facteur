@@ -1,3 +1,4 @@
+import type { DatabaseContent } from '../types/extend.js'
 import type { NotificationStatus } from './types.js'
 
 export class DatabaseMessage {
@@ -37,7 +38,7 @@ export class DatabaseMessage {
     return this
   }
 
-  setContent(content: any) {
+  setContent(content: DatabaseContent) {
     this.#content = content
     return this
   }

@@ -16,12 +16,12 @@ export interface NotificationFilter {
 }
 
 type Identifier = string | number
-export interface Notification {
+export interface Notification<DatabaseContent = Record<string, any>> {
   id: Identifier
   notifiableId: Identifier
   tenantId?: Identifier | undefined
   type: string
-  content: Record<string, any>
+  content: DatabaseContent
   status: NotificationStatus
   tags?: string[]
   readAt?: string
@@ -30,7 +30,7 @@ export interface Notification {
   updatedAt?: string
 }
 
-export type NotificationsList = Notification[]
+export type NotificationsList<DatabaseContent> = Notification<DatabaseContent>[]
 
 export interface MarkAsOptions {
   notificationId: string
@@ -54,7 +54,7 @@ export interface UpdatePreferencesOptions {
   notificationName?: string
 }
 
-class NotificationsApi {
+class NotificationsApi<DatabaseContent> {
   #client: KyInstance
   #notifiableId: string
 
@@ -66,7 +66,7 @@ class NotificationsApi {
   /**
    * Get all notifications for the user
    */
-  async list(options: NotificationFilter = {}): Promise<NotificationsList> {
+  async list(options: NotificationFilter = {}): Promise<NotificationsList<DatabaseContent>> {
     const searchParams = new URLSearchParams()
 
     if (options.page) searchParams.set('page', options.page.toString())
@@ -76,7 +76,7 @@ class NotificationsApi {
 
     return this.#client
       .get(`notifications/notifiable/${this.#notifiableId}/notifications`, { searchParams })
-      .json<NotificationsList>()
+      .json<NotificationsList<DatabaseContent>>()
   }
 
   /**
@@ -166,11 +166,11 @@ class PreferencesApi {
   }
 }
 
-export class FacteurClient {
+export class FacteurClient<DatabaseContent> {
   #client: KyInstance
   #notifiableId: string
 
-  readonly notifications: NotificationsApi
+  readonly notifications: NotificationsApi<DatabaseContent>
   readonly preferences: PreferencesApi
 
   constructor(options: FacteurClientConfig & { notifiableId: string }) {
@@ -191,8 +191,8 @@ export class FacteurClient {
   }
 }
 
-export function createFacteurClient(
-  options: FacteurClientConfig & { notifiableId: string },
-): FacteurClient {
-  return new FacteurClient(options)
+export function createFacteurClient<
+  DatabaseContent extends Record<string, any> = Record<string, any>,
+>(options: FacteurClientConfig & { notifiableId: string }): FacteurClient<DatabaseContent> {
+  return new FacteurClient<DatabaseContent>(options)
 }

@@ -1,5 +1,4 @@
-import type { FacteurClient } from '@facteurjs/client'
-import { useFacteur } from './index.js'
+import { useFacteur, type TypedFacteurClient } from './index.js'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 interface UsePreferencesOptions {
@@ -8,7 +7,7 @@ interface UsePreferencesOptions {
 
 export const listPreferencesQueryOptions = (
   options: UsePreferencesOptions = {},
-  client: FacteurClient,
+  client: TypedFacteurClient,
 ) =>
   queryOptions({
     queryKey: ['facteur', 'preferences', client.notifiableId, options.tenantId],

@@ -8,12 +8,19 @@ interface FacteurProviderProps extends PropsWithChildren {
   apiUrl: string
 }
 
-export const FacteurContext = createContext<FacteurClient | undefined>(undefined)
+/**
+ * Must be extended user-land with module augmentation
+ */
+export interface DatabaseContent {}
+
+export type TypedFacteurClient = FacteurClient<DatabaseContent>
+
+export const FacteurContext = createContext<TypedFacteurClient | undefined>(undefined)
 export function FacteurProvider({ children, notifiableId, apiUrl }: FacteurProviderProps) {
   const client = useMemo(() => {
     if (!notifiableId) return
 
-    return createFacteurClient({ apiUrl, notifiableId: notifiableId.toString() })
+    return createFacteurClient<DatabaseContent>({ apiUrl, notifiableId: notifiableId.toString() })
   }, [notifiableId, apiUrl])
 
   return <FacteurContext.Provider value={client}>{children}</FacteurContext.Provider>
@@ -35,3 +42,4 @@ export * from './use_mark_all_as_read.js'
 export * from './use_mark_all_as_seen.js'
 export * from './use_preferences.js'
 export * from './use_update_preferences.js'
+export * from '@facteurjs/client'

@@ -13,6 +13,12 @@ export type ChannelName = keyof NotificationChannels
 export interface NotificationChannels {}
 
 /**
+ * The type of the notification.content in database notifications.
+ * This must be extended user-land with module augmentation
+ */
+export interface DatabaseContent {}
+
+/**
  * Infer the channels from the Facteur instance
  */
 export type InferChannelsFromConfig<T> =

@@ -1,8 +1,8 @@
-import type { UpdatePreferencesOptions, FacteurClient } from '@facteurjs/client'
-import { useFacteur } from './index.js'
+import type { UpdatePreferencesOptions } from '@facteurjs/client'
+import { useFacteur, type TypedFacteurClient } from './index.js'
 import { useMutation, mutationOptions, useQueryClient } from '@tanstack/react-query'
 
-export const updatePreferencesMutationOptions = (client: FacteurClient) =>
+export const updatePreferencesMutationOptions = (client: TypedFacteurClient) =>
   mutationOptions({
     mutationFn: async (options: UpdatePreferencesOptions) => {
       return await client.preferences.update(options)
