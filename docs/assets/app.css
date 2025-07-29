@@ -66,6 +66,34 @@ html.dark {
   --docsearch-primary-color: var(--mauve-9);
 }
 
+/* Dark mode scrollbar styles */
+html.dark {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mauve-8) var(--mauve-3);
+}
+
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: var(--mauve-3);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--mauve-8);
+  border-radius: 4px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--mauve-9);
+}
+
+html.dark ::-webkit-scrollbar-corner {
+  background: var(--mauve-3);
+}
+
 html.dark .docs_sidebar {
   background-color: var(--mauve-3);
 }

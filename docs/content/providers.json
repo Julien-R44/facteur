@@ -9,16 +9,14 @@
           "name": "Kysely",
           "description": "Store notifications using Kysely query builder",
           "icon": "tabler:database",
-          "docLink": "/docs/kysely",
-          "status": "stable"
+          "docLink": "/docs/kysely"
         },
         {
           "id": "knex",
           "name": "Knex",
           "description": "Store notifications using Knex.js query builder",
           "icon": "tabler:database",
-          "docLink": "/docs/knex",
-          "status": "beta"
+          "docLink": "/docs/knex"
         }
       ]
     },
@@ -31,8 +29,7 @@
           "name": "@adonisjs/mail",
           "description": "Send email notifications using AdonisJS Mail system",
           "icon": "tabler:mail",
-          "docLink": "/docs/mail",
-          "status": "stable"
+          "docLink": "/docs/mail"
         }
       ]
     },
@@ -45,16 +42,14 @@
           "name": "Socket.IO",
           "description": "Real-time notifications using Socket.IO",
           "icon": "tabler:brand-socket-io",
-          "docLink": "/docs/socketio",
-          "status": "stable"
+          "docLink": "/docs/socketio"
         },
         {
           "id": "transmit",
           "name": "Transmit",
           "description": "Real-time notifications using WebSocket connections",
           "icon": "tabler:broadcast",
-          "docLink": "/docs/transmit",
-          "status": "stable"
+          "docLink": "/docs/transmit"
         }
       ]
     },
@@ -67,24 +62,21 @@
           "name": "Slack",
           "description": "Send notifications to Slack channels or users",
           "icon": "tabler:brand-slack",
-          "docLink": "/docs/slack",
-          "status": "stable"
+          "docLink": "/docs/slack"
         },
         {
           "id": "discord",
           "name": "Discord",
           "description": "Send notifications to Discord servers and channels",
           "icon": "tabler:brand-discord",
-          "docLink": "/docs/discord",
-          "status": "stable"
+          "docLink": "/docs/discord"
         },
         {
           "id": "teams",
           "name": "Microsoft Teams",
           "description": "Send notifications to Microsoft Teams channels",
           "icon": "tabler:brand-teams",
-          "docLink": "/docs/teams",
-          "status": "beta"
+          "docLink": "/docs/teams"
         }
       ]
     },
@@ -97,8 +89,14 @@
           "name": "Twilio",
           "description": "Send SMS notifications using Twilio messaging service",
           "icon": "tabler:phone",
-          "docLink": "/docs/twilio",
-          "status": "stable"
+          "docLink": "/docs/twilio"
+        },
+        {
+          "id": "sns",
+          "name": "AWS SNS",
+          "description": "Send SMS notifications using AWS SNS messaging service",
+          "icon": "tabler:brand-aws",
+          "docLink": "/docs/sns"
         }
       ]
     },
@@ -111,24 +109,21 @@
           "name": "Expo Notifications",
           "description": "Push notifications for Expo and React Native apps",
           "icon": "tabler:device-mobile",
-          "docLink": "/docs/expo-notifications",
-          "status": "beta"
+          "docLink": "/docs/expo-notifications"
         },
         {
           "id": "webpush",
           "name": "Web Push",
           "description": "Browser push notifications using VAPID protocol",
           "icon": "tabler:bell",
-          "docLink": "/docs/webpush",
-          "status": "stable"
+          "docLink": "/docs/webpush"
         },
         {
           "id": "fcm",
           "name": "Firebase Cloud Messaging",
           "description": "Firebase Cloud Messaging for mobile push notifications",
           "icon": "tabler:brand-firebase",
-          "docLink": "/docs/fcm",
-          "status": "stable"
+          "docLink": "/docs/fcm"
         }
       ]
     },
@@ -141,8 +136,7 @@
           "name": "Webhook",
           "description": "Send HTTP requests to custom webhook endpoints",
           "icon": "tabler:webhook",
-          "docLink": "/docs/webhook",
-          "status": "stable"
+          "docLink": "/docs/webhook"
         }
       ]
     }

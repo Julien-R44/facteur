@@ -24,6 +24,8 @@ export default defineConfig({
     './channels/webhook/types': './src/channels/webhook/types.ts',
     './channels/socketio': './src/channels/socketio/index.ts',
     './channels/socketio/types': './src/channels/socketio/types.ts',
+    './channels/aws-sns': './src/channels/aws-sns/index.ts',
+    './channels/aws-sns/types': './src/channels/aws-sns/types.ts',
     './api': './src/api/index.ts',
     './api/types': './src/api/types.ts',
     './types': './src/types/index.ts',

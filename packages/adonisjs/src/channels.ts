@@ -21,6 +21,7 @@ import type { MailChannel } from './channels/mail.js'
 import type { FcmChannel } from './channels/fcm.js'
 import type { WebpushChannel } from './channels/webpush.js'
 import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.js'
+import type { AwsSnsChannel, AwsSnsConfig } from './channels/aws-sns.js'
 
 export interface DatabaseConfig {
   connectionName?: string
@@ -45,6 +46,7 @@ export const channels: {
   fcm(config: FcmConfig): ConfigProvider<FcmChannel>
   webpush(config: WebpushConfig): ConfigProvider<WebpushChannel>
   socketIo(config: SocketIOConfig): ConfigProvider<SocketIOChannel>
+  awsSns(config: AwsSnsConfig): ConfigProvider<AwsSnsChannel>
 } = {
   /**
    * Discord channel
@@ -175,6 +177,17 @@ export const channels: {
       const { socketIoChannel } = await import('@facteurjs/core/channels/socketio')
 
       return socketIoChannel(config)
+    })
+  },
+
+  /**
+   * AWS SNS channel
+   */
+  awsSns(config: AwsSnsConfig) {
+    return configProvider.create(async () => {
+      const { awsSnsChannel } = await import('@facteurjs/core/channels/aws-sns')
+
+      return awsSnsChannel(config)
     })
   },
 }
