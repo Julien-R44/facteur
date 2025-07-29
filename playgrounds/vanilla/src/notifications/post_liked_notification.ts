@@ -3,6 +3,7 @@ import { Notification, type NotificationOptions } from '@facteurjs/core/types'
 
 import type { User } from '../types.js'
 import { SocketIoMessage } from '@facteurjs/core/channels/socketio'
+import { AwsSnsMessage } from '@facteurjs/core/channels/aws-sns'
 
 export class AnonymousLikeNotification extends Notification<undefined, {}> {
   static override options: NotificationOptions = {
@@ -18,7 +19,7 @@ export class AnonymousLikeNotification extends Notification<undefined, {}> {
 export class PostLikedNotification extends Notification<User, { amount: number }> {
   static override options: NotificationOptions = {
     name: 'Post Liked',
-    deliverBy: { discord: true, socketio: true },
+    deliverBy: { discord: true, socketio: true, awsSns: true },
   }
 
   asDiscordMessage(): DiscordMessage {
@@ -33,5 +34,9 @@ export class PostLikedNotification extends Notification<User, { amount: number }
       userId: this.notifiable?.id,
       timestamp: new Date().toISOString(),
     })
+  }
+
+  asAwssnsMessage(): AwsSnsMessage {
+    return AwsSnsMessage.create().setMessage('Your post has been liked!')
   }
 }

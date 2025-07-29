@@ -17,6 +17,7 @@ const randomUser: User = {
   notificationTargets: () => ({
     discord: { default: true },
     socketIo: { event: 'toast', namespace: 'users/123' },
+    awsSns: { to: process.env.TO_SMS! },
   }),
 }
 

@@ -36,10 +36,9 @@ export class AwsSnsChannel implements Channel<AwsSnsConfig, AwsSnsMessage, any, 
     const targets = this.#resolveTargets(options)
 
     const messageData = message.serialize()
-    const to = targets.to
 
     const command = new PublishCommand({
-      PhoneNumber: to,
+      PhoneNumber: targets.to,
       Message: messageData.Message,
     })
 

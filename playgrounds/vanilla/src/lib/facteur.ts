@@ -6,6 +6,7 @@ import { InferChannelsFromConfig } from '@facteurjs/core/types'
 import { db } from './db.js'
 import { socketIoChannel } from '@facteurjs/core/channels/socketio'
 import { ioServer } from './socketio.js'
+import { awsSnsChannel } from '@facteurjs/core/channels/aws-sns'
 
 export const facteur = createFacteur({
   discoverer: {
@@ -16,6 +17,11 @@ export const facteur = createFacteur({
     socketio: socketIoChannel({ server: ioServer }),
     discord: discordWebhookChannel({
       webhooks: { default: process.env.DISCORD_DEFAULT_WEBHOOK_URL! },
+    }),
+    awsSns: awsSnsChannel({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      region: process.env.AWS_REGION!,
     }),
   },
 })
