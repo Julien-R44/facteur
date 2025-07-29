@@ -9,7 +9,7 @@ export const listNotificationsQueryOptions = (
   client: TypedFacteurClient,
 ) =>
   queryOptions({
-    queryKey: ['facteur', 'notifications', client.notifiableId, options.status],
+    queryKey: ['facteur', 'notifications', client.notifiableId, options],
     queryFn: async () => {
       return await client?.notifications.list(options)
     },
