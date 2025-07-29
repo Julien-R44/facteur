@@ -41,6 +41,14 @@
       "title": "Realtime",
       "providers": [
         {
+          "id": "socketio",
+          "name": "Socket.IO",
+          "description": "Real-time notifications using Socket.IO",
+          "icon": "tabler:brand-socket-io",
+          "docLink": "/docs/socketio",
+          "status": "stable"
+        },
+        {
           "id": "transmit",
           "name": "Transmit",
           "description": "Real-time notifications using WebSocket connections",
