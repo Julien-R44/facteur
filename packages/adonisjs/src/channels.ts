@@ -20,6 +20,7 @@ import type { TransmitChannel } from './channels/transmit.js'
 import type { MailChannel } from './channels/mail.js'
 import type { FcmChannel } from './channels/fcm.js'
 import type { WebpushChannel } from './channels/webpush.js'
+import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.js'
 
 export interface DatabaseConfig {
   connectionName?: string
@@ -43,6 +44,7 @@ export const channels: {
   mail(): ConfigProvider<MailChannel>
   fcm(config: FcmConfig): ConfigProvider<FcmChannel>
   webpush(config: WebpushConfig): ConfigProvider<WebpushChannel>
+  socketIo(config: SocketIOConfig): ConfigProvider<SocketIOChannel>
 } = {
   /**
    * Discord channel
@@ -162,6 +164,17 @@ export const channels: {
       const { webpushChannel } = await import('@facteurjs/core/channels/webpush')
 
       return webpushChannel(config)
+    })
+  },
+
+  /**
+   * Socket.IO channel
+   */
+  socketIo(config: SocketIOConfig) {
+    return configProvider.create(async () => {
+      const { socketIoChannel } = await import('@facteurjs/core/channels/socketio')
+
+      return socketIoChannel(config)
     })
   },
 }

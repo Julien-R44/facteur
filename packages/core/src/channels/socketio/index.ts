@@ -1,2 +1,2 @@
 export { SocketIoMessage } from './message.js'
-export { socketIoChannel } from './channel.js'
+export { socketIoChannel, SocketIOChannel } from './channel.js'
