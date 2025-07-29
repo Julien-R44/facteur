@@ -22,6 +22,8 @@ export default defineConfig({
     './channels/webpush/types': './src/channels/webpush/types.ts',
     './channels/webhook': './src/channels/webhook/index.ts',
     './channels/webhook/types': './src/channels/webhook/types.ts',
+    './channels/socketio': './src/channels/socketio/index.ts',
+    './channels/socketio/types': './src/channels/socketio/types.ts',
     './api': './src/api/index.ts',
     './api/types': './src/api/types.ts',
     './types': './src/types/index.ts',
