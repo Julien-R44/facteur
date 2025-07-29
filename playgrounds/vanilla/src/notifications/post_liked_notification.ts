@@ -28,7 +28,7 @@ export class PostLikedNotification extends Notification<User, { amount: number }
       .setBotUsername('Facteur Bot')
   }
 
-  asSocketioMessage(): SocketIoMessage {
+  asSocketIoMessage(): SocketIoMessage {
     return SocketIoMessage.create().setData({
       message: `Your post has been liked!`,
       userId: this.notifiable?.id,
@@ -36,7 +36,7 @@ export class PostLikedNotification extends Notification<User, { amount: number }
     })
   }
 
-  asAwssnsMessage(): AwsSnsMessage {
+  asAwsSnsMessage(): AwsSnsMessage {
     return AwsSnsMessage.create().setMessage('Your post has been liked!')
   }
 }

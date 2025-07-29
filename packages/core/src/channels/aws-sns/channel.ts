@@ -10,7 +10,7 @@ export function awsSnsChannel(config: AwsSnsConfig) {
 }
 
 export class AwsSnsChannel implements Channel<AwsSnsConfig, AwsSnsMessage, any, AwsSnsTargets> {
-  name = 'aws-sns' as const;
+  name = 'awsSns' as const;
   [kTargetSymbol] = null as any as AwsSnsTargets
   #client: SNSClient
 

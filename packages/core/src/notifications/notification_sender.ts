@@ -1,5 +1,3 @@
-import { capitalize } from '@julr/utils/string'
-
 import debug from '../debug.js'
 import { facteurEvents } from '../events/events.js'
 import { ChannelResolver, type ResolvedChannel } from './channel_resolver.js'
@@ -16,6 +14,7 @@ import type {
   NotificationClass,
 } from '../types/index.js'
 import { errors } from '../errors/index.js'
+import { capitalizeFirstLetter } from '../helpers.js'
 
 /**
  * Responsible for sending notifications and messages
@@ -113,11 +112,12 @@ export class NotificationSender {
      * `as<ChannelName>Message` method
      */
     const channel = this.#getChannel(channelName as ChannelName)
-    const channelMethodName = `as${capitalize(channelName)}Message` as const
+    const capitalizedChannelName = capitalizeFirstLetter(channelName as string)
+    const channelMethodName = `as${capitalizedChannelName}Message` as const
     const messageBuilder = (options.notification as any)[channelMethodName]
 
     if (typeof messageBuilder !== 'function') {
-      throw new errors.E_MISSING_MESSAGE_METHOD([capitalize(channelName)])
+      throw new errors.E_MISSING_MESSAGE_METHOD([capitalizedChannelName])
     }
 
     const messageContent = messageBuilder.call(options.notification, {

@@ -12,7 +12,7 @@ export function socketIoChannel(config: SocketIOConfig) {
 export class SocketIOChannel
   implements Channel<SocketIOConfig, SocketIoMessage, any, SocketIOTargets>
 {
-  name = 'socketio' as const;
+  name = 'socketIo' as const;
   [kTargetSymbol] = null as any as SocketIOTargets
   protected server: () => SocketIOServer
 
