@@ -5,7 +5,6 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "node bin/server.js",
-    "build": "node ace build",
     "dev": "node ace serve --hmr",
     "quick:test": "node ace test",
     "format": "prettier --write ."
