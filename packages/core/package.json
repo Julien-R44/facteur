@@ -60,6 +60,7 @@
     "web-push": "^3.6.7"
   },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": "./dist/index.js",
       "./api": "./dist/api/index.js",

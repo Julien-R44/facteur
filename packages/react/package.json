@@ -10,6 +10,9 @@
     ".": "./src/index.tsx",
     "./package.json": "./package.json"
   },
+  "files": [
+    "dist"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,6 +27,7 @@
     "@facteurjs/client": "workspace:*"
   },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": "./dist/index.js",
       "./package.json": "./package.json"

@@ -6,6 +6,9 @@
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "ISC",
   "keywords": [],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"
@@ -24,6 +27,7 @@
     "ky": "^1.8.2"
   },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": "./dist/index.js",
       "./package.json": "./package.json"
