@@ -304,6 +304,9 @@ importers:
       '@facteurjs/client':
         specifier: workspace:*
         version: link:../../packages/client
+      '@facteurjs/react':
+        specifier: workspace:*
+        version: link:../../packages/react
       '@inertiajs/react':
         specifier: ^2.0.17
         version: 2.0.17(react@19.1.0)
