@@ -2,7 +2,27 @@ import { test } from '@japa/runner'
 import { Facteur } from '../src/facteur.js'
 import { FakeNotification, testProvider } from './helpers/index.js'
 import { errors } from '../src/index.js'
-import { Notification } from '../src/types/notifications.js'
+import { Notification, type Notifiable } from '../src/types/notifications.js'
+
+type TestUser = { id: string; email: string } & Notifiable
+
+class UserNotification extends Notification<TestUser, any> {
+  static override options = {
+    name: 'UserNotification',
+    tags: ['test'],
+    deliverBy: {
+      email: true,
+      sms: true,
+    },
+  }
+
+  asEmailMessage() {
+    return {
+      subject: 'Test',
+      body: 'Test body',
+    }
+  }
+}
 
 test.group('Facteur | send', () => {
   test('throw pretty aggregate error when notification fails', async ({ assert }) => {
@@ -133,6 +153,113 @@ test.group('Facteur | send', () => {
       via: { email: { to: 'foo@ok.com' } },
       throwOnError: false,
     })
+  })
+
+  test('send to multiple recipients in parallel', async ({ assert }) => {
+    const provider = testProvider()
+
+    const facteur = new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    const recipients: TestUser[] = [
+      { id: '1', email: 'user1@test.com', notificationTargets: () => ({ email: 'foo1' }) },
+      { id: '2', email: 'user2@test.com', notificationTargets: () => ({ email: 'foo2' }) },
+      { id: '3', email: 'user3@test.com', notificationTargets: () => ({ email: 'foo3' }) },
+    ]
+
+    const result = await facteur.send({
+      notification: UserNotification,
+      to: recipients,
+    })
+
+    assert.equal(provider.getSentMessages().length, 3)
+    assert.deepEqual(
+      provider.getSentMessages().map((msg) => msg.to.email),
+      recipients.map((r) => r.email),
+    )
+    assert.equal(result.success, 3)
+    assert.equal(result.failed, 0)
+    assert.equal(result.results.length, 3) // 3 channel results (one per recipient)
+  })
+
+  test('send to single recipient returns single result', async ({ assert }) => {
+    const provider = testProvider()
+
+    const facteur = new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    const result = await facteur.send({
+      notification: UserNotification,
+      to: { id: '1', email: 'user1@test.com', notificationTargets: () => ({ email: 'foo' }) },
+    })
+
+    assert.equal(result.success, 1)
+    assert.equal(result.failed, 0)
+    assert.equal(result.results.length, 1)
+  })
+
+  test('handle failure with multiple recipients using throwOnError false', async ({ assert }) => {
+    const provider = testProvider()
+    provider.throws()
+
+    const facteur = new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    const recipients: TestUser[] = [
+      {
+        id: '1',
+        email: 'user1@test.com',
+        notificationTargets: () => ({ email: { to: 'user1@test.com' } }),
+      },
+      {
+        id: '2',
+        email: 'user2@test.com',
+        notificationTargets: () => ({ email: { to: 'user2@test.com' } }),
+      },
+    ]
+
+    const result = await facteur.send({
+      notification: UserNotification,
+      to: recipients,
+      throwOnError: false,
+    })
+
+    assert.equal(result.success, 0)
+    assert.equal(result.failed, 2)
+    assert.equal(result.results.length, 2)
+    assert.isTrue(result.results.every((r) => r.status === 'failed'))
+  })
+
+  test('fake records multiple recipients correctly', async ({ assert }) => {
+    const provider = testProvider()
+
+    const facteur = new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    const fake = facteur.fake()
+
+    const recipients: TestUser[] = [
+      { id: '1', email: 'user1@test.com', notificationTargets: () => ({ email: 'foo1' }) },
+      { id: '2', email: 'user2@test.com', notificationTargets: () => ({ email: 'foo2' }) },
+    ]
+
+    await facteur.send({
+      notification: UserNotification,
+      to: recipients,
+    })
+
+    const sentNotifications = fake.sent()
+    assert.equal(sentNotifications.length, 2)
+    assert.equal((sentNotifications[0]!.to as TestUser).id, '1')
+    assert.equal((sentNotifications[1]!.to as TestUser).id, '2')
   })
 })
 

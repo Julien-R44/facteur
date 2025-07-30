@@ -10,6 +10,11 @@ import type { ChannelName, NotificationChannels } from './extend.js'
 import type { Channel } from './channel.js'
 
 /**
+ * Type for values that can be a single item or an array of items
+ */
+export type Arrayable<T> = T | T[]
+
+/**
  * Configuration options for the Facteur library
  */
 export interface FacteurConfiguration<
@@ -180,7 +185,7 @@ export type SendOptions<TNotificationClass extends NotificationClass<any, any>> 
       }
     : CommonSendOptions<TNotificationClass> & {
         notification: TNotificationClass
-        to: NonNullable<ExtractNotifiable<TNotificationClass>>
+        to: Arrayable<NonNullable<ExtractNotifiable<TNotificationClass>>>
         via?: ChannelSpecificConfig<ExtractNotifiable<TNotificationClass>>
         tenantId?: Identifier
       }

@@ -16,7 +16,11 @@ export class FacteurFake {
    * Record a notification as sent during fake mode
    */
   recordSent(options: SendOptions<any>): NotificationSendResult {
-    const notification = new options.notification()
+    const notification = new options.notification({
+      to: options.to,
+      params: options.params,
+      tenantId: options.tenantId,
+    })
 
     this.#sentNotifications.push({
       notification,

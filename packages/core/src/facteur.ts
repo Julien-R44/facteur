@@ -92,6 +92,27 @@ export class Facteur<
   async send<TNotificationClass extends NotificationClass<any, any>>(
     options: SendOptions<TNotificationClass>,
   ): Promise<NotificationSendResult> {
+    if ('via' in options && !('to' in options)) return this.#sendToSingle(options as any)
+
+    const optionsWithTo = options as SendOptions<TNotificationClass> & { to: any }
+    const recipients = Array.isArray(optionsWithTo.to) ? optionsWithTo.to : [optionsWithTo.to]
+    const results = await Promise.all(
+      recipients.map((recipient) => this.#sendToSingle({ ...optionsWithTo, to: recipient })),
+    )
+
+    return {
+      success: results.reduce((sum, result) => sum + result.success, 0),
+      failed: results.reduce((sum, result) => sum + result.failed, 0),
+      results: results.flatMap((result) => result.results),
+    }
+  }
+
+  /**
+   * Send notification to a single recipient
+   */
+  async #sendToSingle<TNotificationClass extends NotificationClass<any, any>>(
+    options: SendOptions<TNotificationClass>,
+  ): Promise<NotificationSendResult> {
     const notification = await this.#options.notificationResolver(options.notification, {
       to: 'to' in options ? options.to : undefined,
       params: options.params,

@@ -199,7 +199,7 @@ export class NotificationSender {
 
     const to = 'to' in options ? options.to : undefined
     const resolvedChannels = await this.channelResolver.resolveChannels({
-      to,
+      to: to as any,
       params,
       tenantId: tenantId as Identifier,
       notification: options.notification,
