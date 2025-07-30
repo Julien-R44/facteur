@@ -9,7 +9,7 @@ import { createRoot } from 'react-dom/client'
 import { createInertiaApp } from '@inertiajs/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-
+import { FacteurProvider } from '@facteurjs/react'
 import { subscription } from './transmit'
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
@@ -32,7 +32,9 @@ createInertiaApp({
   setup({ el, App, props }) {
     createRoot(el).render(
       <QueryClientProvider client={queryClient}>
-        <App {...props} />
+        <FacteurProvider apiUrl="http://localhost:3333" notifiableId={1}>
+          <App {...props} />
+        </FacteurProvider>
       </QueryClientProvider>,
     )
   },

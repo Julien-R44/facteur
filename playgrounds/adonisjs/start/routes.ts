@@ -34,7 +34,7 @@ router.post('/send', async ({ request, response }) => {
 
   await facteur.send({
     notification: NotificationClass,
-    notifiable: user,
+    to: user,
     params: { amount: 100 },
     tenantId,
   })

@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import type { Notification } from '@facteurjs/client'
 import { Bell, BellRing, Check, Settings, X, Eye } from 'lucide-react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
-import { facteur } from '~/app/facteur'
 import NotificationSettings from './notification_settings'
+import { useMarkAllAsRead, useMarkAsRead, useNotifications } from '@facteurjs/react'
 
 interface NotificationCenterProps {
   userId: string
@@ -15,44 +13,15 @@ export default function NotificationCenter({ userId, tenantId }: NotificationCen
   const [isOpen, setIsOpen] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all')
-  const queryClient = useQueryClient()
 
-  const { data: notifications = [], isLoading } = useQuery({
-    queryKey: ['notifications', userId, tenantId, filter],
-    queryFn: async () => {
-      const result = await facteur.notifications.list({
-        tenantId,
-        status: filter === 'all' ? undefined : filter,
-      })
-
-      return result
-    },
+  const markAsReadMutation = useMarkAsRead()
+  const { data: notifications = [], isLoading } = useNotifications({
+    tenantId,
+    limit: 50,
+    status: filter === 'all' ? undefined : filter,
   })
 
-  const markAsReadMutation = useMutation({
-    mutationFn: async ({ notificationId, status }: { notificationId: any; status: string }) => {
-      return facteur.notifications.markAs({
-        notificationId,
-        status: status as any,
-        ...(tenantId && { tenantId }),
-      })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', userId] })
-    },
-  })
-
-  const markAllAsReadMutation = useMutation({
-    mutationFn: async (status: string) => {
-      return facteur.notifications.markAllAs({
-        status: status as any,
-        ...(tenantId && { tenantId }),
-      })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications', userId] })
-    },
-  })
+  const markAllAsReadMutation = useMarkAllAsRead()
 
   const unreadCount = notifications?.filter(
     (n) => n.status === 'unread' || n.status === 'unseen',
@@ -94,7 +63,6 @@ export default function NotificationCenter({ userId, tenantId }: NotificationCen
 
   return (
     <div className="relative">
-      {/* Notification Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
@@ -107,10 +75,8 @@ export default function NotificationCenter({ userId, tenantId }: NotificationCen
         )}
       </button>
 
-      {/* Notification Panel */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-[600px] flex flex-col">
-          {/* Header */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
@@ -122,7 +88,6 @@ export default function NotificationCenter({ userId, tenantId }: NotificationCen
               </button>
             </div>
 
-            {/* Filter Tabs */}
             <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
               {(['all', 'unread', 'read'] as const).map((filterOption) => (
                 <button
@@ -140,31 +105,21 @@ export default function NotificationCenter({ userId, tenantId }: NotificationCen
             </div>
           </div>
 
-          {/* Actions */}
           {notifications.length > 0 && (
             <div className="p-3 border-b border-gray-200 bg-gray-50">
               <div className="flex gap-2">
                 <button
-                  onClick={() => markAllAsReadMutation.mutate('read')}
+                  onClick={() => markAllAsReadMutation.mutate({ tenantId })}
                   disabled={markAllAsReadMutation.isPending}
                   className="flex items-center gap-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors disabled:opacity-50"
                 >
                   <Check className="w-3 h-3" />
                   Mark all read
                 </button>
-                <button
-                  onClick={() => markAllAsReadMutation.mutate('seen')}
-                  disabled={markAllAsReadMutation.isPending}
-                  className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50"
-                >
-                  <Eye className="w-3 h-3" />
-                  Mark all seen
-                </button>
               </div>
             </div>
           )}
 
-          {/* Notifications List */}
           <div className="flex-1 overflow-y-auto">
             {isLoading ? (
               <div className="p-4 text-center text-gray-500">
@@ -214,8 +169,7 @@ export default function NotificationCenter({ userId, tenantId }: NotificationCen
                                 <button
                                   onClick={() =>
                                     markAsReadMutation.mutate({
-                                      notificationId: notification.id,
-                                      status: 'read',
+                                      notificationId: notification.id as string,
                                     })
                                   }
                                   className="text-green-600 hover:text-green-800 p-1 rounded"
@@ -228,8 +182,7 @@ export default function NotificationCenter({ userId, tenantId }: NotificationCen
                                 <button
                                   onClick={() =>
                                     markAsReadMutation.mutate({
-                                      notificationId: notification.id,
-                                      status: 'seen',
+                                      notificationId: notification.id as string,
                                     })
                                   }
                                   className="text-blue-600 hover:text-blue-800 p-1 rounded"

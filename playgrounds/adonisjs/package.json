@@ -43,6 +43,7 @@
     "@adonisjs/vite": "^5.0.0-next.0",
     "@facteurjs/adonisjs": "workspace:*",
     "@facteurjs/client": "workspace:*",
+    "@facteurjs/react": "workspace:*",
     "@inertiajs/react": "^2.0.17",
     "@tanstack/react-query": "^5.83.0",
     "@types/react": "^19.1.8",
