@@ -17,6 +17,7 @@ export default defineConfig({
     './channels/socketio': './src/channels/socketio.ts',
     './channels/fcm': './src/channels/fcm.ts',
     './channels/webpush': './src/channels/webpush.ts',
+    './channels/expo': './src/channels/expo.ts',
     './services/main': './src/services/main.ts',
   },
   unbundle: true,

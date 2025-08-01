@@ -22,6 +22,8 @@ import type { FcmChannel } from './channels/fcm.js'
 import type { WebpushChannel } from './channels/webpush.js'
 import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.js'
 import type { AwsSnsChannel, AwsSnsConfig } from './channels/aws-sns.js'
+import type { ExpoConfig } from '@facteurjs/core/channels/expo/types'
+import type { ExpoChannel } from '@facteurjs/core/channels/expo'
 
 export interface DatabaseConfig {
   connectionName?: string
@@ -47,6 +49,7 @@ export const channels: {
   webpush(config: WebpushConfig): ConfigProvider<WebpushChannel>
   socketIo(config: SocketIOConfig): ConfigProvider<SocketIOChannel>
   awsSns(config: AwsSnsConfig): ConfigProvider<AwsSnsChannel>
+  expo(config: ExpoConfig): ConfigProvider<ExpoChannel>
 } = {
   /**
    * Discord channel
@@ -188,6 +191,16 @@ export const channels: {
       const { awsSnsChannel } = await import('@facteurjs/core/channels/aws-sns')
 
       return awsSnsChannel(config)
+    })
+  },
+
+  /**
+   * Expo channel
+   */
+  expo(config: ExpoConfig) {
+    return configProvider.create(async () => {
+      const { expoChannel } = await import('@facteurjs/core/channels/expo')
+      return expoChannel(config)
     })
   },
 }

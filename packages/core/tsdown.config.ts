@@ -26,6 +26,8 @@ export default defineConfig({
     './channels/socketio/types': './src/channels/socketio/types.ts',
     './channels/aws-sns': './src/channels/aws-sns/index.ts',
     './channels/aws-sns/types': './src/channels/aws-sns/types.ts',
+    './channels/expo': './src/channels/expo/index.ts',
+    './channels/expo/types': './src/channels/expo/types.ts',
     './api': './src/api/index.ts',
     './api/types': './src/api/types.ts',
     './types': './src/types/index.ts',
