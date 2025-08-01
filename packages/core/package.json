@@ -53,10 +53,51 @@
     "@poppinss/exception": "catalog:",
     "ky": "^1.8.2"
   },
+  "peerDependencies": {
+    "@aws-sdk/client-sns": "^3.856.0",
+    "@boringnode/transmit": "^0.3.0",
+    "expo-server-sdk": "^3.15.0",
+    "firebase-admin": "^13.4.0",
+    "knex": "^3.1.0",
+    "kysely": "^0.28.3",
+    "socket.io": "^4.8.1",
+    "twilio": "^5.8.0",
+    "web-push": "^3.6.7"
+  },
+  "peerDependenciesMeta": {
+    "@aws-sdk/client-sns": {
+      "optional": true
+    },
+    "@boringnode/transmit": {
+      "optional": true
+    },
+    "expo-server-sdk": {
+      "optional": true
+    },
+    "firebase-admin": {
+      "optional": true
+    },
+    "knex": {
+      "optional": true
+    },
+    "kysely": {
+      "optional": true
+    },
+    "socket.io": {
+      "optional": true
+    },
+    "twilio": {
+      "optional": true
+    },
+    "web-push": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@aws-sdk/client-sns": "^3.856.0",
     "@boringnode/transmit": "^0.3.0",
     "@types/web-push": "^3.6.4",
+    "expo-server-sdk": "^3.15.0",
     "firebase-admin": "^13.4.0",
     "knex": "^3.1.0",
     "kysely": "^0.28.3",
