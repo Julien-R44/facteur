@@ -142,6 +142,22 @@ await facteur.preferences.update({
 })
 ```
 
+### React hooks
+
+To make frontend integration even MORE easier, Facteur provides some React TanStack Query hooks.
+
+```ts
+import { useNotifications } from '@facteurjs/react'
+
+const { data, isLoading } = useNotifications({ userId: '123' })
+const { mutate } = useMarkNotificationAsRead()
+// And more hooks for marking all as read, updating preferences, etc.
+```
+
+### Adapter-based
+
+Facteur is built on an adapter-based architecture for every part of the system. This means you can swap out components like the database adapter ( Knex, Kysely, Prisma ...), notification channels ( Socket.io ? SSE ? Pusher ? ), or event the HTTP Framework ( Hono, Express, Fastify ... ). Everything is supported! Doesn't means everything is implemented but you can really easily write your own adapters when needed.
+
 There's plenty more to explore, we'll cover it all in the following sections.
 
 ## What's Coming
@@ -151,7 +167,7 @@ Facteur is actively being developed. Here's what's on the roadmap:
 - Debouncing and batching system
 - Diagnostic channels for tracing and monitoring
 - Topics. 
-- Headless React/Vue components for even easier integration (TanStack Query hooks? Headless UI components? Shadcn registry ?)
+- Headless React/Vue components for even easier integration ( Shadcn registry ? )
 - Even more notification channels !
 
 If you're interested in a specific feature, feel free to open an issue on GitHub or contribute to the project.

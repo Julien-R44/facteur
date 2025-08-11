@@ -24,10 +24,16 @@
     "category": "Guides"
   },
   {
-    "permalink": "frontend-sdk",
-    "title": "Frontend SDK",
-    "contentPath": "./frontend-sdk.md",
-    "category": "Guides"
+    "permalink": "facteurjs-client",
+    "title": "@facteurjs/client",
+    "contentPath": "./sdks/frontend-sdk.md",
+    "category": "SDKs"
+  },
+  {
+    "permalink": "facteurjs-react",
+    "title": "@facteurjs/react",
+    "contentPath": "./sdks/react-hooks.md",
+    "category": "SDKs"
   },
   {
     "permalink": "Multi-tenancy",
@@ -117,6 +123,12 @@
     "permalink": "custom-providers",
     "title": "Custom Providers",
     "contentPath": "./deep/custom-providers.md",
+    "category": "Digging Deeper"
+  },
+  {
+    "permalink": "custom-http-adapter",
+    "title": "Custom HTTP Adapter",
+    "contentPath": "./deep/custom-http-adapter.md",
     "category": "Digging Deeper"
   }
 ]

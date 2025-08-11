@@ -164,7 +164,7 @@ importers:
   packages/adonisjs:
     dependencies:
       '@facteurjs/core':
-        specifier: workspace:1.0.0-beta.0
+        specifier: workspace:1.0.0-beta.1
         version: link:../core
       '@julr/utils':
         specifier: 'catalog:'
@@ -243,6 +243,15 @@ importers:
       web-push:
         specifier: ^3.6.7
         version: 3.6.7
+
+  packages/hono:
+    devDependencies:
+      '@facteurjs/core':
+        specifier: workspace:*
+        version: link:../core
+      hono:
+        specifier: ^4.8.9
+        version: 4.8.9
 
   packages/react:
     dependencies:
@@ -410,6 +419,9 @@ importers:
       '@facteurjs/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@facteurjs/hono':
+        specifier: workspace:*
+        version: link:../../packages/hono
       '@hono/node-server':
         specifier: ^1.17.1
         version: 1.17.1(hono@4.8.9)
