@@ -1,7 +1,7 @@
 {
   "name": "@facteurjs/hono",
   "type": "module",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.2",
   "description": "Hono adapter for Facteur",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "ISC",
@@ -17,7 +17,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsdown",
+    "//build": "tsdown",
     "stub": "tsdown",
     "test": "tsx tests/index.ts",
     "typecheck": "tsc --noEmit",
