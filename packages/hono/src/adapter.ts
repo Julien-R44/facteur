@@ -1,0 +1,25 @@
+import type { RouteDefinition, ServerAdapter } from '@facteurjs/core/api/types'
+import type { Hono } from 'hono'
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
+
+export class HonoServerAdapter implements ServerAdapter {
+  constructor(protected app: Hono) {}
+
+  setRoutes(routes: RouteDefinition[]) {
+    for (const route of routes) {
+      const method = route.method.toUpperCase()
+      const pattern = route.route
+
+      this.app[method.toLowerCase() as 'get' | 'post'](pattern, async (c) => {
+        const result = await route.handler({
+          body: c.req.json(),
+          params: c.req.param(),
+          query: c.req.query(),
+          headers: c.req.header(),
+        })
+
+        return c.json(result.body, result.status as ContentfulStatusCode)
+      })
+    }
+  }
+}
