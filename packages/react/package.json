@@ -8,6 +8,7 @@
   "keywords": [],
   "exports": {
     ".": "./src/index.tsx",
+    "./types": "./src/types.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -30,6 +31,7 @@
     "access": "public",
     "exports": {
       ".": "./dist/index.js",
+      "./types": "./dist/types.js",
       "./package.json": "./package.json"
     }
   },

@@ -60,6 +60,7 @@ class KyselyAdapter implements DatabaseAdapter {
       .where('notifiable_id', '=', options.notifiableId)
       .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
       .$if(!!options.status, (qb) => qb.where('status', '=', options.status))
+      .$if(!!options.tags, (qb) => qb.where('tags', '@>', JSON.stringify(options.tags)))
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(offset)

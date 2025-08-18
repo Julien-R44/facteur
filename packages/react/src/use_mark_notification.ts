@@ -1,4 +1,4 @@
-import type { MarkAsOptions } from '@facteurjs/client'
+import type { MarkAsOptions } from '@facteurjs/client/types'
 import { useFacteur, type TypedFacteurClient } from './index.js'
 import { useMutation, mutationOptions, useQueryClient } from '@tanstack/react-query'
 

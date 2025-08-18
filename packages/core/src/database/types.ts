@@ -11,6 +11,7 @@ export interface AdapterGetNotificationsParams {
   page?: number | undefined
   status?: NotificationStatus | undefined
   limit?: number
+  tags?: string[] | undefined
 }
 
 export interface GetNotificationsParams {
@@ -19,6 +20,7 @@ export interface GetNotificationsParams {
   page?: number
   limit?: number
   status?: NotificationStatus
+  tags?: string[]
 }
 
 export interface Notification {

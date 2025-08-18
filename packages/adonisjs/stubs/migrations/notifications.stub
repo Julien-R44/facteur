@@ -14,9 +14,9 @@ export default class extends BaseSchema {
       table.text('notifiable_id').notNullable()
       table.text('tenant_id').nullable()
       table.text('type').notNullable()
-      table.json('content').notNullable()
+      table.jsonb('content').notNullable()
       table.text('status').notNullable().defaultTo('unseen')
-      table.json('tags').nullable()
+      table.jsonb('tags').nullable()
       table.timestamp('read_at').nullable()
       table.timestamp('seen_at').nullable()
 

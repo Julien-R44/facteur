@@ -53,8 +53,9 @@ class KnexAdapter implements DatabaseAdapter {
 
     let query = this.#connection.table(this.#tableName).where('notifiable_id', options.notifiableId)
 
-    if (options.tenantId) query = query.where('tenant_id', options.tenantId)
-    if (options.status) query = query.where('status', options.status)
+    if (options.tenantId) query.where('tenant_id', options.tenantId)
+    if (options.status) query.where('status', options.status)
+    if (options.tags) query.whereJsonSupersetOf('tags' as never, JSON.stringify(options.tags))
 
     const results = await query
       .orderBy('created_at', 'desc')

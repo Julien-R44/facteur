@@ -1,58 +1,14 @@
-import ky, { type KyInstance, type Options } from 'ky'
-
-export interface FacteurClientConfig extends Omit<Options, 'prefixUrl'> {
-  /**
-   * The base URL of the Facteur API
-   */
-  apiUrl: string
-}
-
-type NotificationStatus = 'read' | 'seen' | 'unread' | 'unseen'
-export interface NotificationFilter {
-  page?: number
-  limit?: number
-  status?: NotificationStatus
-  tenantId?: string
-}
-
-type Identifier = string | number
-export interface Notification<DatabaseContent = Record<string, any>> {
-  id: Identifier
-  notifiableId: Identifier
-  tenantId?: Identifier | undefined
-  type: string
-  content: DatabaseContent
-  status: NotificationStatus
-  tags?: string[]
-  readAt?: string
-  seenAt?: string
-  createdAt: string
-  updatedAt?: string
-}
-
-export type NotificationsList<DatabaseContent> = Notification<DatabaseContent>[]
-
-export interface MarkAsOptions {
-  notificationId: string
-  status: 'read' | 'seen'
-}
-
-export interface MarkAllAsOptions {
-  status: 'read' | 'seen'
-  tenantId?: string
-}
-
-export interface PreferencesData {
-  [notificationName: string]: {
-    [channelName: string]: boolean
-  }
-}
-
-export interface UpdatePreferencesOptions {
-  preferences: PreferencesData
-  tenantId?: string
-  notificationName?: string
-}
+import type { KyInstance } from 'ky'
+import ky from 'ky'
+import type {
+  NotificationFilter,
+  NotificationsList,
+  MarkAsOptions,
+  MarkAllAsOptions,
+  PreferencesData,
+  UpdatePreferencesOptions,
+  FacteurClientConfig,
+} from './types.js'
 
 class NotificationsApi<DatabaseContent> {
   #client: KyInstance
@@ -73,6 +29,7 @@ class NotificationsApi<DatabaseContent> {
     if (options.limit) searchParams.set('limit', options.limit.toString())
     if (options.status) searchParams.set('status', options.status)
     if (options.tenantId) searchParams.set('tenantId', options.tenantId)
+    if (options.tags) searchParams.set('tags', JSON.stringify(options.tags))
 
     return this.#client
       .get(`notifications/notifiable/${this.#notifiableId}/notifications`, { searchParams })
