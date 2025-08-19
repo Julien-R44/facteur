@@ -23,11 +23,10 @@
     "./channels/webhook": "./src/channels/webhook.ts",
     "./channels/webpush": "./src/channels/webpush.ts",
     "./database": "./src/database/index.ts",
-    "./providers/facteur_provider": "./src/providers/facteur_provider.ts",
     "./services/main": "./src/services/main.ts",
     "./types": "./src/types.ts",
     "./package.json": "./package.json",
-    "./facteur_provider": "./src/providers/facteur_provider.js"
+    "./facteur_provider": "./dist/providers/facteur_provider.js"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -89,11 +88,10 @@
       "./channels/webhook": "./dist/channels/webhook.js",
       "./channels/webpush": "./dist/channels/webpush.js",
       "./database": "./dist/database/index.js",
-      "./providers/facteur_provider": "./dist/providers/facteur_provider.js",
       "./services/main": "./dist/services/main.js",
       "./types": "./dist/types.js",
       "./package.json": "./package.json",
-      "./facteur_provider": "./src/providers/facteur_provider.js"
+      "./facteur_provider": "./dist/providers/facteur_provider.js"
     }
   }
 }

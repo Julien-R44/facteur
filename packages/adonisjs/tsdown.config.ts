@@ -31,8 +31,8 @@ export default defineConfig({
   exports: {
     devExports: true,
     customExports(pkg) {
-      delete pkg['./providers/facteur_provider.js']
-      pkg['./facteur_provider'] = './src/providers/facteur_provider.js'
+      delete pkg['./providers/facteur_provider']
+      pkg['./facteur_provider'] = './dist/providers/facteur_provider.js'
 
       return mapKeys(pkg, (key) => (key.endsWith('/index') ? key.slice(0, -6) : key))
     },
