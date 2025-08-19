@@ -21,6 +21,13 @@ export default defineConfig({
     './services/main': './src/services/main.ts',
   },
   unbundle: true,
+  copy: [
+    {
+      from: './stubs',
+      to: './dist/adonisjs/stubs',
+    },
+  ],
+  clean: true,
   exports: {
     devExports: true,
     customExports(pkg) {
