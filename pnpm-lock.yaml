@@ -164,7 +164,7 @@ importers:
   packages/adonisjs:
     dependencies:
       '@facteurjs/core':
-        specifier: workspace:1.0.0-beta.1
+        specifier: workspace:*
         version: link:../core
       '@julr/utils':
         specifier: 'catalog:'
