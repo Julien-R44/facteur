@@ -1,7 +1,7 @@
 {
   "name": "@facteurjs/hono",
   "type": "module",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "Hono adapter for Facteur",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "ISC",
