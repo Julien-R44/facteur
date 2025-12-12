@@ -1,10 +1,11 @@
 import { Facteur } from '@facteurjs/core'
 import { createFacteurServer } from '@facteurjs/core/api'
+import type { HttpContext } from '@adonisjs/core/http'
 import type { HttpRouterService } from '@adonisjs/core/types'
 import type { ServerAdapter } from '@facteurjs/core/api/types'
 
 import { AdonisServerAdapter } from './server/adapter.js'
-import type { Channel, FacteurConfiguration } from './types.js'
+import type { AdonisAuthorizationCallback, Channel, FacteurConfiguration } from './types.js'
 import type { DatabaseAdapter } from '../../core/src/database/types.js'
 
 export class NotificationManager<
@@ -18,10 +19,22 @@ export class NotificationManager<
     this.#serverAdapter = new AdonisServerAdapter(router)
   }
 
-  registerRoutes() {
+  /**
+   * Register the notification API routes
+   */
+  registerRoutes(options: { authorize: AdonisAuthorizationCallback }) {
     return createFacteurServer({
       facteur: this,
       adapter: this.#serverAdapter,
+      authorize: (context) => {
+        const ctx = context.request.context as HttpContext
+
+        return options.authorize({
+          notifiableId: context.notifiableId,
+          tenantId: context.tenantId,
+          ctx,
+        })
+      },
     })
   }
 }

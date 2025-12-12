@@ -1,5 +1,5 @@
 import type { Facteur } from '../facteur.js'
-import type { RouteDefinition, ServerAdapter } from './types.js'
+import type { AuthorizationCallback, RouteDefinition, ServerAdapter } from './types.js'
 import { getPreferencesRoute, updatePreferencesRoute } from './handlers/preferences.js'
 import {
   getNotificationRoute,
@@ -7,28 +7,39 @@ import {
   markNotificationAsRoute,
 } from './handlers/notifications.js'
 
-export function defineRoute(
-  routeDefinition: (options: { facteur: Facteur<any, any> }) => RouteDefinition,
-) {
+export interface DefineRouteOptions {
+  facteur: Facteur<any, any>
+  authorize?: AuthorizationCallback | undefined
+}
+
+export function defineRoute(routeDefinition: (options: DefineRouteOptions) => RouteDefinition) {
   return routeDefinition
 }
 
-export const routes = (facteur: Facteur<any, any>) =>
+export const routes = (options: DefineRouteOptions) =>
   [
     // Notification routes
-    getNotificationRoute({ facteur }),
-    markNotificationAsRoute({ facteur }),
-    markAllNotificationsAsRoute({ facteur }),
+    getNotificationRoute(options),
+    markNotificationAsRoute(options),
+    markAllNotificationsAsRoute(options),
     // Preferences route
-    getPreferencesRoute({ facteur }),
-    updatePreferencesRoute({ facteur }),
+    getPreferencesRoute(options),
+    updatePreferencesRoute(options),
   ] satisfies RouteDefinition[]
 
-export function createFacteurServer(options: {
+export interface CreateFacteurServerOptions {
   adapter: ServerAdapter
   facteur: Facteur<any, any>
-}) {
-  const { adapter, facteur } = options
 
-  adapter.setRoutes(routes(facteur))
+  /**
+   * Authorization callback to verify that the requester has access to the requested resources.
+   * If not provided, all requests will be allowed (NOT RECOMMENDED for production).
+   */
+  authorize?: AuthorizationCallback | undefined
+}
+
+export function createFacteurServer(options: CreateFacteurServerOptions) {
+  const { adapter, facteur, authorize } = options
+
+  adapter.setRoutes(routes({ facteur, authorize }))
 }

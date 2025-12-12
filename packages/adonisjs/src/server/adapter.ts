@@ -9,15 +9,16 @@ export class AdonisServerAdapter implements ServerAdapter {
       const pattern = route.route
       const method = route.method.toUpperCase()
 
-      this.router.route(pattern, [method], async ({ request, response }) => {
+      this.router.route(pattern, [method], async (ctx) => {
         const result = await route.handler({
-          body: request.body(),
-          params: request.params(),
-          query: request.qs(),
-          headers: request.headers() as Record<string, string | undefined>,
+          body: ctx.request.body(),
+          params: ctx.request.params(),
+          query: ctx.request.qs(),
+          headers: ctx.request.headers() as Record<string, string | undefined>,
+          context: ctx,
         })
 
-        return response.status(result.status).send(result.body)
+        return ctx.response.status(result.status).send(result.body)
       })
     }
   }

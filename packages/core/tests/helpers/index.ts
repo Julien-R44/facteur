@@ -7,7 +7,13 @@ import {
   type ChannelSendParams,
 } from '../../src/types/index.js'
 import { FacteurDatabase } from '../../src/database/database.js'
-import type { GetPreferencesParams, Preferences } from '../../src/database/types.js'
+import type {
+  DatabaseAdapter,
+  GetPreferencesParams,
+  Preferences,
+} from '../../src/database/types.js'
+import { Facteur } from '../../src/facteur.js'
+import type { HTTPRequest } from '../../src/api/types.js'
 
 class TestProvider implements Channel<any, any, any, any> {
   name = 'test' as const;
@@ -106,6 +112,8 @@ export class FakeNotification extends Notification<undefined, any> {
 }
 
 export class FakeDatabase extends FacteurDatabase {
+  #notifications: any[] = []
+
   constructor(protected preferences?: Preferences) {
     super(null as any, null as any)
   }
@@ -125,4 +133,47 @@ export class FakeDatabase extends FacteurDatabase {
       },
     }
   }
+
+  override async getNotifications(_options: any): Promise<any[]> {
+    return this.#notifications
+  }
+
+  override async updateNotification(_options: any): Promise<void> {}
+
+  override async updateAllNotifications(_options: any): Promise<void> {}
+
+  override async updatePreferences(_options: any): Promise<void> {}
+}
+
+/**
+ * A fake DatabaseAdapter for testing purposes.
+ * Implements the DatabaseAdapter interface directly.
+ */
+export function createFakeDatabaseAdapter(): DatabaseAdapter {
+  return {
+    save: async () => {},
+    getNotifications: async () => [],
+    updateNotification: async () => {},
+    updateAllNotifications: async () => {},
+    pruneNotifications: async () => {},
+    getPreferences: async () => [],
+    updatePreferences: async () => {},
+  }
+}
+
+export function createMockRequest(overrides: Partial<HTTPRequest> = {}): HTTPRequest {
+  return { body: {}, params: {}, query: {}, headers: {}, ...overrides }
+}
+
+export function createFacteurWithDb() {
+  const provider = testProvider()
+  const adapter = createFakeDatabaseAdapter()
+
+  const facteur = new Facteur({
+    channels: { email: provider },
+    discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    databaseAdapter: adapter,
+  })
+
+  return { facteur, adapter, provider }
 }
