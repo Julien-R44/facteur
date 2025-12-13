@@ -11,11 +11,13 @@ export class HonoServerAdapter implements ServerAdapter {
       const pattern = route.route
 
       this.app[method.toLowerCase() as 'get' | 'post'](pattern, async (c) => {
+        const body = await c.req.json().catch(() => ({}))
         const result = await route.handler({
-          body: c.req.json(),
+          body,
           params: c.req.param(),
           query: c.req.query(),
           headers: c.req.header(),
+          context: c,
         })
 
         return c.json(result.body, result.status as ContentfulStatusCode)

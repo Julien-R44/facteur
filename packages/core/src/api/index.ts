@@ -32,8 +32,7 @@ export interface CreateFacteurServerOptions {
   facteur: Facteur<any, any>
 
   /**
-   * Authorization callback to verify that the requester has access to the requested resources.
-   * If not provided, all requests will be allowed (NOT RECOMMENDED for production).
+   * Authorization callback to verify that the requester has access to the requested resources
    */
   authorize?: AuthorizationCallback | undefined
 }
