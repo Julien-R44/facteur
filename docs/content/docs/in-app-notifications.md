@@ -192,6 +192,7 @@ console.log('WebSocket server is running on ws://localhost:3000/ws')
 ```
 
 Great, we now have:
+
 - Our Hono API with preconfigured Facteur routes to manage notifications.
 - Our Socket.IO server for real‑time notifications.
 

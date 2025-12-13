@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+
 import { FacteurOptions } from '../src/options.js'
 
 test.group('Options', () => {

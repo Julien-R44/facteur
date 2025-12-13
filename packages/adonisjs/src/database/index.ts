@@ -1,5 +1,5 @@
-import { configProvider } from '@adonisjs/core'
 import { RuntimeException } from '@adonisjs/core/exceptions'
+import { configProvider } from '@adonisjs/core'
 
 import type { DatabaseAdapterCommonOptions, KyselyConfig } from '../channels/database.js'
 

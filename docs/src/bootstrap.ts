@@ -1,3 +1,6 @@
+import type { Collection } from '@dimerapp/content'
+
+import { readFile } from 'node:fs/promises'
 /*
 |--------------------------------------------------------------------------
 | Bootstrap
@@ -10,14 +13,12 @@
 
 import edge from 'edge.js'
 import uiKit from 'edge-uikit'
+import { edgeIconify, addCollection } from 'edge-iconify'
 import collect from 'collect.js'
-import { readFile } from 'node:fs/promises'
-import { Renderer } from '@dimerapp/content'
-import type { Collection } from '@dimerapp/content'
+import { icons as tablerIcons } from '@iconify-json/tabler'
 import { dimer, RenderingPipeline } from '@dimerapp/edge'
 import { docsHook, docsTheme } from '@dimerapp/docs-theme'
-import { edgeIconify, addCollection } from 'edge-iconify'
-import { icons as tablerIcons } from '@iconify-json/tabler'
+import { Renderer } from '@dimerapp/content'
 
 import grammars from '../vscode_grammars/main.js'
 

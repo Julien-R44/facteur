@@ -1,5 +1,5 @@
-import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/lucid'
+import app from '@adonisjs/core/services/app'
 
 const dbConfig = defineConfig({
   connection: 'sqlite',

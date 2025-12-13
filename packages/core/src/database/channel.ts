@@ -1,7 +1,7 @@
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types/index.js'
-
-import type { DatabaseMessage } from './message.js'
 import type { DatabaseAdapter, DatabaseConfig, Identifier } from './types.js'
+import type { DatabaseMessage } from './message.js'
+
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types/index.js'
 import { errors } from '../errors/index.js'
 
 export { DatabaseMessage } from './message.js'
@@ -15,9 +15,12 @@ type DatabaseTargets = {
   tenantId?: Identifier
 }
 
-export class DatabaseChannel
-  implements Channel<DatabaseConfig, DatabaseMessage, any, DatabaseTargets>
-{
+export class DatabaseChannel implements Channel<
+  DatabaseConfig,
+  DatabaseMessage,
+  any,
+  DatabaseTargets
+> {
   name = 'database' as const
   #adapter: DatabaseAdapter;
   [kTargetSymbol] = null as any as DatabaseTargets

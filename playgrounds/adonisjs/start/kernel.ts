@@ -1,15 +1,5 @@
-/*
-|--------------------------------------------------------------------------
-| HTTP kernel file
-|--------------------------------------------------------------------------
-|
-| The HTTP kernel file is used to register the middleware with the server
-| or the router.
-|
-*/
-
-import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
+import router from '@adonisjs/core/services/router'
 
 /**
  * The error handler is used to convert an exception

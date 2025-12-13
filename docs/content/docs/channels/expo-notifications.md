@@ -55,6 +55,7 @@ facteur.send({
 ## Expo Push Token Format
 
 Expo push tokens have a specific format and are validated automatically:
+
 - Format: `ExponentPushToken[...]` or `ExpoPushToken[...]`
 - The channel validates tokens before sending notifications
 - Invalid tokens will throw an error immediately

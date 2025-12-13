@@ -1,5 +1,6 @@
-import { useFacteur, type TypedFacteurClient } from './index.js'
 import { useMutation, mutationOptions, useQueryClient } from '@tanstack/react-query'
+
+import { useFacteur, type TypedFacteurClient } from './index.js'
 
 interface UseMarkAsSeenOptions {
   notificationId: string

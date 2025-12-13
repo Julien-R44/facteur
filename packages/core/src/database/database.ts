@@ -1,5 +1,3 @@
-import type { FacteurOptions } from '../options.js'
-import type { NotificationDiscoverer } from '../notifications/notification_discoverer.js'
 import type {
   DatabaseAdapter,
   GetNotificationsParams,
@@ -9,6 +7,8 @@ import type {
   Preferences,
   UpdatePreferencesParams,
 } from './types.js'
+import type { FacteurOptions } from '../options.js'
+import type { NotificationDiscoverer } from '../notifications/notification_discoverer.js'
 
 export class FacteurDatabase {
   constructor(

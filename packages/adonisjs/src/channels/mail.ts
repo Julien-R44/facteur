@@ -1,8 +1,9 @@
-import { Message, BaseMail } from '@adonisjs/mail'
 import type { MailService } from '@adonisjs/mail/types'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types.js'
 import { errors } from '@facteurjs/core'
+import { Message, BaseMail } from '@adonisjs/mail'
+
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types.js'
 
 export interface MailConfig {
   mailer: MailService

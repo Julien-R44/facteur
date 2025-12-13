@@ -1,9 +1,10 @@
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 import { Expo } from 'expo-server-sdk'
-import { errors } from '../../errors/index.js'
 
-import type { ExpoMessage } from './message.js'
 import type { ExpoConfig, ExpoTargets } from './types.js'
+import type { ExpoMessage } from './message.js'
+
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
+import { errors } from '../../errors/index.js'
 
 export function expoChannel(config: ExpoConfig = {}) {
   return new ExpoChannel(config)

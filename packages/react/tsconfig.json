@@ -2,7 +2,7 @@
   "extends": "@julr/tooling-configs/tsconfigs/tsconfig.node",
   "compilerOptions": {
     "outDir": "./build",
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
 }

@@ -1,8 +1,7 @@
 import EventEmitter from 'node:events'
 import { type Logger, noopLogger } from '@julr/utils/logger'
+import { invoke } from '@julr/utils/functions'
 
-import { errors } from './errors/index.js'
-import type { DatabaseAdapter } from './database/types.js'
 import type {
   Emitter,
   QueueAdapter,
@@ -12,7 +11,9 @@ import type {
   ResolvedDefaultPreferences,
   NotificationResolver,
 } from './types/index.js'
-import { invoke } from '@julr/utils/functions'
+import type { DatabaseAdapter } from './database/types.js'
+
+import { errors } from './errors/index.js'
 
 export class FacteurOptions<
   KnownChannels extends Record<string, Channel>,

@@ -1,12 +1,13 @@
-import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { facteur } from './lib/facteur.js'
-import { PostLikedNotification } from './notifications/post_liked_notification.js'
-import { User } from './types.js'
-import { ioServer } from './lib/socketio.js'
 import { serveStatic } from '@hono/node-server/serve-static'
-import { createFacteurServer } from '@facteurjs/core/api'
+import { serve } from '@hono/node-server'
 import { HonoServerAdapter } from '@facteurjs/hono'
+import { createFacteurServer } from '@facteurjs/core/api'
+
+import { User } from './types.js'
+import { PostLikedNotification } from './notifications/post_liked_notification.js'
+import { ioServer } from './lib/socketio.js'
+import { facteur } from './lib/facteur.js'
 
 /**
  * Create a fake random user just for demonstration purposes.

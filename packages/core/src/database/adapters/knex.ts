@@ -90,7 +90,10 @@ class KnexAdapter implements DatabaseAdapter {
       updateData.seen_at = new Date()
     }
 
-    await this.#connection.table(this.#tableName).where('id', options.id).update(updateData)
+    await this.#connection
+      .table(this.#tableName)
+      .where('id', options.id)
+      .update(updateData)
   }
 
   async updateAllNotifications(options: UpdateAllNotificationsParams): Promise<void> {

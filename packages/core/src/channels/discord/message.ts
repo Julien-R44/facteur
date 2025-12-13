@@ -1,10 +1,11 @@
-import { WebhookMessage } from '../webhook/message.js'
 import type {
   DiscordEmbedAuthor,
   DiscordEmbedField,
   DiscordEmbedFooter,
   HexadecimalColor,
 } from './types.js'
+
+import { WebhookMessage } from '../webhook/message.js'
 
 export class DiscordMessage extends WebhookMessage {
   #body = ''

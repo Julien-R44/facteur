@@ -1,5 +1,4 @@
 import { defineConfig, transports } from '@adonisjs/mail'
-
 import env from '#start/env'
 
 const mailConfig = defineConfig({

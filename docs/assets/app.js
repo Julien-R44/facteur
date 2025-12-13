@@ -1,16 +1,15 @@
 // @ts-nocheck
 import 'unpoly'
-
-import Alpine from 'alpinejs'
 import mediumZoom from 'medium-zoom'
-import docsearch from '@docsearch/js'
 import { tabs } from 'edge-uikit/tabs'
-import Persist from '@alpinejs/persist'
+import Alpine from 'alpinejs'
+import docsearch from '@docsearch/js'
 import {
   initZoomComponent,
   initBaseComponents,
   initSearchComponent,
 } from '@dimerapp/docs-theme/scripts'
+import Persist from '@alpinejs/persist'
 
 import.meta.glob([
   '../content/**/*.png',

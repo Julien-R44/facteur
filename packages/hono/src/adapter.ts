@@ -1,6 +1,6 @@
-import type { RouteDefinition, ServerAdapter } from '@facteurjs/core/api/types'
-import type { Hono } from 'hono'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
+import type { Hono } from 'hono'
+import type { RouteDefinition, ServerAdapter } from '@facteurjs/core/api/types'
 
 export class HonoServerAdapter implements ServerAdapter {
   constructor(protected app: Hono) {}

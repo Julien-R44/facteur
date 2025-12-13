@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Settings, Save, RotateCcw, Bell, Mail, MessageSquare, Database } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface NotificationPreferences {
   global: {

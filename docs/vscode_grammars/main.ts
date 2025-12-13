@@ -1,3 +1,5 @@
+import type { ILanguageRegistration } from '@dimerapp/shiki'
+
 /*
 |--------------------------------------------------------------------------
 | VSCode grammars
@@ -9,7 +11,6 @@
 */
 
 import { fileURLToPath } from 'node:url'
-import type { ILanguageRegistration } from '@dimerapp/shiki'
 
 export default [
   {

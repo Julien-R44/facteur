@@ -1,14 +1,15 @@
-import type { FacteurDatabase } from '../database/database.js'
-import type { Identifier } from '../database/types.js'
+import { mapEntries } from '@julr/utils/object'
+import { is } from '@julr/utils/is'
+import { invoke } from '@julr/utils/functions'
+
 import type {
   Notification,
   Notifiable,
   NotificationOptions,
   ChannelSpecificConfig,
 } from '../types/index.js'
-import { mapEntries } from '@julr/utils/object'
-import { invoke } from '@julr/utils/functions'
-import { is } from '@julr/utils/is'
+import type { Identifier } from '../database/types.js'
+import type { FacteurDatabase } from '../database/database.js'
 
 export interface ResolveChannelsOptions {
   notification: new (...args: any[]) => Notification<any, any>

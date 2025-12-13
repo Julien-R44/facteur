@@ -1,6 +1,7 @@
+import type { InferChannels } from '@facteurjs/adonisjs/types'
+
 import { databases } from '@facteurjs/adonisjs/database'
 import { defineConfig, channels } from '@facteurjs/adonisjs'
-import type { InferChannels } from '@facteurjs/adonisjs/types'
 
 const config = defineConfig({
   databaseAdapter: databases.lucid({ connectionName: 'sqlite' }),

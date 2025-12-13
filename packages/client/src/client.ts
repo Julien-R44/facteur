@@ -1,8 +1,11 @@
 import type { KyInstance } from 'ky'
+
 import ky from 'ky'
+
 import type { FacteurClientConfig } from './types.js'
-import { NotificationsApi } from './notifications_api.js'
+
 import { PreferencesApi } from './preferences_api.js'
+import { NotificationsApi } from './notifications_api.js'
 
 export class FacteurClient<DatabaseContent> {
   #client: KyInstance

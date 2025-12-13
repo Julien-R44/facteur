@@ -1,19 +1,20 @@
 import { AssertionError } from 'node:assert'
 
+import type {
+  DatabaseAdapter,
+  GetPreferencesParams,
+  Preferences,
+} from '../../src/database/types.js'
+import type { HTTPRequest } from '../../src/api/types.js'
+
 import {
   kTargetSymbol,
   Notification,
   type Channel,
   type ChannelSendParams,
 } from '../../src/types/index.js'
-import { FacteurDatabase } from '../../src/database/database.js'
-import type {
-  DatabaseAdapter,
-  GetPreferencesParams,
-  Preferences,
-} from '../../src/database/types.js'
 import { Facteur } from '../../src/facteur.js'
-import type { HTTPRequest } from '../../src/api/types.js'
+import { FacteurDatabase } from '../../src/database/database.js'
 
 class TestProvider implements Channel<any, any, any, any> {
   name = 'test' as const;

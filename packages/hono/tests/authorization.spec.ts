@@ -1,7 +1,9 @@
-import { test } from '@japa/runner'
-import { Hono } from 'hono'
-import { Facteur } from '@facteurjs/core'
 import type { DatabaseAdapter } from '@facteurjs/core/database/types'
+
+import { Hono } from 'hono'
+import { test } from '@japa/runner'
+import { Facteur } from '@facteurjs/core'
+
 import { createHonoFacteurServer, type HonoAuthorizationContext } from '../src/index.js'
 
 function createFakeDatabaseAdapter(): DatabaseAdapter {

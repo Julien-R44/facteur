@@ -31,6 +31,7 @@ function App() {
 ```
 
 **FacteurProvider Props:**
+
 - `apiUrl` (string, required): Your Facteur API URL
 - `notifiableId` (string|number): Connected user ID
 
@@ -56,6 +57,7 @@ declare module '@facteurjs/react' {
 Hook to retrieve the list of notifications with automatic caching.
 
 **Parameters:**
+
 - `page` (number, optional): Page number
 - `limit` (number, optional): Number of items per page
 - `status` (string, optional): Filter by status (`'read'` | `'seen'` | `'unread'` | `'unseen'`)
@@ -122,6 +124,7 @@ const handleMarkAllAsSeen = () => {
 Hook to retrieve notification preferences with caching.
 
 **Parameters:**
+
 - `tenantId` (string, optional): Tenant ID
 
 ```ts

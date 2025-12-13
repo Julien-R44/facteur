@@ -3,6 +3,7 @@
 Facteur is a notification library for Node.js that makes sending notifications across different channels simple and efficient. It's framework-agnostic, so you can use it with any Node.js application. Out of the box, it supports in-app notifications, web push, email, SMS, and chat platforms like Slack, Discord, and Teams.
 
 Whether you need something basic or complex, Facteur has you covered:
+
 - Want to send a quick Slack notification when someone signs up?
 - Need to send notifications through different channels based on user preferences?
 - Building complex notification flows with conditions, delays, and retries?
@@ -11,6 +12,7 @@ Whether you need something basic or complex, Facteur has you covered:
 **Facteur handles all of this**. From simple one-off notifications to sophisticated multi-channel workflows.
 
 Here's what you get out of the box:
+
 - 📱 Multiple notification channels: web push, email, SMS, and chat platforms
 - 🔌 Tons of supported providers (and you can build custom ones too)
 - ⚡ Real-time notifications via Server-Sent Events or WebSockets
@@ -163,10 +165,11 @@ There's plenty more to explore, we'll cover it all in the following sections.
 ## What's Coming
 
 Facteur is actively being developed. Here's what's on the roadmap:
+
 - Notification queuing support
 - Debouncing and batching system
 - Diagnostic channels for tracing and monitoring
-- Topics. 
+- Topics.
 - Headless React/Vue components for even easier integration ( Shadcn registry ? )
 - Even more notification channels !
 

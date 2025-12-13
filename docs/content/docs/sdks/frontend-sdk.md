@@ -53,6 +53,7 @@ All good! Your client is ready to be used. Here are the available methods
 Retrieves the list of notifications for the user.
 
 **Parameters:**
+
 - `page` (number, optional): Page number (default: 1)
 - `limit` (number, optional): Number of items per page
 - `status` (string, optional): Filter by status (`'read'` | `'seen'` | `'unread'` | `'unseen'`)
@@ -72,6 +73,7 @@ const notifications = await facteur.notifications.list({
 Marks a specific notification as read.
 
 **Parameters:**
+
 - `notificationId` (string, required): ID of the notification to mark
 
 ```ts
@@ -85,6 +87,7 @@ await facteur.notifications.markAsRead({
 Marks a specific notification as seen.
 
 **Parameters:**
+
 - `notificationId` (string, required): ID of the notification to mark
 
 ```ts
@@ -98,6 +101,7 @@ await facteur.notifications.markAsSeen({
 Marks all notifications as read.
 
 **Parameters:**
+
 - `tenantId` (string, optional): Tenant ID to filter notifications
 
 ```ts
@@ -111,6 +115,7 @@ await facteur.notifications.markAllAsRead({
 Marks all notifications as seen.
 
 **Parameters:**
+
 - `tenantId` (string, optional): Tenant ID to filter notifications
 
 ```ts
@@ -124,6 +129,7 @@ await facteur.notifications.markAllAsSeen({
 Marks a notification with a specific status (generic method).
 
 **Parameters:**
+
 - `notificationId` (string, required): ID of the notification to mark
 - `status` (string, required): Status to apply (`'read'` | `'seen'`)
 
@@ -139,6 +145,7 @@ await facteur.notifications.markAs({
 Marks all notifications with a specific status (generic method).
 
 **Parameters:**
+
 - `status` (string, required): Status to apply (`'read'` | `'seen'`)
 - `tenantId` (string, optional): Tenant ID to filter notifications
 
@@ -154,6 +161,7 @@ await facteur.notifications.markAllAs({
 Retrieves the user's notification preferences.
 
 **Parameters:**
+
 - `tenantId` (string, optional): Tenant ID to retrieve specific preferences
 
 ```ts
@@ -167,6 +175,7 @@ const preferences = await facteur.preferences.list({
 Updates the user's notification preferences.
 
 **Parameters:**
+
 - `preferences` (object, required): Object containing preferences by notification type and channel
 - `tenantId` (string, optional): Tenant ID for specific preferences
 - `notificationName` (string, optional): Name of the notification type to update

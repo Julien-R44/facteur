@@ -1,6 +1,8 @@
 import type { UpdatePreferencesOptions } from '@facteurjs/client/types'
-import { useFacteur, type TypedFacteurClient } from './index.js'
+
 import { useMutation, mutationOptions, useQueryClient } from '@tanstack/react-query'
+
+import { useFacteur, type TypedFacteurClient } from './index.js'
 
 export const updatePreferencesMutationOptions = (client: TypedFacteurClient) =>
   mutationOptions({

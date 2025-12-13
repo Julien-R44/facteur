@@ -1,7 +1,7 @@
 import app from '@adonisjs/core/services/app'
 
-import type { NotificationManager } from '../manager.js'
 import type { NotificationChannels } from '../types.js'
+import type { NotificationManager } from '../manager.js'
 
 // @ts-ignore
 let facteur: NotificationManager<NotificationChannels, null>

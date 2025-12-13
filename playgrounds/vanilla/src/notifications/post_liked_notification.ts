@@ -1,9 +1,9 @@
-import { DiscordMessage } from '@facteurjs/core/channels/discord'
 import { Notification, type NotificationOptions } from '@facteurjs/core/types'
+import { SocketIoMessage } from '@facteurjs/core/channels/socketio'
+import { DiscordMessage } from '@facteurjs/core/channels/discord'
+import { AwsSnsMessage } from '@facteurjs/core/channels/aws-sns'
 
 import type { User } from '../types.js'
-import { SocketIoMessage } from '@facteurjs/core/channels/socketio'
-import { AwsSnsMessage } from '@facteurjs/core/channels/aws-sns'
 
 export class AnonymousLikeNotification extends Notification<undefined, {}> {
   static override options: NotificationOptions = {

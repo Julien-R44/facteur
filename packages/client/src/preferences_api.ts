@@ -1,4 +1,5 @@
 import type { KyInstance } from 'ky'
+
 import type { PreferencesData, UpdatePreferencesOptions } from './types.js'
 
 export class PreferencesApi {

@@ -1,4 +1,5 @@
 import type { Awaitable } from '@julr/utils/types'
+
 import type { Identifier } from '../database/types.js'
 
 export type ChannelSendParams<Message, Targets> = {

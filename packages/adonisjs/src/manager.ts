@@ -1,12 +1,14 @@
-import { Facteur } from '@facteurjs/core'
-import { createFacteurServer } from '@facteurjs/core/api'
-import type { HttpContext } from '@adonisjs/core/http'
-import type { HttpRouterService } from '@adonisjs/core/types'
 import type { ServerAdapter } from '@facteurjs/core/api/types'
+import type { HttpRouterService } from '@adonisjs/core/types'
+import type { HttpContext } from '@adonisjs/core/http'
 
-import { AdonisServerAdapter } from './server/adapter.js'
+import { createFacteurServer } from '@facteurjs/core/api'
+import { Facteur } from '@facteurjs/core'
+
 import type { AdonisAuthorizationCallback, Channel, FacteurConfiguration } from './types.js'
 import type { DatabaseAdapter } from '../../core/src/database/types.js'
+
+import { AdonisServerAdapter } from './server/adapter.js'
 
 export class NotificationManager<
   KnownChannels extends Record<string, Channel>,

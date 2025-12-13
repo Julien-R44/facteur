@@ -1,5 +1,6 @@
-import { useFacteur, type TypedFacteurClient } from './index.js'
 import { queryOptions, useQuery } from '@tanstack/react-query'
+
+import { useFacteur, type TypedFacteurClient } from './index.js'
 
 interface UsePreferencesOptions {
   tenantId?: string

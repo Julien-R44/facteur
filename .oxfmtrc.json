@@ -11,5 +11,5 @@
   "bracketSpacing": true,
   "arrowParens": "always",
   "printWidth": 100,
-  "ignorePatterns": [".adonisjs/**", "node_modules/**", "dist/**", "build/**"]
+  "ignorePatterns": [".adonisjs/**", "node_modules/**", "dist/**", "build/**", "**.yml", "**.yaml"]
 }

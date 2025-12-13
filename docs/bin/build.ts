@@ -10,9 +10,8 @@
 */
 
 import 'reflect-metadata'
-
-import { Ignitor } from '@adonisjs/core'
 import { defineConfig } from '@adonisjs/vite'
+import { Ignitor } from '@adonisjs/core'
 
 /**
  * URL to the application root. AdonisJS need it to resolve

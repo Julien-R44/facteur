@@ -1,5 +1,5 @@
-import type { DatabaseContent } from '../types/extend.js'
 import type { NotificationStatus } from './types.js'
+import type { DatabaseContent } from '../types/extend.js'
 
 export class DatabaseMessage {
   static create() {

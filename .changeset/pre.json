@@ -7,7 +7,5 @@
     "@facteurjs/core": "0.0.0",
     "@facteurjs/react": "0.0.0"
   },
-  "changesets": [
-    "real-wasps-lay"
-  ]
+  "changesets": ["real-wasps-lay"]
 }

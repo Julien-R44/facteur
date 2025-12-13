@@ -1,9 +1,10 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns'
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 
-import { errors } from '../../errors/index.js'
-import type { AwsSnsMessage } from './message.js'
 import type { AwsSnsConfig, AwsSnsTargets } from './types.js'
+import type { AwsSnsMessage } from './message.js'
+
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
+import { errors } from '../../errors/index.js'
 
 export function awsSnsChannel(config: AwsSnsConfig) {
   return new AwsSnsChannel(config)

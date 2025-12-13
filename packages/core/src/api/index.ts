@@ -1,5 +1,6 @@
-import type { Facteur } from '../facteur.js'
 import type { AuthorizationCallback, RouteDefinition, ServerAdapter } from './types.js'
+import type { Facteur } from '../facteur.js'
+
 import { getPreferencesRoute, updatePreferencesRoute } from './handlers/preferences.js'
 import {
   getNotificationRoute,

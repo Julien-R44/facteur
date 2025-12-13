@@ -41,6 +41,7 @@ export default defineConfig({
 ### Adapter Options
 
 Both Knex and Kysely adapters support:
+
 - **`connection`** (required): Your database connection instance
 - **`tableNames`** (optional): Custom table names for notifications and preferences
 

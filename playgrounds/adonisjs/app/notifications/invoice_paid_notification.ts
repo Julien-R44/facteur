@@ -1,17 +1,17 @@
-import { Notification } from '@facteurjs/adonisjs/types'
-import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
-import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
-import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
-import type { Identifier } from '@facteurjs/adonisjs/channels/database'
-import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
-import type { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
 import type { NotificationOptions } from '@facteurjs/adonisjs/types'
-import { FcmMessage } from '@facteurjs/adonisjs/channels/fcm'
-
+import type { PossibleMailMessage } from '@facteurjs/adonisjs/channels/mail'
+import type { Identifier } from '@facteurjs/adonisjs/channels/database'
 import type User from '#models/user'
-import InvoicePaidMail from '#mails/invoice_paid_notification'
-import { TwilioMessage } from '@facteurjs/adonisjs/channels/twilio'
+
+import { Notification } from '@facteurjs/adonisjs/types'
 import { WebpushMessage } from '@facteurjs/adonisjs/channels/webpush'
+import { TwilioMessage } from '@facteurjs/adonisjs/channels/twilio'
+import { TransmitMessage } from '@facteurjs/adonisjs/channels/transmit'
+import { SlackMessage } from '@facteurjs/adonisjs/channels/slack'
+import { FcmMessage } from '@facteurjs/adonisjs/channels/fcm'
+import { DiscordMessage } from '@facteurjs/adonisjs/channels/discord'
+import { DatabaseMessage } from '@facteurjs/adonisjs/channels/database'
+import InvoicePaidMail from '#mails/invoice_paid_notification'
 
 interface InvoicePaidParams {
   amount: number

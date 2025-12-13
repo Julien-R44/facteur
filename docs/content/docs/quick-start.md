@@ -3,6 +3,7 @@
 You can install FacteurJS via your favorite package manager:
 
 :::codegroup
+
 ```sh
 // title: npm
 npm i @facteurjs/core
@@ -17,6 +18,7 @@ pnpm add @facteurjs/core
 // title: yarn
 yarn add @facteurjs/core
 ```
+
 :::
 
 ## Configuration
@@ -92,6 +94,7 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
 ```
 
 When creating a notification class, you need to extend the `Notification` class from FacteurJS. The `Notification` class requires two type parameters:
+
 - the notifiable entity (in this case, `User`). It represents the entity that will receive the notification.
 - and the parameters required for sending the notification (in this case, `InvoicePaidParams`). You will be able to re-use these parameters when formatting the notification for each channel.
 
@@ -99,7 +102,7 @@ Then as you can see, Facteur provides clean and chainable Message APIs for each 
 
 ## Define notification targets
 
-Now that you have your notification class, we will need to define the TARGETS for the notification. the "targets" are some properties, required by the channels, that will represent the destination of the notification. For example, for an Email channel, the target will be the email address of the user. For a SMS channel, it will be the phone number of the user, etc. 
+Now that you have your notification class, we will need to define the TARGETS for the notification. the "targets" are some properties, required by the channels, that will represent the destination of the notification. For example, for an Email channel, the target will be the email address of the user. For a SMS channel, it will be the phone number of the user, etc.
 
 For that, our Notifiable entity (the `User` in this case) needs to implement the `notificationTargets` method, which will return an object containing the targets for each channel.
 
@@ -121,7 +124,7 @@ export class User implements Notifiable {
 }
 ```
 
-As you can see our `notificationTargets` method returns an object where the keys are the channel names and the values are the targets for each channel. 
+As you can see our `notificationTargets` method returns an object where the keys are the channel names and the values are the targets for each channel.
 
 Now that this is done, Facteur will be able to automatically route the notification to the correct channel targets based on this method. No need to manually specify the targets when sending the notification.
 
@@ -140,15 +143,14 @@ await facteur.send({
 })
 ```
 
-All good. Your user just received a SMS and a WebPush notification saying that their invoice has been paid! 
+All good. Your user just received a SMS and a WebPush notification saying that their invoice has been paid!
 
 ## Next steps
 
-Now that you have a basic understanding of how to create and send notifications with FacteurJS, you can explore more advanced features like : 
+Now that you have a basic understanding of how to create and send notifications with FacteurJS, you can explore more advanced features like :
 
 - [In-app notifications](./in-app-notifications.md)
 - [Scheduling notifications](./scheduling-notifications.md)
 - [Using custom channels](./custom-channels.md)
 - [Preferences and user settings](./preferences.md)
 - [Frontend integration](./frontend-integration.md)
-

@@ -1,7 +1,8 @@
+import type { CommandOptions } from '@adonisjs/core/types/ace'
+
+import StringBuilder from '@poppinss/utils/string_builder'
 import string from '@poppinss/utils/string'
 import { BaseCommand, args } from '@adonisjs/core/ace'
-import StringBuilder from '@poppinss/utils/string_builder'
-import type { CommandOptions } from '@adonisjs/core/types/ace'
 
 import { stubsRoot } from '../stubs/index.js'
 

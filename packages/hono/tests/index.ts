@@ -1,5 +1,5 @@
-import { assert } from '@japa/assert'
 import { processCLIArgs, configure, run } from '@japa/runner'
+import { assert } from '@japa/assert'
 
 processCLIArgs(process.argv.slice(2))
 configure({

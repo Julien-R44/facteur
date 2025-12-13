@@ -1,11 +1,12 @@
 import ky, { HTTPError } from 'ky'
 
-import type { WebhookMessage } from './message.js'
-import { WebhookRequestException } from './exceptions.js'
-import { HTTPErrorExtractor } from '../../errors/http_error.js'
 import type { WebhookOptions, WebhookTargets } from './types.js'
+import type { WebhookMessage } from './message.js'
+
+import { WebhookRequestException } from './exceptions.js'
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 import { errors } from '../../errors/index.js'
+import { HTTPErrorExtractor } from '../../errors/http_error.js'
 
 export function webhookChannel<Options extends WebhookOptions<any>>(
   options: Options & { name: string },
@@ -13,9 +14,12 @@ export function webhookChannel<Options extends WebhookOptions<any>>(
   return new WebhookChannel(options)
 }
 
-export class WebhookChannel<T extends WebhookOptions<any>>
-  implements Channel<T, WebhookMessage, any, WebhookTargets<T>>
-{
+export class WebhookChannel<T extends WebhookOptions<any>> implements Channel<
+  T,
+  WebhookMessage,
+  any,
+  WebhookTargets<T>
+> {
   name = 'webhook' as const;
   [kTargetSymbol] = null as any as WebhookTargets<T>
   #webhooksUrls: Map<string, URL> = new Map()

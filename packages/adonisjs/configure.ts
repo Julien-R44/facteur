@@ -1,7 +1,8 @@
-import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { readFile, writeFile } from 'node:fs/promises'
 import type ConfigureCommand from '@adonisjs/core/commands/configure'
+
+import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
+import { readFile, writeFile } from 'node:fs/promises'
 
 import { stubsRoot } from './stubs/index.js'
 

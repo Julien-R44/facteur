@@ -35,6 +35,7 @@ export class HonoServerAdapter implements ServerAdapter {
 ```
 
 Several things to note:
+
 - We need to implement Facteur's `ServerAdapter` interface, which requires us to define the `setRoutes` method.
 - `setRoutes` receives an array of `RouteDefinition`, which contains the HTTP method, the route pattern, and the handler to call.
 - Then it's simple, just use your HTTP framework's methods to register the routes. Here we use Hono, but you can do the same with Express, Fastify, etc.

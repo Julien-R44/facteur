@@ -1,9 +1,10 @@
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-
-import type { FcmMessage } from './message.js'
-import type { FcmConfig, FcmTargets } from './types.js'
-import { initializeApp, cert } from 'firebase-admin/app'
 import { getMessaging, Messaging } from 'firebase-admin/messaging'
+import { initializeApp, cert } from 'firebase-admin/app'
+
+import type { FcmConfig, FcmTargets } from './types.js'
+import type { FcmMessage } from './message.js'
+
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 import { errors } from '../../errors/index.js'
 
 export function fcmChannel(config: FcmConfig) {

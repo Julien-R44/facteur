@@ -1,6 +1,6 @@
-import { FacteurClient } from '@facteurjs/client'
 import { createContext, useContext } from 'react'
 import { type PropsWithChildren, useMemo } from 'react'
+import { FacteurClient } from '@facteurjs/client'
 import { createFacteurClient } from '@facteurjs/client'
 
 interface FacteurProviderProps extends PropsWithChildren {

@@ -1,16 +1,19 @@
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-
-import type { TransmitMessage } from './message.js'
 import type { TransmitConfig, TransmitTargets } from './types.js'
+import type { TransmitMessage } from './message.js'
+
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
 import { errors } from '../../errors/index.js'
 
 export function transmitChannel(config: TransmitConfig) {
   return new TransmitChannel(config)
 }
 
-export class TransmitChannel
-  implements Channel<TransmitConfig, TransmitMessage, any, TransmitTargets>
-{
+export class TransmitChannel implements Channel<
+  TransmitConfig,
+  TransmitMessage,
+  any,
+  TransmitTargets
+> {
   name = 'transmit' as const;
   [kTargetSymbol] = null as any as TransmitTargets
 

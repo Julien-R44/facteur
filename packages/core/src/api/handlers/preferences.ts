@@ -1,5 +1,5 @@
-import { defineRoute } from '../index.js'
 import { checkAuthorization, UNAUTHORIZED_RESPONSE } from './utils.js'
+import { defineRoute } from '../index.js'
 
 export const getPreferencesRoute = defineRoute(({ facteur, authorize }) => ({
   method: 'get',

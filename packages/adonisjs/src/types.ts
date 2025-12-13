@@ -1,6 +1,6 @@
-import type { HttpContext } from '@adonisjs/core/http'
-import type { ConfigProvider } from '@adonisjs/core/types'
 import type { Identifier } from '@facteurjs/core/database/types'
+import type { ConfigProvider } from '@adonisjs/core/types'
+import type { HttpContext } from '@adonisjs/core/http'
 
 export * from '@facteurjs/core/types'
 

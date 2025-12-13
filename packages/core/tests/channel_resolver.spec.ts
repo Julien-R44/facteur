@@ -1,7 +1,8 @@
 import { test } from '@japa/runner'
-import { ChannelResolver } from '../src/notifications/channel_resolver.js'
-import { Notification, type NotificationOptions } from '../src/types/index.js'
+
 import { FakeDatabase } from './helpers/index.js'
+import { Notification, type NotificationOptions } from '../src/types/index.js'
+import { ChannelResolver } from '../src/notifications/channel_resolver.js'
 
 class NotifA extends Notification<any> {
   static override options: NotificationOptions<any> = {

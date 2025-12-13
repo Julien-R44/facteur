@@ -1,7 +1,3 @@
-import debug from '../debug.js'
-import { facteurEvents } from '../events/events.js'
-import { ChannelResolver, type ResolvedChannel } from './channel_resolver.js'
-import type { Identifier } from '../database/types.js'
 import type {
   Channel,
   SendOptions,
@@ -13,8 +9,13 @@ import type {
   Emitter,
   NotificationClass,
 } from '../types/index.js'
-import { errors } from '../errors/index.js'
+import type { Identifier } from '../database/types.js'
+
+import { ChannelResolver, type ResolvedChannel } from './channel_resolver.js'
 import { capitalizeFirstLetter } from '../helpers.js'
+import { facteurEvents } from '../events/events.js'
+import { errors } from '../errors/index.js'
+import debug from '../debug.js'
 
 /**
  * Responsible for sending notifications and messages

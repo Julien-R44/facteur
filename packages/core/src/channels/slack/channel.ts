@@ -1,8 +1,8 @@
+import type { SlackOptions, SlackTargets } from './types.js'
+import type { SlackMessage } from './message.js'
 import type { Channel } from '../../types/index.js'
 
-import type { SlackMessage } from './message.js'
 import { WebhookChannel } from '../webhook/provider.js'
-import type { SlackOptions, SlackTargets } from './types.js'
 
 export function slackWebhookChannel<Options extends SlackOptions<any>>(options: Options) {
   return new SlackWebhookChannel({ name: 'slack', ...options })

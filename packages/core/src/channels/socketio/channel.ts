@@ -1,17 +1,21 @@
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-
-import { errors } from '../../errors/index.js'
-import type { SocketIoMessage } from './message.js'
-import type { SocketIOConfig, SocketIOTargets } from './types.js'
 import type { Server as SocketIOServer } from 'socket.io'
+
+import type { SocketIOConfig, SocketIOTargets } from './types.js'
+import type { SocketIoMessage } from './message.js'
+
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
+import { errors } from '../../errors/index.js'
 
 export function socketIoChannel(config: SocketIOConfig) {
   return new SocketIOChannel(config)
 }
 
-export class SocketIOChannel
-  implements Channel<SocketIOConfig, SocketIoMessage, any, SocketIOTargets>
-{
+export class SocketIOChannel implements Channel<
+  SocketIOConfig,
+  SocketIoMessage,
+  any,
+  SocketIOTargets
+> {
   name = 'socketIo' as const;
   [kTargetSymbol] = null as any as SocketIOTargets
   protected server: () => SocketIOServer

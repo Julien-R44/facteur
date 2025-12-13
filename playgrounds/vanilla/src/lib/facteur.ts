@@ -1,12 +1,13 @@
-import { createFacteur } from '@facteurjs/core'
-import { discordWebhookChannel } from '@facteurjs/core/channels/discord'
-import { databaseChannel } from '@facteurjs/core/database'
-import { kyselyAdapter } from '@facteurjs/core/database/adapters/kysely'
 import { InferChannelsFromConfig } from '@facteurjs/core/types'
-import { db } from './db.js'
+import { kyselyAdapter } from '@facteurjs/core/database/adapters/kysely'
+import { databaseChannel } from '@facteurjs/core/database'
 import { socketIoChannel } from '@facteurjs/core/channels/socketio'
-import { ioServer } from './socketio.js'
+import { discordWebhookChannel } from '@facteurjs/core/channels/discord'
 import { awsSnsChannel } from '@facteurjs/core/channels/aws-sns'
+import { createFacteur } from '@facteurjs/core'
+
+import { ioServer } from './socketio.js'
+import { db } from './db.js'
 
 export const facteur = createFacteur({
   discoverer: {

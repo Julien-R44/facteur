@@ -1,10 +1,10 @@
 import 'reflect-metadata'
+import type { ApplicationService } from '@adonisjs/core/types'
 
-import { Ignitor } from '@adonisjs/core'
 import { readFile } from 'node:fs/promises'
 import { defineConfig } from '@adonisjs/vite'
-import type { ApplicationService } from '@adonisjs/core/types'
 import { defineConfig as defineHttpConfig } from '@adonisjs/core/http'
+import { Ignitor } from '@adonisjs/core'
 
 /**
  * URL to the application root. AdonisJS need it to resolve

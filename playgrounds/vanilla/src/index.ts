@@ -1,12 +1,13 @@
-import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { facteur } from './lib/facteur.js'
+import { serve } from '@hono/node-server'
+
+import { User } from './types.js'
 import {
   AnonymousLikeNotification,
   PostLikedNotification,
 } from './notifications/post_liked_notification.js'
-import { User } from './types.js'
 import { ioServer } from './lib/socketio.js'
+import { facteur } from './lib/facteur.js'
 
 const randomUser: User = {
   id: '123',

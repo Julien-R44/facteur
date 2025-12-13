@@ -1,29 +1,30 @@
+import type { WebpushConfig } from '@facteurjs/core/channels/webpush/types'
+import type { TwilioConfig } from '@facteurjs/core/channels/twilio/types'
+import type { SlackOptions } from '@facteurjs/core/channels/slack/types'
+import type { FcmConfig } from '@facteurjs/core/channels/fcm/types'
+import type { ExpoConfig } from '@facteurjs/core/channels/expo/types'
+import type { ExpoChannel } from '@facteurjs/core/channels/expo'
+import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
+import type { ConfigProvider } from '@adonisjs/core/types'
+
+import { RuntimeException } from '@adonisjs/core/exceptions'
 /// <reference types="@adonisjs/redis/redis_provider" />
 /// <reference types="@adonisjs/lucid/database_provider" />
 /// <reference types="@adonisjs/transmit/transmit_provider" />
 /// <reference types="@adonisjs/mail/mail_provider" />
 
 import { configProvider } from '@adonisjs/core'
-import { RuntimeException } from '@adonisjs/core/exceptions'
-import type { SlackOptions } from '@facteurjs/core/channels/slack/types'
-import type { TwilioConfig } from '@facteurjs/core/channels/twilio/types'
-import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
-import type { FcmConfig } from '@facteurjs/core/channels/fcm/types'
-import type { WebpushConfig } from '@facteurjs/core/channels/webpush/types'
 
-import type { KyselyConfig } from './channels/database.js'
-import type { ConfigProvider } from '@adonisjs/core/types'
-import type { DiscordProvider } from './channels/discord.js'
-import type { DatabaseChannel } from './channels/database.js'
+import type { WebpushChannel } from './channels/webpush.js'
 import type { TwilioChannel } from './channels/twilio.js'
 import type { TransmitChannel } from './channels/transmit.js'
+import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.js'
 import type { MailChannel } from './channels/mail.js'
 import type { FcmChannel } from './channels/fcm.js'
-import type { WebpushChannel } from './channels/webpush.js'
-import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.js'
+import type { DiscordProvider } from './channels/discord.js'
+import type { KyselyConfig } from './channels/database.js'
+import type { DatabaseChannel } from './channels/database.js'
 import type { AwsSnsChannel, AwsSnsConfig } from './channels/aws-sns.js'
-import type { ExpoConfig } from '@facteurjs/core/channels/expo/types'
-import type { ExpoChannel } from '@facteurjs/core/channels/expo'
 
 export interface DatabaseConfig {
   connectionName?: string

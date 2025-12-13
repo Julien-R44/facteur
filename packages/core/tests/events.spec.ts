@@ -1,9 +1,9 @@
-import { test } from '@japa/runner'
-import EventEmitter from 'node:events'
 import { pEvent } from 'p-event'
+import EventEmitter from 'node:events'
+import { test } from '@japa/runner'
 
-import { Facteur } from '../src/index.js'
 import { FakeNotification, testProvider } from './helpers/index.js'
+import { Facteur } from '../src/index.js'
 
 test.group('Facteur | Events', () => {
   test('emit message sending event when message starts sending', async ({ assert }) => {

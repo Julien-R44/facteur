@@ -1,8 +1,10 @@
-import { useState } from 'react'
 import type { Notification } from '@facteurjs/client'
+
+import { useState } from 'react'
 import { Bell, BellRing, Check, Settings, X, Eye } from 'lucide-react'
-import NotificationSettings from './notification_settings'
 import { useMarkAllAsRead, useMarkAsRead, useNotifications } from '@facteurjs/react'
+
+import NotificationSettings from './notification_settings'
 
 interface NotificationCenterProps {
   userId: string

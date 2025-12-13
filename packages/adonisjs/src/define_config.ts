@@ -1,6 +1,6 @@
-import type { HttpContext } from '@adonisjs/core/http'
-import type { ConfigProvider } from '@adonisjs/core/types'
 import type { Channel, DefaultPreferences, FacteurConfiguration } from '@facteurjs/core/types'
+import type { ConfigProvider } from '@adonisjs/core/types'
+import type { HttpContext } from '@adonisjs/core/http'
 
 import type { DatabaseAdapter } from './channels/database.js'
 

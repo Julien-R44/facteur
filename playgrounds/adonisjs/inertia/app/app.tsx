@@ -2,14 +2,14 @@
 /// <reference path="../../config/inertia.ts" />
 
 import '../css/app.css'
-
 // import './fcm'
 import './webpush'
 import { createRoot } from 'react-dom/client'
-import { createInertiaApp } from '@inertiajs/react'
-import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createInertiaApp } from '@inertiajs/react'
 import { FacteurProvider } from '@facteurjs/react'
+import { resolvePageComponent } from '@adonisjs/inertia/helpers'
+
 import { subscription } from './transmit'
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'

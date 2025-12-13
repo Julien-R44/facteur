@@ -7,4 +7,3 @@ Facteur is a simple and framework agnostic library for sending notifications acr
 ```sh
 pnpm add facteurjs
 ```
-
