@@ -20,7 +20,12 @@ export function FacteurProvider({ children, notifiableId, apiUrl }: FacteurProvi
   const client = useMemo(() => {
     if (!notifiableId) return
 
-    return createFacteurClient<DatabaseContent>({ apiUrl, notifiableId: notifiableId.toString() })
+    return createFacteurClient<DatabaseContent>({
+      apiUrl,
+      // Disabling retries since Tanstack Query has its own retry mechanism
+      retry: 0,
+      notifiableId: notifiableId.toString(),
+    })
   }, [notifiableId, apiUrl])
 
   return <FacteurContext.Provider value={client}>{children}</FacteurContext.Provider>
