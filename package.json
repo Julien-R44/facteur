@@ -2,7 +2,7 @@
   "name": "@facteurjs/monorepo",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.25.0",
   "description": "Framework-agnostic notification system for Node.js",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "MIT",
@@ -15,23 +15,24 @@
     "checks": "pnpm lint && pnpm typecheck"
   },
   "dependencies": {
-    "@types/node": "^24.1.0"
+    "@types/node": "^25.0.1"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.5",
-    "@japa/assert": "^4.1.0",
+    "p-event": "^6.0.1",
+    "@changesets/cli": "^2.29.8",
+    "@japa/assert": "^4.1.1",
     "@japa/expect-type": "^2.0.3",
     "@japa/file-system": "^2.3.2",
-    "@japa/runner": "^4.3.0",
+    "@japa/runner": "^4.4.0",
     "@julr/tooling-configs": "^4.0.0",
-    "@poppinss/utils": "^6.10.0",
-    "@prettier/plugin-oxc": "^0.0.4",
-    "oxlint": "^1.8.0",
-    "prettier": "^3.6.2",
-    "tsdown": "^0.13.0",
-    "tsx": "^4.20.3",
-    "typescript": "^5.9.1-rc",
-    "wrangler": "^4.26.0"
+    "@poppinss/utils": "^6.10.1",
+    "@prettier/plugin-oxc": "^0.1.3",
+    "oxlint": "^1.32.0",
+    "prettier": "^3.7.4",
+    "tsdown": "^0.17.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.54.0"
   },
   "prettier": "@julr/tooling-configs/prettier",
   "pnpm": {

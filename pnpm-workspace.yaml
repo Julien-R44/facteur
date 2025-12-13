@@ -5,4 +5,4 @@ packages:
 
 catalog:
   '@julr/utils': 1.9.0
-  '@poppinss/exception': ^1.2.2
+  '@poppinss/exception': ^1.2.3

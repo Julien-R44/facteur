@@ -68,7 +68,7 @@
   "dependencies": {
     "@julr/utils": "catalog:",
     "@poppinss/exception": "catalog:",
-    "ky": "^1.8.2"
+    "ky": "^1.14.1"
   },
   "peerDependencies": {
     "@aws-sdk/client-sns": "^3.856.0",
@@ -111,16 +111,15 @@
     }
   },
   "devDependencies": {
-    "@aws-sdk/client-sns": "^3.856.0",
+    "@aws-sdk/client-sns": "^3.948.0",
     "@boringnode/transmit": "^0.3.0",
     "@types/web-push": "^3.6.4",
-    "expo-server-sdk": "^3.15.0",
-    "firebase-admin": "^13.4.0",
+    "expo-server-sdk": "^4.0.0",
+    "firebase-admin": "^13.6.0",
     "knex": "^3.1.0",
-    "kysely": "^0.28.3",
-    "p-event": "^6.0.1",
+    "kysely": "^0.28.8",
     "socket.io": "^4.8.1",
-    "twilio": "^5.8.0",
+    "twilio": "^5.10.7",
     "web-push": "^3.6.7"
   },
   "publishConfig": {
