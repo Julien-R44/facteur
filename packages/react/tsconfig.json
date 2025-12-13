@@ -3,5 +3,6 @@
   "compilerOptions": {
     "outDir": "./build",
     "jsx": "react-jsx"
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }
