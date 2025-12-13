@@ -2,10 +2,17 @@
   "name": "@facteurjs/client",
   "type": "module",
   "version": "1.0.0-beta.4",
-  "description": "Core package for facteur",
+  "description": "JavaScript client for Facteur - Fetch and manage notifications from your frontend application",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "ISC",
-  "keywords": [],
+  "license": "MIT",
+  "keywords": [
+    "notifications",
+    "notification-client",
+    "notification-center",
+    "frontend",
+    "javascript",
+    "typescript"
+  ],
   "files": [
     "dist"
   ],

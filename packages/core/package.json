@@ -2,10 +2,25 @@
   "name": "@facteurjs/core",
   "type": "module",
   "version": "1.0.0-beta.4",
-  "description": "Core package for facteur",
+  "description": "Framework-agnostic notification system for Node.js with support for multiple channels (email, SMS, push, webhooks, etc.)",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "ISC",
-  "keywords": [],
+  "license": "MIT",
+  "keywords": [
+    "notifications",
+    "notification-system",
+    "push-notifications",
+    "email",
+    "sms",
+    "webhooks",
+    "discord",
+    "slack",
+    "twilio",
+    "firebase",
+    "expo",
+    "fcm",
+    "webpush",
+    "nodejs"
+  ],
   "files": [
     "dist"
   ],

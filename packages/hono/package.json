@@ -2,10 +2,21 @@
   "name": "@facteurjs/hono",
   "type": "module",
   "version": "1.0.0-beta.4",
-  "description": "Hono adapter for Facteur",
+  "description": "Hono integration for Facteur - Send notifications via multiple channels in your Hono application",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "ISC",
-  "keywords": [],
+  "license": "MIT",
+  "keywords": [
+    "hono",
+    "honojs",
+    "notifications",
+    "notification-system",
+    "push-notifications",
+    "email",
+    "sms",
+    "webhooks",
+    "cloudflare-workers",
+    "edge"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"
@@ -30,8 +41,13 @@
       "./package.json": "./package.json"
     }
   },
+  "dependencies": {
+    "@facteurjs/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0"
+  },
   "devDependencies": {
-    "@facteurjs/core": "workspace:*",
     "hono": "^4.8.9"
   }
 }
