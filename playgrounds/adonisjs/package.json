@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node bin/server.js",
     "dev": "node ace serve --hmr",
-    "quick:test": "node ace test",
-    "format": "prettier --write ."
+    "quick:test": "node ace test"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
@@ -61,7 +60,6 @@
   },
   "devDependencies": {
     "@adonisjs/assembler": "^7.8.2",
-    "@adonisjs/prettier-config": "^1.4.5",
     "@adonisjs/tsconfig": "^1.4.1",
     "@japa/api-client": "^3.1.0",
     "@japa/assert": "^4.1.1",
