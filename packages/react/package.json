@@ -20,7 +20,6 @@
   "scripts": {
     "build": "tsdown",
     "stub": "tsdown",
-    "test": "tsx tests/index.ts",
     "typecheck": "tsc --noEmit",
     "quick:test": "tsx tests/index.ts"
   },
