@@ -9,8 +9,6 @@ export async function checkAuthorization(options: {
   notifiableId: string | number
   tenantId?: string | number
 }): Promise<boolean> {
-  if (!options.authorize) return true
-
   return options.authorize({
     notifiableId: options.notifiableId,
     tenantId: options.tenantId,

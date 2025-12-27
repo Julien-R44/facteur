@@ -306,12 +306,13 @@ test.group('API Authorization | async authorization', () => {
   })
 })
 
-test.group('API Authorization | no authorization callback', () => {
-  test('should allow all requests when no authorization callback is provided', async ({
+test.group('API Authorization | authorization is required', () => {
+  test('should throw when authorization callback calls authorize without callback', async ({
     assert,
   }) => {
     const { facteur } = createFacteurWithDb()
 
+    // @ts-expect-error - Testing runtime behavior when authorize is not provided
     const allRoutes = routes({ facteur })
 
     const getNotificationRoute = allRoutes.find(
@@ -319,13 +320,13 @@ test.group('API Authorization | no authorization callback', () => {
         r.route === '/notifications/notifiable/:notifiableId/notifications' && r.method === 'get',
     )!
 
-    const response = await getNotificationRoute.handler(
-      createMockRequest({
-        params: { notifiableId: 'any-user' },
-        query: {},
-      }),
+    await assert.rejects(() =>
+      getNotificationRoute.handler(
+        createMockRequest({
+          params: { notifiableId: 'any-user' },
+          query: {},
+        }),
+      ),
     )
-
-    assert.equal(response.status, 200)
   })
 })

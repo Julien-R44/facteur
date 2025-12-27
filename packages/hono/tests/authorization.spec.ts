@@ -122,17 +122,15 @@ test.group('Hono Authorization | createHonoFacteurServer', () => {
     assert.equal(deniedResponse.status, 403)
   })
 
-  test('should allow all requests when no authorization callback is provided', async ({
-    assert,
-  }) => {
+  test('should throw when no authorization callback is provided', async ({ assert }) => {
     const app = new Hono()
     const facteur = createTestFacteur()
 
-    createHonoFacteurServer({ app, facteur })
-
-    const response = await app.request('/notifications/notifiable/any-user/notifications')
-
-    assert.equal(response.status, 200)
+    assert.throws(
+      // @ts-expect-error - Testing runtime behavior when authorize is not provided
+      () => createHonoFacteurServer({ app, facteur }),
+      /Authorization callback is required/,
+    )
   })
 
   test('should check authorization on POST endpoints', async ({ assert }) => {

@@ -13,9 +13,9 @@ export interface CreateHonoFacteurServerOptions {
 
   /**
    * Authorization callback to verify that the requester has access to the requested resources.
-   * If not provided, all requests will be allowed (NOT RECOMMENDED for production).
+   * This callback is required to ensure proper access control.
    */
-  authorize?: HonoAuthorizationCallback | undefined
+  authorize: HonoAuthorizationCallback
 }
 
 /**
@@ -23,20 +23,25 @@ export interface CreateHonoFacteurServerOptions {
  */
 export function createHonoFacteurServer(options: CreateHonoFacteurServerOptions) {
   const { app, facteur, authorize } = options
+
+  if (!authorize) {
+    throw new Error(
+      'Authorization callback is required. You must provide an authorize function to control access to notification resources.',
+    )
+  }
+
   const adapter = new HonoServerAdapter(app)
 
   createFacteurServer({
     facteur,
     adapter,
-    authorize: authorize
-      ? (context) => {
-          const ctx = context.request.context as Context
-          return authorize({
-            notifiableId: context.notifiableId,
-            tenantId: context.tenantId,
-            ctx,
-          })
-        }
-      : undefined,
+    authorize: (context) => {
+      const ctx = context.request.context as Context
+      return authorize({
+        notifiableId: context.notifiableId,
+        tenantId: context.tenantId,
+        ctx,
+      })
+    },
   })
 }
