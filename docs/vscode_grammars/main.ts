@@ -1,5 +1,4 @@
 import type { ILanguageRegistration } from '@dimerapp/shiki'
-
 /*
 |--------------------------------------------------------------------------
 | VSCode grammars

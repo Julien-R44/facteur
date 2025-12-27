@@ -1,38 +1,31 @@
 {
   "name": "@facteurjs/hono",
-  "type": "module",
   "version": "1.0.0-beta.4",
   "description": "Hono integration for Facteur - Send notifications via multiple channels in your Hono application",
-  "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "MIT",
   "keywords": [
+    "cloudflare-workers",
+    "edge",
+    "email",
     "hono",
     "honojs",
-    "notifications",
     "notification-system",
+    "notifications",
     "push-notifications",
-    "email",
     "sms",
-    "webhooks",
-    "cloudflare-workers",
-    "edge"
+    "webhooks"
   ],
-  "exports": {
-    ".": "./src/index.ts",
-    "./package.json": "./package.json"
-  },
+  "license": "MIT",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
   "files": [
     "dist"
   ],
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "scripts": {
-    "//build": "tsdown",
-    "stub": "tsdown",
-    "test": "tsx tests/index.ts",
-    "typecheck": "tsc --noEmit",
-    "quick:test": "tsx tests/index.ts"
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
@@ -41,13 +34,20 @@
       "./package.json": "./package.json"
     }
   },
+  "scripts": {
+    "//build": "tsdown",
+    "stub": "tsdown",
+    "test": "tsx tests/index.ts",
+    "typecheck": "tsc --noEmit",
+    "quick:test": "tsx tests/index.ts"
+  },
   "dependencies": {
     "@facteurjs/core": "workspace:*"
   },
-  "peerDependencies": {
-    "hono": "^4.0.0"
-  },
   "devDependencies": {
     "hono": "^4.11.3"
+  },
+  "peerDependencies": {
+    "hono": "^4.0.0"
   }
 }

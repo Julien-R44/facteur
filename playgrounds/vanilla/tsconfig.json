@@ -4,7 +4,7 @@
     "rootDir": "./",
     "outDir": "./build",
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "jsxImportSource": "hono/jsx"
   },
-  "exclude": ["./inertia/**/*", "node_modules", "build"],
+  "exclude": ["./inertia/**/*", "node_modules", "build"]
 }

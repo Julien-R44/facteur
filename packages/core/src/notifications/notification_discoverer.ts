@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
-import { isScriptFile } from '@poppinss/utils'
 import { fsReadAll } from '@poppinss/utils/fs'
+import { isScriptFile } from '@poppinss/utils'
 
 import { Notification } from '../types/index.js'
 import { errors } from '../errors/index.js'

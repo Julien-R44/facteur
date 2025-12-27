@@ -1,7 +1,7 @@
-import { createContext, useContext } from 'react'
 import { type PropsWithChildren, useMemo } from 'react'
-import { FacteurClient } from '@facteurjs/client'
+import { createContext, useContext } from 'react'
 import { createFacteurClient } from '@facteurjs/client'
+import { FacteurClient } from '@facteurjs/client'
 
 interface FacteurProviderProps extends PropsWithChildren {
   notifiableId?: string | number

@@ -1,5 +1,5 @@
 {
-  "$scheme": "./node_modules/oxlint/configuration_schema.json",
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["node", "promise", "eslint", "import", "jsdoc", "unicorn"],
   "rules": {
     "jsdoc/check-tag-names": "off"

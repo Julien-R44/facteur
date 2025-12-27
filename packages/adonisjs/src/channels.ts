@@ -5,14 +5,13 @@ import type { FcmConfig } from '@facteurjs/core/channels/fcm/types'
 import type { ExpoConfig } from '@facteurjs/core/channels/expo/types'
 import type { ExpoChannel } from '@facteurjs/core/channels/expo'
 import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
+import type { Database } from '@adonisjs/lucid/database'
 import type { ConfigProvider } from '@adonisjs/core/types'
 
 import { RuntimeException } from '@adonisjs/core/exceptions'
-import type { Database } from '@adonisjs/lucid/database'
 /// <reference types="@adonisjs/redis/redis_provider" />
 /// <reference types="@adonisjs/transmit/transmit_provider" />
 /// <reference types="@adonisjs/mail/mail_provider" />
-
 import { configProvider } from '@adonisjs/core'
 
 import type { WebpushChannel } from './channels/webpush.js'
@@ -22,8 +21,8 @@ import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.js'
 import type { MailChannel } from './channels/mail.js'
 import type { FcmChannel } from './channels/fcm.js'
 import type { DiscordProvider } from './channels/discord.js'
-import type { KyselyConfig } from './channels/database.js'
 import type { DatabaseChannel } from './channels/database.js'
+import type { KyselyConfig } from './channels/database.js'
 import type { AwsSnsChannel, AwsSnsConfig } from './channels/aws-sns.js'
 
 export interface DatabaseConfig {

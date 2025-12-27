@@ -1,15 +1,15 @@
 {
   "name": "@facteurjs/adonisjs-playground",
+  "private": true,
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
   "type": "module",
   "main": "index.js",
-  "private": true,
   "scripts": {
     "dev": "tsx --env-file .env --watch src/ index.ts"
   },
-  "keywords": [],
-  "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "ISC",
   "dependencies": {
     "@facteurjs/client": "workspace:*",
     "@facteurjs/core": "workspace:*",
@@ -21,8 +21,8 @@
     "kysely": "^0.28.9",
     "socket.io": "^4.8.3"
   },
-  "packageManager": "pnpm@10.26.2",
   "devDependencies": {
     "@adonisjs/tsconfig": "^1.4.1"
-  }
+  },
+  "packageManager": "pnpm@10.26.2"
 }

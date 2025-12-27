@@ -1,13 +1,8 @@
 {
   "name": "@facteurjs/adonisjs-playground",
-  "type": "module",
   "private": true,
   "license": "UNLICENSED",
-  "scripts": {
-    "start": "node bin/server.js",
-    "dev": "node ace serve --hmr",
-    "quick:test": "node ace test"
-  },
+  "type": "module",
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
     "#exceptions/*": "./app/exceptions/*.js",
@@ -25,6 +20,11 @@
     "#tests/*": "./tests/*.js",
     "#start/*": "./start/*.js",
     "#config/*": "./config/*.js"
+  },
+  "scripts": {
+    "start": "node bin/server.js",
+    "dev": "node ace serve --hmr",
+    "quick:test": "node ace test"
   },
   "dependencies": {
     "@adonisjs/auth": "^9.5.1",

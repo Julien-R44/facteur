@@ -10,7 +10,6 @@ import { readFile } from 'node:fs/promises'
 | extreme control over the rendering pipeline
 |
 */
-
 import edge from 'edge.js'
 import uiKit from 'edge-uikit'
 import { edgeIconify, addCollection } from 'edge-iconify'

@@ -1,23 +1,26 @@
 {
   "name": "@facteurjs/adonisjs",
-  "type": "module",
   "version": "1.0.0-beta.4",
   "description": "AdonisJS integration for Facteur - Send notifications via multiple channels in your AdonisJS application",
-  "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "MIT",
   "keywords": [
-    "adonisjs",
     "adonis",
-    "notifications",
-    "notification-system",
-    "push-notifications",
+    "adonisjs",
     "email",
+    "notification-system",
+    "notifications",
+    "push-notifications",
     "sms",
     "webhooks"
   ],
+  "license": "MIT",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
   "files": [
     "dist"
   ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
     "./channels/aws-sns": "./src/channels/aws-sns.ts",
@@ -36,49 +39,6 @@
     "./types": "./src/types.ts",
     "./package.json": "./package.json",
     "./facteur_provider": "./dist/providers/facteur_provider.js"
-  },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsdown",
-    "stub": "tsdown",
-    "test": "tsx tests/index.ts",
-    "quick:test": "tsx tests/index.ts",
-    "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "@adonisjs/core": "^7.0.0-next.16",
-    "@adonisjs/lucid": "^22.0.0-next.1",
-    "@adonisjs/mail": "^10.0.0-next.1",
-    "@adonisjs/redis": "^10.0.0-next.2",
-    "@adonisjs/transmit": "^2.0.0-1"
-  },
-  "peerDependenciesMeta": {
-    "@adonisjs/lucid": {
-      "optional": true
-    },
-    "@adonisjs/mail": {
-      "optional": true
-    },
-    "@adonisjs/redis": {
-      "optional": true
-    },
-    "@adonisjs/transmit": {
-      "optional": true
-    }
-  },
-  "dependencies": {
-    "@facteurjs/core": "workspace:*",
-    "@julr/utils": "catalog:",
-    "@poppinss/exception": "catalog:"
-  },
-  "devDependencies": {
-    "@adonisjs/core": "^7.0.0-next.16",
-    "@adonisjs/lucid": "^22.0.0-next.1",
-    "@adonisjs/mail": "^10.0.0-next.1",
-    "@adonisjs/redis": "^10.0.0-next.2",
-    "@adonisjs/transmit": "^2.0.0-1"
   },
   "publishConfig": {
     "access": "public",
@@ -100,6 +60,46 @@
       "./types": "./dist/types.js",
       "./package.json": "./package.json",
       "./facteur_provider": "./dist/providers/facteur_provider.js"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "stub": "tsdown",
+    "test": "tsx tests/index.ts",
+    "quick:test": "tsx tests/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@facteurjs/core": "workspace:*",
+    "@julr/utils": "catalog:",
+    "@poppinss/exception": "catalog:"
+  },
+  "devDependencies": {
+    "@adonisjs/core": "^7.0.0-next.16",
+    "@adonisjs/lucid": "^22.0.0-next.1",
+    "@adonisjs/mail": "^10.0.0-next.1",
+    "@adonisjs/redis": "^10.0.0-next.2",
+    "@adonisjs/transmit": "^2.0.0-1"
+  },
+  "peerDependencies": {
+    "@adonisjs/core": "^7.0.0-next.16",
+    "@adonisjs/lucid": "^22.0.0-next.1",
+    "@adonisjs/mail": "^10.0.0-next.1",
+    "@adonisjs/redis": "^10.0.0-next.2",
+    "@adonisjs/transmit": "^2.0.0-1"
+  },
+  "peerDependenciesMeta": {
+    "@adonisjs/lucid": {
+      "optional": true
+    },
+    "@adonisjs/mail": {
+      "optional": true
+    },
+    "@adonisjs/redis": {
+      "optional": true
+    },
+    "@adonisjs/transmit": {
+      "optional": true
     }
   }
 }

@@ -1,29 +1,37 @@
 {
   "name": "@facteurjs/client",
-  "type": "module",
   "version": "1.0.0-beta.4",
   "description": "JavaScript client for Facteur - Fetch and manage notifications from your frontend application",
-  "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "MIT",
   "keywords": [
-    "notifications",
-    "notification-client",
-    "notification-center",
     "frontend",
     "javascript",
+    "notification-center",
+    "notification-client",
+    "notifications",
     "typescript"
   ],
+  "license": "MIT",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
   "files": [
     "dist"
   ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
     "./types": "./src/types.ts",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./types": "./dist/types.js",
+      "./package.json": "./package.json"
+    }
+  },
   "scripts": {
     "build": "tsdown",
     "stub": "tsdown",
@@ -33,13 +41,5 @@
   },
   "dependencies": {
     "ky": "^1.14.2"
-  },
-  "publishConfig": {
-    "access": "public",
-    "exports": {
-      ".": "./dist/index.js",
-      "./types": "./dist/types.js",
-      "./package.json": "./package.json"
-    }
   }
 }

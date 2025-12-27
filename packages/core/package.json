@@ -1,29 +1,32 @@
 {
   "name": "@facteurjs/core",
-  "type": "module",
   "version": "1.0.0-beta.4",
   "description": "Framework-agnostic notification system for Node.js with support for multiple channels (email, SMS, push, webhooks, etc.)",
-  "author": "Julien Ripouteau <julien@ripouteau.com>",
-  "license": "MIT",
   "keywords": [
-    "notifications",
-    "notification-system",
-    "push-notifications",
-    "email",
-    "sms",
-    "webhooks",
     "discord",
-    "slack",
-    "twilio",
-    "firebase",
+    "email",
     "expo",
     "fcm",
-    "webpush",
-    "nodejs"
+    "firebase",
+    "nodejs",
+    "notification-system",
+    "notifications",
+    "push-notifications",
+    "slack",
+    "sms",
+    "twilio",
+    "webhooks",
+    "webpush"
   ],
+  "license": "MIT",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
   "files": [
     "dist"
   ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
     "./api": "./src/api/index.ts",
@@ -55,9 +58,40 @@
     "./types": "./src/types/index.ts",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": "./dist/index.js",
+      "./api": "./dist/api/index.js",
+      "./api/types": "./dist/api/types.js",
+      "./channels/aws-sns": "./dist/channels/aws-sns/index.js",
+      "./channels/aws-sns/types": "./dist/channels/aws-sns/types.js",
+      "./channels/discord": "./dist/channels/discord/index.js",
+      "./channels/discord/types": "./dist/channels/discord/types.js",
+      "./channels/expo": "./dist/channels/expo/index.js",
+      "./channels/expo/types": "./dist/channels/expo/types.js",
+      "./channels/fcm": "./dist/channels/fcm/index.js",
+      "./channels/fcm/types": "./dist/channels/fcm/types.js",
+      "./channels/slack": "./dist/channels/slack/index.js",
+      "./channels/slack/types": "./dist/channels/slack/types.js",
+      "./channels/socketio": "./dist/channels/socketio/index.js",
+      "./channels/socketio/types": "./dist/channels/socketio/types.js",
+      "./channels/transmit": "./dist/channels/transmit/index.js",
+      "./channels/transmit/types": "./dist/channels/transmit/types.js",
+      "./channels/twilio": "./dist/channels/twilio/index.js",
+      "./channels/twilio/types": "./dist/channels/twilio/types.js",
+      "./channels/webhook": "./dist/channels/webhook/index.js",
+      "./channels/webhook/types": "./dist/channels/webhook/types.js",
+      "./channels/webpush": "./dist/channels/webpush/index.js",
+      "./channels/webpush/types": "./dist/channels/webpush/types.js",
+      "./database/adapters/knex": "./dist/database/adapters/knex.js",
+      "./database/adapters/kysely": "./dist/database/adapters/kysely.js",
+      "./database": "./dist/database/index.js",
+      "./database/types": "./dist/database/types.js",
+      "./types": "./dist/types/index.js",
+      "./package.json": "./package.json"
+    }
+  },
   "scripts": {
     "build": "tsdown",
     "stub": "tsdown",
@@ -69,6 +103,18 @@
     "@julr/utils": "catalog:",
     "@poppinss/exception": "catalog:",
     "ky": "^1.14.2"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-sns": "^3.958.0",
+    "@boringnode/transmit": "^0.3.0",
+    "@types/web-push": "^3.6.4",
+    "expo-server-sdk": "^4.0.0",
+    "firebase-admin": "^13.6.0",
+    "knex": "^3.1.0",
+    "kysely": "^0.28.9",
+    "socket.io": "^4.8.3",
+    "twilio": "^5.11.1",
+    "web-push": "^3.6.7"
   },
   "peerDependencies": {
     "@aws-sdk/client-sns": "^3.856.0",
@@ -108,52 +154,6 @@
     },
     "web-push": {
       "optional": true
-    }
-  },
-  "devDependencies": {
-    "@aws-sdk/client-sns": "^3.958.0",
-    "@boringnode/transmit": "^0.3.0",
-    "@types/web-push": "^3.6.4",
-    "expo-server-sdk": "^4.0.0",
-    "firebase-admin": "^13.6.0",
-    "knex": "^3.1.0",
-    "kysely": "^0.28.9",
-    "socket.io": "^4.8.3",
-    "twilio": "^5.11.1",
-    "web-push": "^3.6.7"
-  },
-  "publishConfig": {
-    "access": "public",
-    "exports": {
-      ".": "./dist/index.js",
-      "./api": "./dist/api/index.js",
-      "./api/types": "./dist/api/types.js",
-      "./channels/aws-sns": "./dist/channels/aws-sns/index.js",
-      "./channels/aws-sns/types": "./dist/channels/aws-sns/types.js",
-      "./channels/discord": "./dist/channels/discord/index.js",
-      "./channels/discord/types": "./dist/channels/discord/types.js",
-      "./channels/expo": "./dist/channels/expo/index.js",
-      "./channels/expo/types": "./dist/channels/expo/types.js",
-      "./channels/fcm": "./dist/channels/fcm/index.js",
-      "./channels/fcm/types": "./dist/channels/fcm/types.js",
-      "./channels/slack": "./dist/channels/slack/index.js",
-      "./channels/slack/types": "./dist/channels/slack/types.js",
-      "./channels/socketio": "./dist/channels/socketio/index.js",
-      "./channels/socketio/types": "./dist/channels/socketio/types.js",
-      "./channels/transmit": "./dist/channels/transmit/index.js",
-      "./channels/transmit/types": "./dist/channels/transmit/types.js",
-      "./channels/twilio": "./dist/channels/twilio/index.js",
-      "./channels/twilio/types": "./dist/channels/twilio/types.js",
-      "./channels/webhook": "./dist/channels/webhook/index.js",
-      "./channels/webhook/types": "./dist/channels/webhook/types.js",
-      "./channels/webpush": "./dist/channels/webpush/index.js",
-      "./channels/webpush/types": "./dist/channels/webpush/types.js",
-      "./database/adapters/knex": "./dist/database/adapters/knex.js",
-      "./database/adapters/kysely": "./dist/database/adapters/kysely.js",
-      "./database": "./dist/database/index.js",
-      "./database/types": "./dist/database/types.js",
-      "./types": "./dist/types/index.js",
-      "./package.json": "./package.json"
     }
   }
 }

@@ -1,11 +1,10 @@
 {
   "name": "@facteurjs/monorepo",
-  "type": "module",
   "private": true,
-  "packageManager": "pnpm@10.26.2",
   "description": "Framework-agnostic notification system for Node.js",
-  "author": "Julien Ripouteau <julien@ripouteau.com>",
   "license": "MIT",
+  "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "type": "module",
   "scripts": {
     "typecheck": "pnpm run -r --parallel typecheck",
     "build": "pnpm run -r build",
@@ -32,6 +31,7 @@
     "typescript": "^5.9.3",
     "wrangler": "^4.54.0"
   },
+  "packageManager": "pnpm@10.26.2",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@swc/core",

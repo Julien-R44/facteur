@@ -1,6 +1,7 @@
+import type { Database } from '@adonisjs/lucid/database'
+
 import { RuntimeException } from '@adonisjs/core/exceptions'
 import { configProvider } from '@adonisjs/core'
-import type { Database } from '@adonisjs/lucid/database'
 
 import type { DatabaseAdapterCommonOptions, KyselyConfig } from '../channels/database.js'
 
