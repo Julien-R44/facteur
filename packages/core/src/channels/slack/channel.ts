@@ -9,7 +9,7 @@ export function slackWebhookChannel<Options extends SlackOptions<any>>(options: 
 }
 
 type SlackResponse = {}
-class SlackWebhookChannel<T extends SlackOptions<any>>
+export class SlackWebhookChannel<T extends SlackOptions<any>>
   extends WebhookChannel<T>
   implements Channel<T, SlackMessage, SlackResponse, SlackTargets<T>>
 {

@@ -1,6 +1,7 @@
 import type { WebpushConfig } from '@facteurjs/core/channels/webpush/types'
 import type { TwilioConfig } from '@facteurjs/core/channels/twilio/types'
 import type { SlackOptions } from '@facteurjs/core/channels/slack/types'
+import type { SlackWebhookChannel } from '@facteurjs/core/channels/slack'
 import type { FcmConfig } from '@facteurjs/core/channels/fcm/types'
 import type { ExpoConfig } from '@facteurjs/core/channels/expo/types'
 import type { ExpoChannel } from '@facteurjs/core/channels/expo'
@@ -39,7 +40,7 @@ export const channels: {
   ): ConfigProvider<DiscordProvider<Options>>
   slackWebhook<Options extends SlackOptions<any>>(
     config: Options,
-  ): ConfigProvider<DiscordProvider<Options>>
+  ): ConfigProvider<SlackWebhookChannel<Options>>
   database(config: DatabaseConfig): ConfigProvider<DatabaseChannel>
   kysely(config: KyselyConfig): ConfigProvider<DatabaseChannel>
   twilio(config: TwilioConfig): ConfigProvider<TwilioChannel>

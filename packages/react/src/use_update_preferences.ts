@@ -18,7 +18,7 @@ export function useUpdatePreferences() {
   return useMutation({
     ...updatePreferencesMutationOptions(client),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['facteur'] })
+      queryClient.invalidateQueries({ queryKey: ['facteur', 'preferences'] })
     },
   })
 }

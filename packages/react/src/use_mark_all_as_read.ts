@@ -20,7 +20,7 @@ export function useMarkAllAsRead() {
   return useMutation({
     ...markAllAsReadMutationOptions(client),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['facteur'] })
+      queryClient.invalidateQueries({ queryKey: ['facteur', 'notifications'] })
     },
   })
 }

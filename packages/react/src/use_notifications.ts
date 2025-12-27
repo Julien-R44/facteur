@@ -11,7 +11,7 @@ export const listNotificationsQueryOptions = (
   client: TypedFacteurClient,
 ) =>
   queryOptions({
-    queryKey: ['facteur', 'notifications', client.notifiableId, options],
+    queryKey: ['facteur', 'notifications', 'list', client.notifiableId, options],
     queryFn: () => client.notifications.list(options),
   })
 
@@ -25,7 +25,7 @@ export function useInfiniteNotifications(options: Omit<UseNotificationsOptions, 
 
   return useInfiniteQuery({
     initialPageParam: 0,
-    queryKey: ['facteur', 'notifications', client.notifiableId, options],
+    queryKey: ['facteur', 'notifications', 'infinite', client.notifiableId, options],
     queryFn: ({ pageParam = 0 }) => client.notifications.list({ ...options, page: pageParam }),
     getNextPageParam: (lastPage, _, lastPageParam) => {
       if (lastPage.length < (options.limit || 10)) return undefined

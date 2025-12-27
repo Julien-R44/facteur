@@ -18,7 +18,7 @@ export function useMarkNotification() {
   return useMutation({
     ...markNotificationMutationOptions(client),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['facteur'] })
+      queryClient.invalidateQueries({ queryKey: ['facteur', 'notifications'] })
     },
   })
 }

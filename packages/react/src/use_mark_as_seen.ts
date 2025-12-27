@@ -20,7 +20,7 @@ export function useMarkAsSeen() {
   return useMutation({
     ...markAsSeenMutationOptions(client),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['facteur'] })
+      queryClient.invalidateQueries({ queryKey: ['facteur', 'notifications'] })
     },
   })
 }

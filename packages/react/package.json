@@ -36,6 +36,7 @@
   "scripts": {
     "build": "tsdown",
     "stub": "tsdown",
+    "test": "tsx tests/index.ts",
     "typecheck": "tsc --noEmit",
     "quick:test": "tsx tests/index.ts"
   },
@@ -43,6 +44,8 @@
     "@facteurjs/client": "workspace:*"
   },
   "devDependencies": {
+    "@japa/assert": "^4.0.1",
+    "@japa/runner": "^4.2.0",
     "@tanstack/react-query": "^5.90.12",
     "@types/react": "^19.2.7",
     "react": "^19.2.3"

@@ -1,2 +1,2 @@
 export { SlackMessage } from './message.js'
-export { slackWebhookChannel } from './channel.js'
+export { slackWebhookChannel, SlackWebhookChannel } from './channel.js'
