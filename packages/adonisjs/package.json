@@ -48,11 +48,11 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@adonisjs/core": "^6.19.0",
-    "@adonisjs/lucid": "^21.8.0",
-    "@adonisjs/mail": "^9.2.2",
-    "@adonisjs/redis": "^9.2.0",
-    "@adonisjs/transmit": "^2.0.2"
+    "@adonisjs/core": "^7.0.0-next.16",
+    "@adonisjs/lucid": "^22.0.0-next.1",
+    "@adonisjs/mail": "^10.0.0-next.1",
+    "@adonisjs/redis": "^10.0.0-next.2",
+    "@adonisjs/transmit": "^2.0.0-1"
   },
   "peerDependenciesMeta": {
     "@adonisjs/lucid": {
@@ -74,11 +74,11 @@
     "@poppinss/exception": "catalog:"
   },
   "devDependencies": {
-    "@adonisjs/core": "^6.19.1",
-    "@adonisjs/lucid": "^21.8.1",
-    "@adonisjs/mail": "^9.2.2",
-    "@adonisjs/redis": "^9.2.0",
-    "@adonisjs/transmit": "^2.0.2"
+    "@adonisjs/core": "^7.0.0-next.16",
+    "@adonisjs/lucid": "^22.0.0-next.1",
+    "@adonisjs/mail": "^10.0.0-next.1",
+    "@adonisjs/redis": "^10.0.0-next.2",
+    "@adonisjs/transmit": "^2.0.0-1"
   },
   "publishConfig": {
     "access": "public",

@@ -1,12 +1,13 @@
 import { RuntimeException } from '@adonisjs/core/exceptions'
 import { configProvider } from '@adonisjs/core'
+import type { Database } from '@adonisjs/lucid/database'
 
 import type { DatabaseAdapterCommonOptions, KyselyConfig } from '../channels/database.js'
 
 export const databases = {
   lucid(config: DatabaseAdapterCommonOptions & { connectionName?: string }) {
     return configProvider.create(async (app) => {
-      const db = await app.container.make('lucid.db')
+      const db: Database = await app.container.make('lucid.db')
       const connectionName = config?.connectionName || db.primaryConnectionName
       const connection = db.manager.get(connectionName)
 

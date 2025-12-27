@@ -8,8 +8,8 @@ import type { DiscordOptions } from '@facteurjs/core/channels/discord/types'
 import type { ConfigProvider } from '@adonisjs/core/types'
 
 import { RuntimeException } from '@adonisjs/core/exceptions'
+import type { Database } from '@adonisjs/lucid/database'
 /// <reference types="@adonisjs/redis/redis_provider" />
-/// <reference types="@adonisjs/lucid/database_provider" />
 /// <reference types="@adonisjs/transmit/transmit_provider" />
 /// <reference types="@adonisjs/mail/mail_provider" />
 
@@ -77,7 +77,7 @@ export const channels: {
    */
   database(config: DatabaseConfig) {
     return configProvider.create(async (app) => {
-      const db = await app.container.make('lucid.db')
+      const db: Database = await app.container.make('lucid.db')
       const connectionName = config?.connectionName || db.primaryConnectionName
       const connection = db.manager.get(connectionName)
 
