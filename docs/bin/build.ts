@@ -11,6 +11,7 @@
 
 import 'reflect-metadata'
 import { defineConfig } from '@adonisjs/vite'
+import { drivers, defineConfig as defineEncryptionConfig } from '@adonisjs/core/encryption'
 import { Ignitor } from '@adonisjs/core'
 
 /**
@@ -59,6 +60,15 @@ const application = new Ignitor(APP_ROOT, { importer: IMPORTER })
           appKey: 'zKXHe-Ahdb7aPK1ylAJlRgTefktEaACi',
           http: {},
         },
+        encryption: defineEncryptionConfig({
+          default: 'app',
+          list: {
+            app: drivers.aes256gcm({
+              id: 'app',
+              keys: ['zKXHe-Ahdb7aPK1ylAJlRgTefktEaACi'],
+            }),
+          },
+        }),
         logger: {
           default: 'app',
           loggers: {
