@@ -39,11 +39,9 @@ export class MailChannel implements Channel<MailConfig, PossibleMailMessage, any
 
     console.log(options.message)
     if (options.message instanceof BaseMail) {
-      console.log('Sending BaseMail instance')
       options.message.message.to(targets.email)
       this.config.mailer.send(options.message)
     } else {
-      console.log('Sending MailMessage instance')
       options.message.to(targets.email)
       this.config.mailer.send((message) => {
         Object.assign(message, options.message)
