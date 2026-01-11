@@ -76,14 +76,10 @@ export class FacteurOptions<
       config.notificationResolver || ((notification, ctx) => new notification(ctx))
     this.retry = config.retry || {}
 
-    const throwIfQueueNotSet = () => {
-      throw new errors.E_QUEUE_NOT_SET()
-    }
-
     this.queueAdapter = config.queueAdapter || {
-      queue: throwIfQueueNotSet,
-      startQueueProcessor: throwIfQueueNotSet,
-      disconnect: throwIfQueueNotSet,
+      queue: () => {
+        throw new errors.E_QUEUE_NOT_SET()
+      },
     }
   }
 }

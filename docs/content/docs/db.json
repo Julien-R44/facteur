@@ -42,6 +42,12 @@
     "category": "Guides"
   },
   {
+    "permalink": "queueing",
+    "title": "Queueing",
+    "contentPath": "./queueing.md",
+    "category": "Guides"
+  },
+  {
     "permalink": "database",
     "title": "Database",
     "contentPath": "./channels/database.md",
@@ -129,6 +135,12 @@
     "permalink": "custom-http-adapter",
     "title": "Custom HTTP Adapter",
     "contentPath": "./deep/custom-http-adapter.md",
+    "category": "Digging Deeper"
+  },
+  {
+    "permalink": "custom-queue-adapter",
+    "title": "Custom Queue Adapter",
+    "contentPath": "./deep/custom-queue-adapter.md",
     "category": "Digging Deeper"
   }
 ]

@@ -5,6 +5,7 @@ import type {
   ExtractParams,
   ExtractNotifiable,
   ChannelSpecificConfig,
+  NotificationQueueOptions,
 } from '../types/options.ts'
 import type { Identifier } from '../database/types.ts'
 import type {
@@ -99,6 +100,12 @@ export class NotificationBuilderImpl<
   onProgress(callback: (completed: number, total: number) => void): NotificationBuilderImpl<TNotification, TState> {
     this.#options.onProgress = callback
     return this
+  }
+
+  async queue(options?: NotificationQueueOptions): Promise<NotificationSendResult> {
+    this.#options.queueMode = true
+    if (options) this.#options.queueOptions = options
+    return this.#sendFn(this.#options)
   }
 
   async send(): Promise<NotificationSendResult> {

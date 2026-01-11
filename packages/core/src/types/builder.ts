@@ -6,6 +6,7 @@ import type {
   ChannelSpecificConfig,
   ExtractParams,
   ExtractNotifiable,
+  NotificationQueueOptions,
   RetryOptions,
 } from './options.ts'
 import type { Identifier } from '../database/types.ts'
@@ -46,6 +47,16 @@ export interface BuilderOptions<TNotification extends NotificationClass<any, any
   via?: ChannelSpecificConfig<any>
   tenantId?: Identifier
   throwOnError?: boolean
+
+  /**
+   * Internal flag: use queue mode instead of direct send
+   */
+  queueMode?: boolean
+
+  /**
+   * Queue options when using queue mode
+   */
+  queueOptions?: NotificationQueueOptions
 }
 
 /**
@@ -120,6 +131,13 @@ interface SendMethod {
 }
 
 /**
+ * queue() method type - queues the notification instead of sending immediately
+ */
+interface QueueMethod {
+  queue(options?: NotificationQueueOptions): Promise<NotificationSendResult>
+}
+
+/**
  * Returns true if send() should be available. Requires:
  * - params() called if notification has required params
  * - to() called for non-anonymous, or via() called for anonymous
@@ -162,5 +180,5 @@ export type NotificationBuilder<
     : TState['hasTo'] extends true
       ? {}
       : ToMethod<TNotification, TState>) &
-  // send() available when all requirements are met
-  (CanSend<TNotification, TState> extends true ? SendMethod : {})
+  // send() and queue() available when all requirements are met
+  (CanSend<TNotification, TState> extends true ? SendMethod & QueueMethod : {})

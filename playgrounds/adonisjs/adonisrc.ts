@@ -16,6 +16,7 @@ export default defineConfig({
     () => import('@adonisjs/lucid/commands'),
     () => import('@adonisjs/cache/commands'),
     () => import('@adonisjs/mail/commands'),
+    () => import('@adonisjs/queue/commands'),
   ],
 
   /*
@@ -46,6 +47,8 @@ export default defineConfig({
     () => import('@adonisjs/inertia/inertia_provider'),
     () => import('@adonisjs/cache/cache_provider'),
     () => import('@adonisjs/mail/mail_provider'),
+    () => import('@adonisjs/redis/redis_provider'),
+    () => import('@adonisjs/queue/queue_provider'),
     () => import('@facteurjs/adonisjs/facteur_provider'),
     () => import('@adonisjs/transmit/transmit_provider'),
   ],
@@ -58,7 +61,14 @@ export default defineConfig({
   | List of modules to import before starting the application.
   |
   */
-  preloads: [() => import('#start/routes'), () => import('#start/kernel')],
+  preloads: [
+    () => import('#start/routes'),
+    () => import('#start/kernel'),
+    {
+      file: () => import('#start/facteur_worker'),
+      environment: ['web', 'console', 'test'],
+    },
+  ],
 
   /*
   |--------------------------------------------------------------------------

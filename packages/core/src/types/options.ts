@@ -85,6 +85,21 @@ export type NotificationResolver = (
   ctx: MessageCtx<any, any>,
 ) => Awaitable<Notification>
 
+/**
+ * Options for queueing notifications
+ */
+export interface NotificationQueueOptions {
+  /**
+   * Queue name to use
+   */
+  queue?: string
+
+  /**
+   * Delay before processing (milliseconds or duration string like '5m')
+   */
+  delay?: string | number
+}
+
 export interface NotificationOptions<N extends Notifiable = Notifiable> {
   /**
    * A human readable name for the notification.
@@ -120,6 +135,12 @@ export interface NotificationOptions<N extends Notifiable = Notifiable> {
    * Channels to deliver the notification by.
    */
   deliverBy: Partial<Record<ChannelName, boolean | DeliverByOptions<N>>>
+
+  /**
+   * Queue configuration. If true or an object, the notification will be queued
+   * instead of sent immediately. Requires a QueueAdapter to be configured.
+   */
+  queue?: boolean | NotificationQueueOptions
 }
 
 export interface DeliverByOptions<N extends Notifiable = Notifiable> {

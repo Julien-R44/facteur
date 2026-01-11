@@ -2,9 +2,11 @@ import type { InferChannels } from '@facteurjs/adonisjs/types'
 
 import { databases } from '@facteurjs/adonisjs/database'
 import { defineConfig, channels } from '@facteurjs/adonisjs'
+import { BoringNodeQueueAdapter } from '@facteurjs/adapter-boring-queue'
 
 const config = defineConfig({
   databaseAdapter: databases.lucid({ connectionName: 'sqlite' }),
+  queueAdapter: new BoringNodeQueueAdapter({ defaultQueue: 'notifications' }),
   channels: {
     transmit: channels.transmit(),
     database: channels.database({ connectionName: 'sqlite' }),

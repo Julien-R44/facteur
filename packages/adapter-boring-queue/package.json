@@ -1,18 +1,15 @@
 {
-  "name": "@facteurjs/hono",
+  "name": "@facteurjs/adapter-boring-queue",
   "version": "2.0.0-beta.0",
-  "description": "Hono integration for Facteur - Send notifications via multiple channels in your Hono application",
+  "description": "BoringNode Queue adapter for Facteur - Background job processing for notifications",
   "keywords": [
-    "cloudflare-workers",
-    "edge",
-    "email",
-    "hono",
-    "honojs",
-    "notification-system",
+    "facteur",
     "notifications",
-    "push-notifications",
-    "sms",
-    "webhooks"
+    "queue",
+    "boringnode",
+    "jobs",
+    "background-jobs",
+    "async"
   ],
   "license": "MIT",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
@@ -46,9 +43,9 @@
     "@facteurjs/core": "workspace:*"
   },
   "devDependencies": {
-    "hono": "^4.11.3"
+    "@boringnode/queue": "^0.1.0"
   },
   "peerDependencies": {
-    "hono": "^4.0.0"
+    "@boringnode/queue": ">=0.1.0"
   }
 }

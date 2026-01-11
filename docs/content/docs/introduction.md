@@ -21,6 +21,7 @@ Here's what you get out of the box:
 - 🎨 Frontend SDK for easy integration
 - 🎯 Unified API for creating messages
 - 🏢 Multi-tenancy support
+- 📦 Background job queueing for high-volume delivery
 
 ::include{template="partials/supported_providers"}
 
@@ -166,7 +167,6 @@ There's plenty more to explore, we'll cover it all in the following sections.
 
 Facteur is actively being developed. Here's what's on the roadmap:
 
-- Notification queuing support
 - Debouncing and batching system
 - Diagnostic channels for tracing and monitoring
 - Topics.

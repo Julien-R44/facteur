@@ -171,6 +171,16 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0(@types/node@25.0.6)(jiti@2.6.1)(tsx@4.21.0)
 
+  packages/adapter-boring-queue:
+    dependencies:
+      '@facteurjs/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@boringnode/queue':
+        specifier: ^0.1.0
+        version: 0.1.0(ioredis@5.8.2)(knex@3.1.0)
+
   packages/adonisjs:
     dependencies:
       '@facteurjs/core':
@@ -309,6 +319,12 @@ importers:
       '@adonisjs/mail':
         specifier: 'catalog:'
         version: 10.0.0-next.1(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@aws-sdk/client-sesv2@3.958.0)(@types/luxon@3.7.1)(@types/node@25.0.6)(dayjs@1.11.19)(edge.js@6.4.0)(luxon@3.7.2)
+      '@adonisjs/queue':
+        specifier: ^0.2.2
+        version: 0.2.2(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@adonisjs/lucid@22.0.0-next.5(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@vinejs/vine@4.2.0)(better-sqlite3@12.6.0)(luxon@3.7.2))(@adonisjs/redis@10.0.0-next.2(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10)))(ioredis@5.8.2)(knex@3.1.0(better-sqlite3@12.6.0))
+      '@adonisjs/redis':
+        specifier: 10.0.0-next.2
+        version: 10.0.0-next.2(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))
       '@adonisjs/session':
         specifier: ^8.0.0-next.2
         version: 8.0.0-next.2(d0515afa213c0f9831d79bd2db0204da)
@@ -327,6 +343,9 @@ importers:
       '@adonisjs/vite':
         specifier: ^5.1.0-next.2
         version: 5.1.0-next.2(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@adonisjs/shield@9.0.0-next.2(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@adonisjs/session@8.0.0-next.2(d0515afa213c0f9831d79bd2db0204da))(@japa/api-client@3.2.1(@japa/assert@4.2.0(@japa/runner@4.5.0))(@japa/runner@4.5.0))(@japa/plugin-adonisjs@5.1.0-next.1(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@japa/api-client@3.2.1(@japa/assert@4.2.0(@japa/runner@4.5.0))(@japa/runner@4.5.0))(@japa/runner@4.5.0))(edge.js@6.4.0))(edge.js@6.4.0)(vite@7.3.1(@types/node@25.0.6)(jiti@2.6.1)(tsx@4.21.0))
+      '@facteurjs/adapter-boring-queue':
+        specifier: workspace:*
+        version: link:../../packages/adapter-boring-queue
       '@facteurjs/adonisjs':
         specifier: workspace:*
         version: link:../../packages/adonisjs
@@ -708,6 +727,20 @@ packages:
       '@adonisjs/core': ^7.0.0-next.1
     peerDependenciesMeta:
       '@adonisjs/assembler':
+        optional: true
+
+  '@adonisjs/queue@0.2.2':
+    resolution: {integrity: sha512-RY8l9Zo77EY35zRwJmAYBcR8TiII/u9VU3vElTP2sBf3ADVS8aFqiJEoZ6iGnkggZkL9lmLuqELZAhDVDK9cTA==}
+    engines: {node: '>=20.11.1'}
+    peerDependencies:
+      '@adonisjs/assembler': ^7.0.0 || ^8.0.0 || ^8.0.0-next
+      '@adonisjs/core': ^6.2.0 || ^7.0.0 || ^7.0.0-next
+      '@adonisjs/lucid': ^20.0.0 || ^21.0.0 || ^22.0.0 || ^22.0.0-next
+      '@adonisjs/redis': ^8.0.0 || ^9.0.0 || ^10.0.0 || ^10.0.0-next
+    peerDependenciesMeta:
+      '@adonisjs/lucid':
+        optional: true
+      '@adonisjs/redis':
         optional: true
 
   '@adonisjs/redis@10.0.0-next.2':
@@ -1241,6 +1274,30 @@ packages:
   '@boringnode/encryption@0.2.4':
     resolution: {integrity: sha512-wriFgWCopd7f1RM2Y/ROGmM4/j/kUPjEjQh1Bu6wiVKDnyvZzxRaXMeBNKhI47KaUSlZlslbmuaBCV6b3VJGqw==}
     engines: {node: '>=20.6'}
+
+  '@boringnode/queue@0.1.0':
+    resolution: {integrity: sha512-yVn93OEcE4CNAeKnRV5SDkwhxqJTHbqRLxFBAqrPVzAIyXvpUeOtXWapUi17HyWGu2TQ1EG9+vrPfZz2Na8N5Q==}
+    engines: {node: '>=24.0.0'}
+    peerDependencies:
+      ioredis: ^5.0.0
+      knex: ^3.0.0
+    peerDependenciesMeta:
+      ioredis:
+        optional: true
+      knex:
+        optional: true
+
+  '@boringnode/queue@0.2.0':
+    resolution: {integrity: sha512-JGd9gI/zvNxeNq7J5QLedQ4l4sd6hIopTUovRyqr4kBnzMRxCcunePwrFMUpN8J34NR7lVbgLybPb/cyyBs+FQ==}
+    engines: {node: '>=24.0.0'}
+    peerDependencies:
+      ioredis: ^5.0.0
+      knex: ^3.0.0
+    peerDependenciesMeta:
+      ioredis:
+        optional: true
+      knex:
+        optional: true
 
   '@boringnode/transmit@0.2.2':
     resolution: {integrity: sha512-xIBg5PKqqgawNsXffq1P+BpRDjplfwOspwcFH5wfSN6uVcd5hYGC9lJpcXa1oL3wkQZimtiJhrTHhZZtgh2lqA==}
@@ -4119,6 +4176,10 @@ packages:
 
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
+
+  cron-parser@5.4.0:
+    resolution: {integrity: sha512-HxYB8vTvnQFx4dLsZpGRa0uHp6X3qIzS3ZJgJ9v6l/5TJMgeWQbLkR5yiJ5hOxGbc9+jCADDnydIe15ReLZnJA==}
+    engines: {node: '>=18'}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -7647,10 +7708,23 @@ snapshots:
     optionalDependencies:
       '@adonisjs/assembler': 8.0.0-next.30(typescript@5.9.3)
 
+  '@adonisjs/queue@0.2.2(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@adonisjs/lucid@22.0.0-next.5(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@vinejs/vine@4.2.0)(better-sqlite3@12.6.0)(luxon@3.7.2))(@adonisjs/redis@10.0.0-next.2(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10)))(ioredis@5.8.2)(knex@3.1.0(better-sqlite3@12.6.0))':
+    dependencies:
+      '@adonisjs/assembler': 8.0.0-next.30(typescript@5.9.3)
+      '@adonisjs/core': 7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10)
+      '@boringnode/queue': 0.2.0(ioredis@5.8.2)(knex@3.1.0(better-sqlite3@12.6.0))
+      '@poppinss/utils': 6.10.1
+    optionalDependencies:
+      '@adonisjs/lucid': 22.0.0-next.5(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))(@vinejs/vine@4.2.0)(better-sqlite3@12.6.0)(luxon@3.7.2)
+      '@adonisjs/redis': 10.0.0-next.2(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))
+    transitivePeerDependencies:
+      - ioredis
+      - knex
+
   '@adonisjs/redis@10.0.0-next.2(@adonisjs/core@7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10))':
     dependencies:
       '@adonisjs/core': 7.0.0-next.23(@adonisjs/assembler@8.0.0-next.30(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)(pino-pretty@13.1.3)(youch@4.1.0-beta.10)
-      '@poppinss/utils': 7.0.0-next.4
+      '@poppinss/utils': 7.0.0-next.6
       emittery: 1.2.0
       ioredis: 5.8.2
     transitivePeerDependencies:
@@ -8501,6 +8575,24 @@ snapshots:
   '@boringnode/encryption@0.2.4':
     dependencies:
       '@poppinss/utils': 7.0.0-next.6
+
+  '@boringnode/queue@0.1.0(ioredis@5.8.2)(knex@3.1.0)':
+    dependencies:
+      '@lukeed/ms': 2.0.2
+      '@poppinss/utils': 6.10.1
+      cron-parser: 5.4.0
+    optionalDependencies:
+      ioredis: 5.8.2
+      knex: 3.1.0(better-sqlite3@12.6.0)
+
+  '@boringnode/queue@0.2.0(ioredis@5.8.2)(knex@3.1.0(better-sqlite3@12.6.0))':
+    dependencies:
+      '@lukeed/ms': 2.0.2
+      '@poppinss/utils': 6.10.1
+      cron-parser: 5.4.0
+    optionalDependencies:
+      ioredis: 5.8.2
+      knex: 3.1.0(better-sqlite3@12.6.0)
 
   '@boringnode/transmit@0.2.2(ioredis@5.8.2)':
     dependencies:
@@ -11501,6 +11593,10 @@ snapshots:
       vary: 1.1.2
 
   create-require@1.1.1: {}
+
+  cron-parser@5.4.0:
+    dependencies:
+      luxon: 3.7.2
 
   cross-spawn@7.0.6:
     dependencies:

@@ -22,6 +22,15 @@ export const E_QUEUE_NOT_SET = createError(
 )
 
 /**
+ * Thrown when a channel is not found in the configuration.
+ */
+export const E_CHANNEL_NOT_FOUND = createError<[channelName: string]>(
+  `Channel "%s" is not registered. Make sure it is configured in the Facteur channels option.`,
+  'E_CHANNEL_NOT_FOUND',
+  500,
+)
+
+/**
  * Thrown when a `as<ChannelName>Message` method is not defined
  */
 export const E_MISSING_MESSAGE_METHOD = createError<[channelName: string]>(
@@ -47,6 +56,7 @@ export class E_SEND_NOTIFICATION_FAILED extends AggregateError {
 
 export const errors = {
   E_QUEUE_NOT_SET,
+  E_CHANNEL_NOT_FOUND,
   E_UNAVAILABLE_TARGETS,
   E_DUPLICATE_NOTIFICATION,
   E_MISSING_MESSAGE_METHOD,
