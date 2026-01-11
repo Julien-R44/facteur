@@ -1,5 +1,6 @@
 import type { Awaitable } from '@julr/utils/types'
 import type { Logger } from '@julr/utils/logger'
+import type { Duration } from '@julr/tenace/types'
 
 import type { QueueAdapter } from './queue.js'
 import type { DefaultPreferences } from './preferences.js'
@@ -68,6 +69,12 @@ export interface FacteurConfiguration<
    * If not provided, the default constructor will be used.
    */
   notificationResolver?: NotificationResolver
+
+  /**
+   * Global retry configuration for channel sends.
+   * Can be overridden per-channel or per-send.
+   */
+  retry?: RetryConfig<KnownChannels>
 }
 
 /**
@@ -178,17 +185,19 @@ type IsAnonymousNotification<T> =
  */
 export type SendOptions<TNotificationClass extends NotificationClass<any, any>> =
   IsAnonymousNotification<TNotificationClass> extends true
-    ? CommonSendOptions<TNotificationClass> & {
-        notification: TNotificationClass
-        via: { [K in ChannelName]?: ProviderTarget<any, K> }
-        tenantId?: Identifier
-      }
-    : CommonSendOptions<TNotificationClass> & {
-        notification: TNotificationClass
-        to: Arrayable<NonNullable<ExtractNotifiable<TNotificationClass>>>
-        via?: ChannelSpecificConfig<ExtractNotifiable<TNotificationClass>>
-        tenantId?: Identifier
-      }
+    ? CommonSendOptions<TNotificationClass> &
+        RetryOptions & {
+          notification: TNotificationClass
+          via: { [K in ChannelName]?: ProviderTarget<any, K> }
+          tenantId?: Identifier
+        }
+    : CommonSendOptions<TNotificationClass> &
+        BulkSendOptions & {
+          notification: TNotificationClass
+          to: Arrayable<NonNullable<ExtractNotifiable<TNotificationClass>>>
+          via?: ChannelSpecificConfig<ExtractNotifiable<TNotificationClass>>
+          tenantId?: Identifier
+        }
 
 export type ChannelSpecificConfig<N extends Notifiable> = {
   [K in ChannelName]?: boolean | ProviderTarget<N, K>
@@ -199,3 +208,93 @@ export type ExtractChannelTargets<T> = T extends Channel<any, any, any, infer U>
 export type ProviderTarget<_N extends Notifiable, K extends ChannelName> = ExtractChannelTargets<
   NotificationChannels[K]
 >
+
+/**
+ * Retry options for channel sends
+ */
+export interface RetryOptions {
+  /**
+   * Number of retry attempts when a channel send fails.
+   * Uses exponential backoff with jitter.
+   * @default 0 (no retries)
+   */
+  retries?: number
+
+  /**
+   * Timeout for each channel send operation.
+   * Accepts milliseconds or duration strings like '30s', '1m'.
+   */
+  timeout?: Duration
+}
+
+/**
+ * Global retry configuration with per-channel overrides
+ */
+export interface RetryConfig<KnownChannels extends Record<string, Channel> = Record<string, Channel>> extends RetryOptions {
+  /**
+   * Per-channel retry overrides
+   */
+  channels?: {
+    [K in keyof KnownChannels]?: RetryOptions
+  }
+}
+
+/**
+ * Options for bulk sending operations
+ */
+export interface BulkSendOptions extends RetryOptions {
+  /**
+   * Number of recipients to process per chunk.
+   * Useful for memory management with large recipient lists.
+   * @default Infinity (no chunking)
+   */
+  chunkSize?: number
+
+  /**
+   * Maximum number of concurrent sends.
+   * @default 10
+   */
+  concurrency?: number
+
+  /**
+   * If true, continues sending even if some recipients fail (Promise.allSettled behavior).
+   * If false, stops on first error (Promise.all behavior).
+   * @default false
+   */
+  continueOnError?: boolean
+
+  /**
+   * Number of retry attempts per recipient.
+   * Uses exponential backoff with jitter.
+   * @default 0 (no retries)
+   */
+  retries?: number
+
+  /**
+   * Timeout per recipient send operation.
+   * Accepts milliseconds or duration strings like '30s', '1m'.
+   */
+  timeout?: Duration
+
+  /**
+   * Callback invoked after each recipient is processed.
+   */
+  onProgress?: (completed: number, total: number) => void
+
+  /**
+   * Disable driver-level batching even if the channel supports it.
+   * When true, each message is sent individually.
+   * @default false
+   */
+  disableDriverBatch?: boolean
+
+  /**
+   * Enable batch mode which groups messages by channel and uses batch APIs when available.
+   * This mode has different semantics:
+   * - Retries and timeouts apply at the batch level, not per-recipient
+   * - Progress callback is called per chunk, not per recipient
+   * - More efficient for channels that support batch APIs (FCM, Expo)
+   * @default false
+   */
+  useDriverBatching?: boolean
+}

@@ -23,12 +23,12 @@ router.post('/send', async ({ request, response }) => {
     return response.badRequest({ error: 'Invalid notification identifier' })
   }
 
-  await facteur.send({
-    notification: NotificationClass,
-    to: user,
-    params: { amount: 100 },
-    tenantId,
-  })
+  await facteur
+    .notification(NotificationClass)
+    .params({ amount: 100 })
+    .to(user)
+    .tenant(tenantId)
+    .send()
 
   return response.ok({ message: 'Notification sent successfully' })
 })

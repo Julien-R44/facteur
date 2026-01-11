@@ -55,7 +55,7 @@ export class Facteur<
       this.#options.channels,
       channelResolver,
       this.#options.emitter,
-      this.#options.resilience,
+      this.#options.retry,
     )
 
     this.#orchestrationSender = new OrchestrationSender(this.#sender)
@@ -118,7 +118,7 @@ export class Facteur<
       return { success: recipients.length, failed: 0, results: [] }
     }
 
-    // Single recipient: fast path that preserves per-send resilience options
+    // Single recipient: fast path that preserves per-send retry options
     if (recipients.length === 1) return this.#sendSingle({ ...options, to: recipients[0] })
 
     const prepareNotification = this.#prepareNotification.bind(this)

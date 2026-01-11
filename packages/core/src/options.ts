@@ -10,6 +10,7 @@ import type {
   DefaultPreferences,
   ResolvedDefaultPreferences,
   NotificationResolver,
+  RetryConfig,
 } from './types/index.js'
 import type { DatabaseAdapter } from './database/types.js'
 
@@ -25,6 +26,7 @@ export class FacteurOptions<
   queueAdapter: QueueAdapter
   databaseAdapter: DBAdapter | null = null
   notificationResolver: NotificationResolver
+  retry: RetryConfig<KnownChannels> = {}
   readonly defaultPreferences: ResolvedDefaultPreferences<KnownChannels>
 
   #resolveDefaultPreferences(
@@ -72,6 +74,7 @@ export class FacteurOptions<
     this.defaultPreferences = this.#resolveDefaultPreferences(config.preferences)
     this.notificationResolver =
       config.notificationResolver || ((notification, ctx) => new notification(ctx))
+    this.retry = config.retry || {}
 
     const throwIfQueueNotSet = () => {
       throw new errors.E_QUEUE_NOT_SET()

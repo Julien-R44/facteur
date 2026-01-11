@@ -24,21 +24,21 @@ const randomUser: User = {
 
 const app = new Hono()
 app.get('/send', async (c) => {
-  await facteur.send({
-    notification: AnonymousLikeNotification,
-    via: { discord: { default: true } },
-    params: {},
-  })
+  await facteur
+    .notification(AnonymousLikeNotification)
+    .params({})
+    .via({ discord: { default: true } })
+    .send()
 
   return c.text('Hello, this is a test notification!')
 })
 
 app.get('/send-post-liked', async (c) => {
-  await facteur.send({
-    notification: PostLikedNotification,
-    notifiable: randomUser,
-    params: { amount: 1 },
-  })
+  await facteur
+    .notification(PostLikedNotification)
+    .params({ amount: 1 })
+    .to(randomUser)
+    .send()
 
   return c.text('Post liked notification sent!')
 })
