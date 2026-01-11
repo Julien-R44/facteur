@@ -5,7 +5,10 @@
     "@facteurjs/adonisjs": "0.0.0",
     "@facteurjs/client": "0.0.0",
     "@facteurjs/core": "0.0.0",
-    "@facteurjs/react": "0.0.0"
+    "@facteurjs/react": "0.0.0",
+    "@facteurjs/hono": "2.0.0-beta.0"
   },
-  "changesets": ["real-wasps-lay"]
+  "changesets": [
+    "fix-stubs-path"
+  ]
 }
