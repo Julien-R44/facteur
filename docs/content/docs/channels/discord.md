@@ -41,22 +41,27 @@ You must provide either `webhooks` or `webhookUrl`.
 The Discord channel targets work exactly like [webhook targets](./webhook.md#targets):
 
 ```ts
-facteur.send({
-  notification: MyNotification,
-  via: {
+// Send to specific named webhooks
+await facteur
+  .notification(MyNotification)
+  .via({
     discord: {
-      // Send to specific named webhooks
       general: true,
       alerts: false,
       announcements: true
     }
+  })
+  .send()
 
-    // Or send to an arbitrary Discord webhook URL
+// Or send to an arbitrary Discord webhook URL
+await facteur
+  .notification(MyNotification)
+  .via({
     discord: {
       webhookUrl: 'https://discord.com/api/webhooks/CUSTOM/WEBHOOK'
     }
-  }
-})
+  })
+  .send()
 ```
 
 ### Target Properties

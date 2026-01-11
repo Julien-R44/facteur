@@ -16,10 +16,7 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-    })
+    facteur.notification(FakeNotification).via({ email: { to: 'foo@ok.com' } }).send()
 
     const event = await pEvent(emitter, 'facteur:message:sending')
 
@@ -40,10 +37,7 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-    })
+    facteur.notification(FakeNotification).via({ email: { to: 'foo@ok.com' } }).send()
 
     const event = await pEvent(emitter, 'facteur:message:sent')
 
@@ -66,11 +60,11 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-      throwOnError: false,
-    })
+    facteur
+      .notification(FakeNotification)
+      .via({ email: { to: 'foo@ok.com' } })
+      .throwOnError(false)
+      .send()
 
     const event = await pEvent(emitter, 'facteur:message:failed')
 
@@ -93,11 +87,11 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-      params: { test: 'value' },
-    })
+    facteur
+      .notification(FakeNotification)
+      .params({ test: 'value' })
+      .via({ email: { to: 'foo@ok.com' } })
+      .send()
 
     const event = await pEvent(emitter, 'facteur:notification:sending')
 
@@ -119,11 +113,11 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-      params: { test: 'value' },
-    })
+    facteur
+      .notification(FakeNotification)
+      .params({ test: 'value' })
+      .via({ email: { to: 'foo@ok.com' } })
+      .send()
 
     const event = await pEvent(emitter, 'facteur:notification:sent')
 
@@ -147,11 +141,11 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-      throwOnError: false,
-    })
+    facteur
+      .notification(FakeNotification)
+      .via({ email: { to: 'foo@ok.com' } })
+      .throwOnError(false)
+      .send()
 
     const event = await pEvent(emitter, 'facteur:notification:failed')
 
@@ -181,10 +175,7 @@ test.group('Facteur | Events', () => {
     emitter.on('facteur:message:sent', () => events.push('message:sent'))
     emitter.on('facteur:notification:sent', () => events.push('notification:sent'))
 
-    await facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-    })
+    await facteur.notification(FakeNotification).via({ email: { to: 'foo@ok.com' } }).send()
 
     assert.deepEqual(events, [
       'notification:sending',
@@ -215,11 +206,11 @@ test.group('Facteur | Events', () => {
     emitter.on('facteur:message:failed', () => events.push('message:failed'))
     emitter.on('facteur:notification:failed', () => events.push('notification:failed'))
 
-    await facteur.send({
-      notification: FakeNotification,
-      via: { email: { to: 'foo@ok.com' } },
-      throwOnError: false,
-    })
+    await facteur
+      .notification(FakeNotification)
+      .via({ email: { to: 'foo@ok.com' } })
+      .throwOnError(false)
+      .send()
 
     assert.deepEqual(events, [
       'notification:sending',

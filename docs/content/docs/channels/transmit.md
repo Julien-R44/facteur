@@ -28,15 +28,15 @@ export default defineConfig({
 The Transmit channel requires a channel name to broadcast to:
 
 ```ts
-facteur.send({
-  notification: MyNotification,
-  via: {
+await facteur
+  .notification(MyNotification)
+  .via({
     transmit: {
       // Channel name to broadcast to (required)
       channel: 'user-123'
     }
-  }
-})
+  })
+  .send()
 ```
 
 ### Target Properties

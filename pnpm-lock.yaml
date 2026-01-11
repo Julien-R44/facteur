@@ -196,6 +196,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@julr/tenace':
+        specifier: 1.0.0-next.0
+        version: 1.0.0-next.0(@opentelemetry/api@1.9.0)(ioredis@5.8.2)(knex@3.1.0)(kysely@0.28.9)
       '@julr/utils':
         specifier: 'catalog:'
         version: 1.9.0
@@ -2381,6 +2384,15 @@ packages:
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
 
+  '@julr/tenace@1.0.0-next.0':
+    resolution: {integrity: sha512-euTVBybJ46d1C9j/L8rsEX+D3RHMJVsUP6DkSTuSOC2WgsgiCeSWzzC8Qu2Hgn+rcPDdX2FWpSo/Se+MtqWNGg==}
+    engines: {node: '>=24'}
+    peerDependencies:
+      '@opentelemetry/api': ^1.0.0
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+
   '@julr/tooling-configs@5.0.0':
     resolution: {integrity: sha512-VQFKN99jfBy75qKzx9DlxpsL4XYHTxhsyJVLRnvuj2fWWd3T8sDiF08BUaQXEIsNx+2rqUk/hr523Lxr/mJ4iQ==}
     hasBin: true
@@ -3974,6 +3986,10 @@ packages:
   cluster-key-slot@1.1.2:
     resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
     engines: {node: '>=0.10.0'}
+
+  cockatiel@3.2.1:
+    resolution: {integrity: sha512-gfrHV6ZPkquExvMh9IOkKsBzNDk6sDuZ6DdBGUBkvFnTCqCxzpuq48RySgP0AnaqQkw2zynOFj9yly6T1Q2G5Q==}
+    engines: {node: '>=16'}
 
   code-block-writer@13.0.3:
     resolution: {integrity: sha512-Oofo0pq3IKnsFtuHqSF7TqBfr71aeyZDVJ0HpmqB7FBM2qEigL0iPONSCZSO9pE9dZTAxANe5XHG9Uy0YMv8cg==}
@@ -6019,6 +6035,10 @@ packages:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
 
+  p-wait-for@6.0.0:
+    resolution: {integrity: sha512-2kKzMtjS8TVcpCOU/gr3vZ4K/WIyS1AsEFXFWapM/0lERCdyTbB6ZeuCIp+cL1aeLZfQoMdZFCBTHiK4I9UtOw==}
+    engines: {node: '>=20'}
+
   package-manager-detector@0.2.9:
     resolution: {integrity: sha512-+vYvA/Y31l8Zk8dwxHhL3JfTuHPm6tlxM2A3GeQyl7ovYnSp1+mzAxClxaOr0qO1TtPxbQxetI7v5XqKLJZk7Q==}
 
@@ -6268,6 +6288,9 @@ packages:
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
+
+  rate-limiter-flexible@9.0.1:
+    resolution: {integrity: sha512-sO+QdoGPCxroi4VkO2FIVjfUGuexhRkBc9ROHqu5eVEEz+oPHzQqvCc25ajFfMUBosbNGb6qpNa8xmxH9YNZsg==}
 
   raw-body@3.0.0:
     resolution: {integrity: sha512-RmkhL8CAyCRPXCE28MMH0z2PNWQBNk2Q09ZdxM9IOOXwxwZbN+qbWaatPkdkWIKL2ZVDImrN/pK5HTRz2PcS4g==}
@@ -7547,7 +7570,7 @@ snapshots:
     dependencies:
       '@adonisjs/assembler': 7.8.2(typescript@5.9.3)
       '@adonisjs/core': 6.19.1(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0)
-      bentocache: 1.5.0(ioredis@5.8.2)(knex@3.1.0(better-sqlite3@12.5.0))
+      bentocache: 1.5.0(ioredis@5.8.2)(knex@3.1.0)(kysely@0.28.9)
     optionalDependencies:
       '@adonisjs/lucid': 21.8.1(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@adonisjs/core@6.19.1(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0))(@vinejs/vine@4.2.0)(better-sqlite3@12.5.0)(luxon@3.7.2)
       '@adonisjs/redis': 9.2.0(@adonisjs/core@6.19.1(@adonisjs/assembler@7.8.2(typescript@5.9.3))(@vinejs/vine@4.2.0)(edge.js@6.4.0))
@@ -10077,6 +10100,22 @@ snapshots:
   '@js-sdsl/ordered-map@4.4.2':
     optional: true
 
+  '@julr/tenace@1.0.0-next.0(@opentelemetry/api@1.9.0)(ioredis@5.8.2)(knex@3.1.0)(kysely@0.28.9)':
+    dependencies:
+      '@julr/utils': 1.9.0
+      bentocache: 1.5.0(ioredis@5.8.2)(knex@3.1.0)(kysely@0.28.9)
+      cockatiel: 3.2.1
+      p-wait-for: 6.0.0
+      rate-limiter-flexible: 9.0.1
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.0
+    transitivePeerDependencies:
+      - '@aws-sdk/client-dynamodb'
+      - ioredis
+      - knex
+      - kysely
+      - orchid-orm
+
   '@julr/tooling-configs@5.0.0(@typescript-eslint/utils@8.50.1(eslint@9.31.0(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint@9.31.0(jiti@2.6.1))(prettier@3.7.4)(typescript@5.9.3)':
     dependencies:
       '@adonisjs/eslint-plugin': 2.0.0-beta.5(eslint@9.31.0(jiti@2.6.1))(typescript@5.9.3)
@@ -11543,7 +11582,7 @@ snapshots:
     dependencies:
       safe-buffer: 5.1.2
 
-  bentocache@1.5.0(ioredis@5.8.2)(knex@3.1.0(better-sqlite3@12.5.0)):
+  bentocache@1.5.0(ioredis@5.8.2)(knex@3.1.0)(kysely@0.28.9):
     dependencies:
       '@boringnode/bus': 0.7.1(ioredis@5.8.2)
       '@julr/utils': 1.9.0
@@ -11554,6 +11593,7 @@ snapshots:
     optionalDependencies:
       ioredis: 5.8.2
       knex: 3.1.0(better-sqlite3@12.5.0)
+      kysely: 0.28.9
 
   better-path-resolve@1.0.0:
     dependencies:
@@ -11733,6 +11773,8 @@ snapshots:
       wrap-ansi: 7.0.0
 
   cluster-key-slot@1.1.2: {}
+
+  cockatiel@3.2.1: {}
 
   code-block-writer@13.0.3: {}
 
@@ -14025,6 +14067,8 @@ snapshots:
 
   p-try@2.2.0: {}
 
+  p-wait-for@6.0.0: {}
+
   package-manager-detector@0.2.9: {}
 
   package-manager-detector@1.3.0: {}
@@ -14288,6 +14332,8 @@ snapshots:
   random-bytes@1.0.0: {}
 
   range-parser@1.2.1: {}
+
+  rate-limiter-flexible@9.0.1: {}
 
   raw-body@3.0.0:
     dependencies:

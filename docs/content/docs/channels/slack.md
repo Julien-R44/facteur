@@ -41,22 +41,27 @@ You must provide either `webhooks` or `webhookUrl`.
 The Slack channel targets work exactly like [webhook targets](./webhook.md#targets):
 
 ```ts
-facteur.send({
-  notification: MyNotification,
-  via: {
+// Send to specific named webhooks
+await facteur
+  .notification(MyNotification)
+  .via({
     slack: {
-      // Send to specific named webhooks
       general: true,
       alerts: false,
       marketing: true
     }
+  })
+  .send()
 
-    // Or send to an arbitrary Slack webhook URL
+// Or send to an arbitrary Slack webhook URL
+await facteur
+  .notification(MyNotification)
+  .via({
     slack: {
       webhookUrl: 'https://hooks.slack.com/services/CUSTOM/TENANT/WEBHOOK'
     }
-  }
-})
+  })
+  .send()
 ```
 
 ### Target Properties

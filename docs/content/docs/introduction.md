@@ -58,12 +58,12 @@ export class UserRegisteredNotification extends Notification<User> {
 ```
 
 ```ts
-import facteur from './facteur.js'
+import facteur from './facteur.ts'
 
-await facteur.send({
-  notification: UserRegisteredNotification,
-  notifiable: user,
-})
+await facteur
+  .notification(UserRegisteredNotification)
+  .to(user)
+  .send()
 ```
 
 That's it. This notification gets sent through all the channels you specified in `deliverBy` (Slack and Email in this case).
@@ -103,12 +103,12 @@ export class UserMentionedNotification extends Notification<User> {
 Send it the same way:
 
 ```ts
-import facteur from './facteur.js'
+import facteur from './facteur.ts'
 
-await facteur.send({
-  notification: UserMentionedNotification,
-  notifiable: user,
-})
+await facteur
+  .notification(UserMentionedNotification)
+  .to(user)
+  .send()
 ```
 
 After sending, the notification gets saved to your database and delivered in real-time via Server-Sent Events or WebSockets. Users can see it in your app and mark it as read.

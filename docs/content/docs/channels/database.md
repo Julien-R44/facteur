@@ -92,9 +92,9 @@ CREATE TABLE notification_preferences (
 The Database channel requires a notifiable identifier:
 
 ```ts
-facteur.send({
-  notification: MyNotification,
-  via: {
+await facteur
+  .notification(MyNotification)
+  .via({
     database: {
       // Notifiable ID (required) - usually a user ID
       notifiableId: '123',
@@ -102,8 +102,8 @@ facteur.send({
       // Optional: Tenant ID for multi-tenancy
       tenantId: 'tenant-456'
     }
-  }
-})
+  })
+  .send()
 ```
 
 ### Target Properties

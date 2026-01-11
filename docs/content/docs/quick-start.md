@@ -133,14 +133,15 @@ Now that this is done, Facteur will be able to automatically route the notificat
 To send the notification, will be as simple as:
 
 ```ts
-import { facteur } from './facteur' // Import your configured facteur instance
+import { facteur } from './facteur.ts'
 
 const user = await User.find(1)
-await facteur.send({
-  notification: InvoicePaidNotification,
-  params: { amount: 100 },
-  notifiable: user,
-})
+
+await facteur
+  .notification(InvoicePaidNotification)
+  .to(user)
+  .params({ amount: 100 })
+  .send()
 ```
 
 All good. Your user just received a SMS and a WebPush notification saying that their invoice has been paid!

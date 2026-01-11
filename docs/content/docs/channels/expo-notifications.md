@@ -37,15 +37,15 @@ All configuration options are optional. The channel works out of the box without
 The Expo channel requires an Expo push token for the target device:
 
 ```ts
-facteur.send({
-  notification: MyNotification,
-  via: {
+await facteur
+  .notification(MyNotification)
+  .via({
     expo: {
       // Expo push token (required)
       expoToken: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]'
     }
-  }
-})
+  })
+  .send()
 ```
 
 ### Target Properties

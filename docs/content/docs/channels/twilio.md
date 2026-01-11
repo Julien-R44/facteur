@@ -57,9 +57,9 @@ export default defineConfig({
 The Twilio channel targets are:
 
 ```ts
-facteur.send({
-  notification: MyNotification,
-  via: {
+await facteur
+  .notification(MyNotification)
+  .via({
     twilio: {
       // Recipient phone number (required)
       to: '+1234567890',
@@ -67,8 +67,8 @@ facteur.send({
       // Optional: override the sender for this specific message
       from: '+0987654321'
     }
-  }
-})
+  })
+  .send()
 ```
 
 ### Target Properties

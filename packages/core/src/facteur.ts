@@ -1,35 +1,38 @@
 import type { DatabaseAdapter } from './database/types.js'
 
-import {
-  type FacteurConfiguration,
-  type Channel,
-  type SendOptions,
-  type NotificationSendResult,
-  type NotificationClass,
+import type {
+  FacteurConfiguration,
+  Channel,
+  NotificationSendResult,
+  NotificationClass,
+  Notification,
 } from './types/index.js'
+import type { BuilderOptions, NotificationBuilder } from './types/builder.js'
+import { collect, isAsyncIterable } from './utils/chunk.js'
 import { FacteurOptions } from './options.js'
 import { NotificationSender } from './notifications/notification_sender.js'
 import { NotificationDiscoverer } from './notifications/notification_discoverer.js'
 import { ChannelResolver } from './notifications/channel_resolver.js'
 import { FacteurFake } from './fake.js'
 import { FacteurDatabase } from './database/database.js'
+import { createNotificationBuilder } from './notifications/notification_builder.js'
+import { OrchestrationSender } from './notifications/orchestration_sender.js'
+import { BatchingSender } from './notifications/batching_sender.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
   return new Facteur(config)
 }
 
-/**
- * Main manager class for Facteur library.
- */
 export class Facteur<
   KnownChannels extends Record<string, Channel>,
   DBAdapter extends DatabaseAdapter | null = null,
 > {
   #sender: NotificationSender
+  #orchestrationSender: OrchestrationSender
+  #batchingSender: BatchingSender
   #fake: FacteurFake | null = null
   #db: FacteurDatabase | null = null
   #discoverer: NotificationDiscoverer
-  #channelResolver: ChannelResolver
   #options: FacteurOptions<KnownChannels, DBAdapter>
 
   constructor(config: FacteurConfiguration<KnownChannels, DBAdapter>) {
@@ -39,29 +42,124 @@ export class Facteur<
       fileSuffix: config.discoverer.fileSuffix,
     })
 
+    let channelResolver: ChannelResolver
     if (this.#options.databaseAdapter) {
       const options = this.#options as FacteurOptions<KnownChannels, DatabaseAdapter>
       this.#db = new FacteurDatabase(options, this.#discoverer)
-      this.#channelResolver = new ChannelResolver(this.#db)
+      channelResolver = new ChannelResolver(this.#db)
     } else {
-      this.#channelResolver = new ChannelResolver()
+      channelResolver = new ChannelResolver()
     }
 
     this.#sender = new NotificationSender(
       this.#options.channels,
-      this.#channelResolver,
+      channelResolver,
       this.#options.emitter,
+      this.#options.resilience,
     )
+
+    this.#orchestrationSender = new OrchestrationSender(this.#sender)
+    this.#batchingSender = new BatchingSender(this.#sender, channelResolver)
   }
 
-  get db(): DBAdapter extends DatabaseAdapter ? FacteurDatabase : never {
-    if (!this.#options.databaseAdapter) {
-      throw new Error('No database adapter configured')
+  /**
+   * Converts recipients input to an array, handling single values, arrays, and async iterables
+   */
+  async #resolveRecipients(to: unknown): Promise<unknown[]> {
+    if (!to) return []
+    if (Array.isArray(to)) return to
+    if (isAsyncIterable(to)) return collect(to)
+
+    return [to]
+  }
+
+  /**
+   * Resolves notification instance and runs lifecycle hooks
+   */
+  async #prepareNotification(
+    recipient: unknown,
+    options: BuilderOptions<any>,
+  ): Promise<{ notification: Notification<any, any>; shouldSkip: boolean }> {
+    const notification = await this.#options.notificationResolver(options.notification, {
+      to: recipient,
+      params: options.params,
+      tenantId: options.tenantId,
+    })
+
+    await notification.beforeSend()
+    const shouldSkip = (await notification.shouldSend()) === false
+
+    return { notification, shouldSkip }
+  }
+
+  /**
+   * Handles anonymous sends (via without to) - e.g., sending to a fixed webhook
+   */
+  async #sendAnonymous(options: BuilderOptions<any>): Promise<NotificationSendResult> {
+    const { notification, shouldSkip } = await this.#prepareNotification(undefined, options)
+    if (shouldSkip) return { success: 0, failed: 0, results: [] }
+    if (this.#fake) return this.#fake.recordSent(options)
+
+    return this.#sender.send(options, notification)
+  }
+
+  /**
+   * Main send entry point - unified handling for all recipient types
+   */
+  async #send(options: BuilderOptions<any>): Promise<NotificationSendResult> {
+    if (options.via && !options.to) return this.#sendAnonymous(options)
+
+    const recipients = await this.#resolveRecipients(options.to)
+    if (recipients.length === 0) return { success: 0, failed: 0, results: [] }
+
+    // Fake mode - early return for all recipients
+    if (this.#fake) {
+      for (const recipient of recipients) this.#fake.recordSent({ ...options, to: recipient })
+      return { success: recipients.length, failed: 0, results: [] }
     }
 
-    return this.#db as any
+    // Single recipient: fast path that preserves per-send resilience options
+    if (recipients.length === 1) return this.#sendSingle({ ...options, to: recipients[0] })
+
+    const prepareNotification = this.#prepareNotification.bind(this)
+
+    if (options.useDriverBatching) {
+      return this.#batchingSender.send({
+        recipients,
+        builderOptions: options,
+        prepareNotification,
+      })
+    }
+
+    return this.#orchestrationSender.send({
+      recipients,
+      builderOptions: options,
+      prepareNotification,
+    })
   }
 
+  /**
+   * Fast path for single recipient - passes options directly to sender
+   */
+  async #sendSingle(options: BuilderOptions<any>): Promise<NotificationSendResult> {
+    const { notification, shouldSkip } = await this.#prepareNotification(options.to, options)
+    if (shouldSkip) return { success: 0, failed: 0, results: [] }
+
+    return this.#sender.send(options, notification)
+  }
+
+  /**
+   * Access the database layer for in-app notifications and preferences
+   */
+  get db(): DBAdapter extends DatabaseAdapter ? FacteurDatabase : never {
+    if (!this.#options.databaseAdapter) throw new Error('No database adapter configured')
+
+    return this.#db as DBAdapter extends DatabaseAdapter ? FacteurDatabase : never
+  }
+
+  /**
+   * Access notification discovery utilities for finding and managing notifications
+   */
   get discoverer() {
     return {
       discoverNotifications: () => this.#discoverer.discoverNotifications(),
@@ -72,7 +170,7 @@ export class Facteur<
   }
 
   /**
-   * Fake the notification sending process for testing purposes
+   * Enable fake mode for testing - captures sent notifications instead of sending
    */
   fake(): FacteurFake {
     this.#fake = new FacteurFake()
@@ -81,52 +179,18 @@ export class Facteur<
   }
 
   /**
-   * Restore the original notification sending process after faking it
+   * Restore normal sending behavior after fake mode
    */
   restore() {
     this.#fake = null
   }
 
   /**
-   * Send a notification
+   * Create a notification builder for fluent API
    */
-  async send<TNotificationClass extends NotificationClass<any, any>>(
-    options: SendOptions<TNotificationClass>,
-  ): Promise<NotificationSendResult> {
-    if ('via' in options && !('to' in options)) return this.#sendToSingle(options as any)
-
-    const optionsWithTo = options as SendOptions<TNotificationClass> & { to: any }
-    const recipients = Array.isArray(optionsWithTo.to) ? optionsWithTo.to : [optionsWithTo.to]
-    const results = await Promise.all(
-      recipients.map((recipient) => this.#sendToSingle({ ...optionsWithTo, to: recipient })),
-    )
-
-    return {
-      success: results.reduce((sum, result) => sum + result.success, 0),
-      failed: results.reduce((sum, result) => sum + result.failed, 0),
-      results: results.flatMap((result) => result.results),
-    }
-  }
-
-  /**
-   * Send notification to a single recipient
-   */
-  async #sendToSingle<TNotificationClass extends NotificationClass<any, any>>(
-    options: SendOptions<TNotificationClass>,
-  ): Promise<NotificationSendResult> {
-    const notification = await this.#options.notificationResolver(options.notification, {
-      to: 'to' in options ? options.to : undefined,
-      params: options.params,
-      tenantId: options.tenantId,
-    })
-
-    await notification.beforeSend()
-
-    const shouldSend = await notification.shouldSend()
-    if (shouldSend === false) return { success: 0, failed: 0, results: [] }
-
-    if (this.#fake) return this.#fake.recordSent(options as SendOptions<any>)
-
-    return this.#sender.send(options, notification)
+  notification<TNotification extends NotificationClass<any, any>>(
+    notificationClass: TNotification,
+  ): NotificationBuilder<TNotification, { hasParams: false; hasTo: false; hasVia: false }> {
+    return createNotificationBuilder((options) => this.#send(options), notificationClass)
   }
 }
