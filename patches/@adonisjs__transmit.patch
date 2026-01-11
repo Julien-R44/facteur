@@ -1,0 +1,34 @@
+diff --git a/build/src/controllers/event_stream_controller.js b/build/src/controllers/event_stream_controller.js
+index 51ef2ec1b7d6ef1777fa92c8e3e1229dd74cadc4..14c1fff8d86789861ccc4a4afbfcf79337dc220f 100644
+--- a/build/src/controllers/event_stream_controller.js
++++ b/build/src/controllers/event_stream_controller.js
+@@ -6,13 +6,13 @@
+  * For the full copyright and license information, please view the LICENSE
+  * file that was distributed with this source code.
+  */
+-import { RuntimeException } from '@poppinss/utils';
++// import { RuntimeException } from '@poppinss/utils';
+ import transmit from '../../services/transmit.js';
+ export default class EventStreamController {
+     handle(ctx) {
+         const uid = ctx.request.input('uid');
+         if (!uid) {
+-            throw new RuntimeException('Missing required field "uid" in the request body');
++            throw new Error('Missing required field "uid" in the request body');
+         }
+         const stream = transmit.createStream({
+             uid,
+diff --git a/build/stubs/main.js b/build/stubs/main.js
+index b4a795ac45f7f4d0db20ea7c2944ae9788e112de..a5e2905ce95a341c6bc8a01aa414fe3af52e4e33 100644
+--- a/build/stubs/main.js
++++ b/build/stubs/main.js
+@@ -6,5 +6,7 @@
+  * For the full copyright and license information, please view the LICENSE
+  * file that was distributed with this source code.
+  */
+-import { getDirname } from '@poppinss/utils';
+-export const stubsRoot = getDirname(import.meta.url);
++import { fileURLToPath } from 'node:url'
++import { dirname } from 'node:path'
++
++export const stubsRoot = dirname(fileURLToPath(import.meta.url))

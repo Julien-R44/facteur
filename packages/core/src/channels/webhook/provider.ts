@@ -68,7 +68,7 @@ export class WebhookChannel<T extends WebhookOptions<any>> implements Channel<
   #normalizeTargets(targets: WebhookTargets<any>) {
     if (!targets) return [...this.#webhooksUrls.values()]
 
-    if ('webhookUrl' in targets) {
+    if ('webhookUrl' in targets && targets.webhookUrl) {
       return [this.#buildWebhookEntry('default', targets.webhookUrl)[1]]
     }
 

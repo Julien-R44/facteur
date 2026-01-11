@@ -6,7 +6,7 @@ import facteur from '../facteur/service.js'
 import PostLikedNotification from '../app/notifications/post_liked_notification.js'
 import InvoicePaidNotification from '../app/notifications/invoice_paid_notification.js'
 
-router.on('/').renderInertia('home')
+router.on('/').renderInertia('home', {})
 
 router.post('/send', async ({ request, response }) => {
   const { identifier: notificationIdentifier, tenantId } = request.body()
@@ -35,7 +35,13 @@ router.post('/send', async ({ request, response }) => {
 
 transmit.registerRoutes()
 
-router.group(() => facteur.registerRoutes())
+router.group(() =>
+  facteur.registerRoutes({
+    authorize: async (ctx) => {
+      return true
+    },
+  }),
+)
 // .use(async ({ params, response, auth }, next) => {
 //   if (params.notifiableId != auth.user?.id) return response.forbidden({ error: 'Forbidden' })
 

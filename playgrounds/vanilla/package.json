@@ -22,7 +22,7 @@
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
-    "@adonisjs/tsconfig": "^1.4.1"
+    "@adonisjs/tsconfig": "catalog:"
   },
   "packageManager": "pnpm@10.26.2"
 }

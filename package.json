@@ -31,6 +31,9 @@
     "typescript": "^5.9.3",
     "wrangler": "^4.54.0"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "packageManager": "pnpm@10.26.2",
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -40,6 +43,9 @@
     ],
     "ignoredBuiltDependencies": [
       "msgpackr-extract"
-    ]
+    ],
+    "patchedDependencies": {
+      "@adonisjs/transmit": "patches/@adonisjs__transmit.patch"
+    }
   }
 }

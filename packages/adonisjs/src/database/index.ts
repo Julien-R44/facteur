@@ -24,7 +24,7 @@ export const databases = {
 
       const { knexAdapter } = await import('@facteurjs/core/database/adapters/knex')
       return knexAdapter({
-        connection: db.connection(connectionName).getWriteClient(),
+        connection: () => db.connection(connectionName).getWriteClient(),
         tableNames: {
           notifications: config?.tableNames?.notifications,
           preferences: config?.tableNames?.preferences,

@@ -21,12 +21,22 @@ export function knexAdapter(config: KnexConfig): DatabaseAdapter {
 class KnexAdapter implements DatabaseAdapter {
   #tableName: string = 'notifications'
   #preferencesTableName: string = 'notification_preferences'
-  #connection: Knex
+  #connectionResolver: () => Knex
 
   constructor(config: KnexConfig) {
-    this.#connection = config.connection
+    this.#connectionResolver = this.#isKnexInstance(config.connection)
+      ? () => config.connection as Knex
+      : (config.connection as () => Knex)
     this.#tableName = config.tableNames?.notifications || 'notifications'
     this.#preferencesTableName = config.tableNames?.preferences || 'notification_preferences'
+  }
+
+  #isKnexInstance(connection: Knex | (() => Knex)): connection is Knex {
+    return 'client' in connection
+  }
+
+  #getConnection(): Knex {
+    return this.#connectionResolver()
   }
 
   setTableName(tableName: string) {
@@ -34,7 +44,7 @@ class KnexAdapter implements DatabaseAdapter {
   }
 
   async save(options: SaveToDatabaseParams) {
-    await this.#connection.table(this.#tableName).insert({
+    await this.#getConnection().table(this.#tableName).insert({
       notifiable_id: options.notifiableId,
       tenant_id: options.tenantId || null,
       type: options.type,
@@ -51,7 +61,7 @@ class KnexAdapter implements DatabaseAdapter {
     const limit = Math.min(options.limit || 10, 100)
     const offset = (page - 1) * limit
 
-    let query = this.#connection.table(this.#tableName).where('notifiable_id', options.notifiableId)
+    let query = this.#getConnection().table(this.#tableName).where('notifiable_id', options.notifiableId)
 
     if (options.tenantId) query.where('tenant_id', options.tenantId)
     if (options.status) query.where('status', options.status)
@@ -90,7 +100,7 @@ class KnexAdapter implements DatabaseAdapter {
       updateData.seen_at = new Date()
     }
 
-    await this.#connection
+    await this.#getConnection()
       .table(this.#tableName)
       .where('id', options.id)
       .update(updateData)
@@ -108,14 +118,14 @@ class KnexAdapter implements DatabaseAdapter {
       updateData.seen_at = new Date()
     }
 
-    let query = this.#connection.table(this.#tableName).where('notifiable_id', options.notifiableId)
+    let query = this.#getConnection().table(this.#tableName).where('notifiable_id', options.notifiableId)
     if (options.tenantId) query = query.where('tenant_id', options.tenantId)
 
     await query.update(updateData)
   }
 
   async pruneNotifications(options: PruneNotificationsParams): Promise<void> {
-    let query = this.#connection.table(this.#tableName)
+    let query = this.#getConnection().table(this.#tableName)
 
     if (options.notifiableId) query = query.where('notifiable_id', options.notifiableId)
     if (options.tenantId) query = query.where('tenant_id', options.tenantId)
@@ -125,7 +135,7 @@ class KnexAdapter implements DatabaseAdapter {
   }
 
   async getPreferences(options: GetPreferencesParams): Promise<RawPreferenceRow[]> {
-    const results = await this.#connection
+    const results = await this.#getConnection()
       .table(this.#preferencesTableName)
       .where('user_id', options.notifiableId)
       .andWhere((builder) => {
@@ -149,7 +159,7 @@ class KnexAdapter implements DatabaseAdapter {
   }
 
   async updatePreferences(options: UpdatePreferencesParams): Promise<void> {
-    await this.#connection.transaction(async (trx) => {
+    await this.#getConnection().transaction(async (trx) => {
       // Check if preference already exists
       const existing = await trx
         .table(this.#preferencesTableName)

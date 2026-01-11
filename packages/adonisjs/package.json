@@ -18,9 +18,9 @@
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": "./src/index.ts",
     "./channels/aws-sns": "./src/channels/aws-sns.ts",
@@ -35,31 +35,31 @@
     "./channels/webhook": "./src/channels/webhook.ts",
     "./channels/webpush": "./src/channels/webpush.ts",
     "./database": "./src/database/index.ts",
+    "./facteur_provider": "./src/providers/facteur_provider.ts",
     "./services/main": "./src/services/main.ts",
     "./types": "./src/types.ts",
-    "./package.json": "./package.json",
-    "./facteur_provider": "./dist/providers/facteur_provider.js"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
     "exports": {
-      ".": "./dist/index.js",
-      "./channels/aws-sns": "./dist/channels/aws-sns.js",
-      "./channels/database": "./dist/channels/database.js",
-      "./channels/discord": "./dist/channels/discord.js",
-      "./channels/expo": "./dist/channels/expo.js",
-      "./channels/fcm": "./dist/channels/fcm.js",
-      "./channels/slack": "./dist/channels/slack.js",
-      "./channels/socketio": "./dist/channels/socketio.js",
-      "./channels/transmit": "./dist/channels/transmit.js",
-      "./channels/twilio": "./dist/channels/twilio.js",
-      "./channels/webhook": "./dist/channels/webhook.js",
-      "./channels/webpush": "./dist/channels/webpush.js",
-      "./database": "./dist/database/index.js",
-      "./services/main": "./dist/services/main.js",
-      "./types": "./dist/types.js",
-      "./package.json": "./package.json",
-      "./facteur_provider": "./dist/providers/facteur_provider.js"
+      ".": "./dist/index.mjs",
+      "./channels/aws-sns": "./dist/channels/aws-sns.mjs",
+      "./channels/database": "./dist/channels/database.mjs",
+      "./channels/discord": "./dist/channels/discord.mjs",
+      "./channels/expo": "./dist/channels/expo.mjs",
+      "./channels/fcm": "./dist/channels/fcm.mjs",
+      "./channels/slack": "./dist/channels/slack.mjs",
+      "./channels/socketio": "./dist/channels/socketio.mjs",
+      "./channels/transmit": "./dist/channels/transmit.mjs",
+      "./channels/twilio": "./dist/channels/twilio.mjs",
+      "./channels/webhook": "./dist/channels/webhook.mjs",
+      "./channels/webpush": "./dist/channels/webpush.mjs",
+      "./database": "./dist/database.mjs",
+      "./facteur_provider": "./dist/facteur_provider.mjs",
+      "./services/main": "./dist/services/main.mjs",
+      "./types": "./dist/types.mjs",
+      "./package.json": "./package.json"
     }
   },
   "scripts": {
@@ -75,18 +75,22 @@
     "@poppinss/exception": "catalog:"
   },
   "devDependencies": {
-    "@adonisjs/core": "^7.0.0-next.16",
-    "@adonisjs/lucid": "^22.0.0-next.1",
-    "@adonisjs/mail": "^10.0.0-next.1",
+    "@adonisjs/core": "^7.0.0-next.23",
+    "@adonisjs/tsconfig": "catalog:",
+    "@adonisjs/lucid": "^22.0.0-next.5",
+    "@adonisjs/mail": "catalog:",
     "@adonisjs/redis": "^10.0.0-next.2",
     "@adonisjs/transmit": "^2.0.0-1"
   },
   "peerDependencies": {
-    "@adonisjs/core": "^7.0.0-next.16",
-    "@adonisjs/lucid": "^22.0.0-next.1",
+    "@adonisjs/core": "^7.0.0-next.23",
+    "@adonisjs/lucid": "^22.0.0-next.5",
     "@adonisjs/mail": "^10.0.0-next.1",
     "@adonisjs/redis": "^10.0.0-next.2",
     "@adonisjs/transmit": "^2.0.0-1"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   },
   "peerDependenciesMeta": {
     "@adonisjs/lucid": {

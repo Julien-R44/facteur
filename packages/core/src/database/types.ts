@@ -91,7 +91,7 @@ export interface KyselyConfig extends DatabaseAdapterCommonOptions {
  * Options accepted by the Knex adapter
  */
 export interface KnexConfig extends DatabaseAdapterCommonOptions {
-  connection: Knex
+  connection: Knex | (() => Knex)
 }
 
 export interface GetPreferencesParams {

@@ -1,5 +1,3 @@
-import type { DatabaseAdapter } from './database/types.js'
-
 import type {
   FacteurConfiguration,
   Channel,
@@ -8,16 +6,18 @@ import type {
   Notification,
 } from './types/index.js'
 import type { BuilderOptions, NotificationBuilder } from './types/builder.js'
+import type { DatabaseAdapter } from './database/types.js'
+
 import { collect, isAsyncIterable } from './utils/chunk.js'
 import { FacteurOptions } from './options.js'
+import { OrchestrationSender } from './notifications/orchestration_sender.js'
 import { NotificationSender } from './notifications/notification_sender.js'
 import { NotificationDiscoverer } from './notifications/notification_discoverer.js'
+import { createNotificationBuilder } from './notifications/notification_builder.js'
 import { ChannelResolver } from './notifications/channel_resolver.js'
+import { BatchingSender } from './notifications/batching_sender.js'
 import { FacteurFake } from './fake.js'
 import { FacteurDatabase } from './database/database.js'
-import { createNotificationBuilder } from './notifications/notification_builder.js'
-import { OrchestrationSender } from './notifications/orchestration_sender.js'
-import { BatchingSender } from './notifications/batching_sender.js'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
   return new Facteur(config)

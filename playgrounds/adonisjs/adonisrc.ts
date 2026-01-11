@@ -1,4 +1,5 @@
 import { defineConfig } from '@adonisjs/core/app'
+import { indexEntities } from '@adonisjs/core'
 
 export default defineConfig({
   /*
@@ -104,8 +105,22 @@ export default defineConfig({
     },
   ],
 
-  assetsBundler: false,
   hooks: {
-    onBuildStarting: [() => import('@adonisjs/vite/build_hook')],
+    init: [
+      indexEntities({
+        transformers: {
+          enabled: true,
+          source: './app',
+          glob: ['**/*_transformer.ts'],
+          importAlias: '#app',
+        },
+        controllers: {
+          enabled: true,
+          source: './app',
+          glob: ['**/*_controller.ts'],
+          importAlias: '#app',
+        },
+      }),
+    ],
   },
 })
