@@ -9,6 +9,6 @@
     "@facteurjs/hono": "2.0.0-beta.0"
   },
   "changesets": [
-    "fix-stubs-path"
+    "fix-stubs-to-attribute"
   ]
 }

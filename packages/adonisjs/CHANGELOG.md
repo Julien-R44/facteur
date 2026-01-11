@@ -1,5 +1,11 @@
 # @facteurjs/adonisjs
 
+## 2.0.0-beta.2
+
+### Patch Changes
+
+- Add missing "to" attribute in config/notifications.stub frontmatter
+
 ## 2.0.0-beta.1
 
 ### Patch Changes
