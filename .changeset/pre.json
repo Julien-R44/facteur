@@ -9,6 +9,7 @@
     "@facteurjs/hono": "2.0.0-beta.0"
   },
   "changesets": [
-    "fix-stubs-to-attribute"
+    "fix-stubs-to-attribute",
+    "legal-lamps-worry"
   ]
 }

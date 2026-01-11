@@ -1,5 +1,11 @@
 # @facteurjs/adonisjs
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- Fix TypeScript error where `kTargetSymbol` was missing from `MailChannel` type declarations due to bundler not correctly handling re-exports
+
 ## 2.0.0-beta.2
 
 ### Patch Changes

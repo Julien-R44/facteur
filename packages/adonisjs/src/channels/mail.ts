@@ -3,7 +3,7 @@ import type { MailService } from '@adonisjs/mail/types'
 import { errors } from '@facteurjs/core'
 import { Message, BaseMail } from '@adonisjs/mail'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types.ts'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '@facteurjs/core/types'
 
 export interface MailConfig {
   mailer: MailService
