@@ -38,7 +38,7 @@ export async function configure(command: ConfigureCommand) {
 
   await addSubpathImport(command)
 
-  await codemods.makeUsingStub(stubsRoot, 'migration.stub', {
+  await codemods.makeUsingStub(stubsRoot, 'migrations/notifications.stub', {
     entity: command.app.generators.createEntity('notifications'),
     migration: {
       folder: 'database/migrations',
