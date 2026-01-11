@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/hono",
-  "version": "1.0.0-beta.4",
+  "version": "2.0.0-beta.0",
   "description": "Hono integration for Facteur - Send notifications via multiple channels in your Hono application",
   "keywords": [
     "cloudflare-workers",
@@ -35,7 +35,8 @@
     }
   },
   "scripts": {
-    "//build": "tsdown",
+    "prepublishOnly": "pnpm build",
+    "build": "tsdown",
     "stub": "tsdown",
     "test": "tsx tests/index.ts",
     "typecheck": "tsc --noEmit",

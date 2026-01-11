@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/react",
-  "version": "1.0.0-beta.4",
+  "version": "2.0.0-beta.0",
   "description": "React hooks and components for Facteur - Build notification centers in your React application",
   "keywords": [
     "hooks",
@@ -34,6 +34,7 @@
     }
   },
   "scripts": {
+    "prepublishOnly": "pnpm build",
     "build": "tsdown",
     "stub": "tsdown",
     "test": "tsx tests/index.ts",

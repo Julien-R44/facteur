@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/client",
-  "version": "1.0.0-beta.4",
+  "version": "2.0.0-beta.0",
   "description": "JavaScript client for Facteur - Fetch and manage notifications from your frontend application",
   "keywords": [
     "frontend",
@@ -33,6 +33,7 @@
     }
   },
   "scripts": {
+    "prepublishOnly": "pnpm build",
     "build": "tsdown",
     "stub": "tsdown",
     "test": "tsx tests/index.ts",

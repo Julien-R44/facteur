@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/adonisjs",
-  "version": "1.0.0-beta.4",
+  "version": "2.0.0-beta.0",
   "description": "AdonisJS integration for Facteur - Send notifications via multiple channels in your AdonisJS application",
   "keywords": [
     "adonis",
@@ -63,6 +63,7 @@
     }
   },
   "scripts": {
+    "prepublishOnly": "pnpm build",
     "build": "tsdown",
     "stub": "tsdown",
     "test": "tsx tests/index.ts",
