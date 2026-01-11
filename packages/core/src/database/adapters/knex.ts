@@ -12,7 +12,7 @@ import type {
   GetPreferencesParams,
   RawPreferenceRow,
   UpdatePreferencesParams,
-} from '../types.js'
+} from '../types.ts'
 
 export function knexAdapter(config: KnexConfig): DatabaseAdapter {
   return new KnexAdapter(config)

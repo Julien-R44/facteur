@@ -6,9 +6,9 @@ import type {
   GetPreferencesParams,
   Preferences,
   UpdatePreferencesParams,
-} from './types.js'
-import type { FacteurOptions } from '../options.js'
-import type { NotificationDiscoverer } from '../notifications/notification_discoverer.js'
+} from './types.ts'
+import type { FacteurOptions } from '../options.ts'
+import type { NotificationDiscoverer } from '../notifications/notification_discoverer.ts'
 
 export class FacteurDatabase {
   constructor(

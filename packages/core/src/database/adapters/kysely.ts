@@ -12,7 +12,7 @@ import type {
   GetPreferencesParams,
   RawPreferenceRow,
   UpdatePreferencesParams,
-} from '../types.js'
+} from '../types.ts'
 
 export function kyselyAdapter(config: KyselyConfig): DatabaseAdapter {
   return new KyselyAdapter(config)

@@ -1,2 +1,2 @@
-export { ExpoMessage } from './message.js'
-export { expoChannel, ExpoChannel } from './channel.js'
+export { ExpoMessage } from './message.ts'
+export { expoChannel, ExpoChannel } from './channel.ts'

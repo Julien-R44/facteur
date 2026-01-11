@@ -2,7 +2,7 @@ import type { NotificationFilter } from '@facteurjs/client/types'
 
 import { queryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
-import { useFacteur, type TypedFacteurClient } from './index.js'
+import { useFacteur, type TypedFacteurClient } from './index.tsx'
 
 interface UseNotificationsOptions extends NotificationFilter {}
 

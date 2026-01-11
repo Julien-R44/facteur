@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
-import { listNotificationsQueryOptions } from '../src/use_notifications.js'
-import { listPreferencesQueryOptions } from '../src/use_preferences.js'
+import { listNotificationsQueryOptions } from '../src/use_notifications.ts'
+import { listPreferencesQueryOptions } from '../src/use_preferences.ts'
 
 function createMockClient(notifiableId: string) {
   return {

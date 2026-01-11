@@ -1,4 +1,4 @@
-import type { WebhookOptions, WebhookTargets } from '../webhook/types.js'
+import type { WebhookOptions, WebhookTargets } from '../webhook/types.ts'
 
 export type DiscordOptions<WebhooksNames extends string> = WebhookOptions<WebhooksNames>
 export type DiscordTargets<Options extends DiscordOptions<any>> = WebhookTargets<Options>

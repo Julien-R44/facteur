@@ -1,15 +1,15 @@
 import type { Duration } from '@julr/tenace/types'
 
-import type { NotificationClass, NotificationSendResult } from './notifications.js'
+import type { NotificationClass, NotificationSendResult } from './notifications.ts'
 import type {
   BulkSendOptions,
   ChannelSpecificConfig,
   ExtractParams,
   ExtractNotifiable,
   RetryOptions,
-} from './options.js'
-import type { Identifier } from '../database/types.js'
-import type { ChannelName } from './extend.js'
+} from './options.ts'
+import type { Identifier } from '../database/types.ts'
+import type { ChannelName } from './extend.ts'
 
 /**
  * Helper type to check if params are required for a notification

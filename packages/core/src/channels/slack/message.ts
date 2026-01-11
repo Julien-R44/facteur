@@ -1,4 +1,4 @@
-import { WebhookMessage } from '../webhook/message.js'
+import { WebhookMessage } from '../webhook/message.ts'
 
 export class SlackMessage extends WebhookMessage {
   #text = ''

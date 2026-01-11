@@ -1,4 +1,4 @@
-import type { facteurEvents } from '../events/events.js'
+import type { facteurEvents } from '../events/events.ts'
 
 /**
  * Shape of the emitter accepted by facteur

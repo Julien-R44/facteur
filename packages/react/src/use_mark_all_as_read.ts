@@ -1,6 +1,6 @@
 import { useMutation, mutationOptions, useQueryClient } from '@tanstack/react-query'
 
-import { useFacteur, type TypedFacteurClient } from './index.js'
+import { useFacteur, type TypedFacteurClient } from './index.tsx'
 
 interface UseMarkAllAsReadOptions {
   tenantId?: string

@@ -1,4 +1,4 @@
-import type { Channel } from './channel.js'
+import type { Channel } from './channel.ts'
 
 type ChannelPreferences<KnownChannels extends Record<string, Channel>> = Record<
   keyof KnownChannels,

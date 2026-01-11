@@ -4,20 +4,20 @@ import type {
   NotificationSendResult,
   NotificationClass,
   Notification,
-} from './types/index.js'
-import type { BuilderOptions, NotificationBuilder } from './types/builder.js'
-import type { DatabaseAdapter } from './database/types.js'
+} from './types/index.ts'
+import type { BuilderOptions, NotificationBuilder } from './types/builder.ts'
+import type { DatabaseAdapter } from './database/types.ts'
 
-import { collect, isAsyncIterable } from './utils/chunk.js'
-import { FacteurOptions } from './options.js'
-import { OrchestrationSender } from './notifications/orchestration_sender.js'
-import { NotificationSender } from './notifications/notification_sender.js'
-import { NotificationDiscoverer } from './notifications/notification_discoverer.js'
-import { createNotificationBuilder } from './notifications/notification_builder.js'
-import { ChannelResolver } from './notifications/channel_resolver.js'
-import { BatchingSender } from './notifications/batching_sender.js'
-import { FacteurFake } from './fake.js'
-import { FacteurDatabase } from './database/database.js'
+import { collect, isAsyncIterable } from './utils/chunk.ts'
+import { FacteurOptions } from './options.ts'
+import { OrchestrationSender } from './notifications/orchestration_sender.ts'
+import { NotificationSender } from './notifications/notification_sender.ts'
+import { NotificationDiscoverer } from './notifications/notification_discoverer.ts'
+import { createNotificationBuilder } from './notifications/notification_builder.ts'
+import { ChannelResolver } from './notifications/channel_resolver.ts'
+import { BatchingSender } from './notifications/batching_sender.ts'
+import { FacteurFake } from './fake.ts'
+import { FacteurDatabase } from './database/database.ts'
 
 export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
   return new Facteur(config)

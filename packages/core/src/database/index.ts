@@ -1,2 +1,2 @@
-export { DatabaseMessage } from './message.js'
-export { databaseChannel, DatabaseChannel } from './channel.js'
+export { DatabaseMessage } from './message.ts'
+export { databaseChannel, DatabaseChannel } from './channel.ts'

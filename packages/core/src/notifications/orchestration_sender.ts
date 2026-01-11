@@ -2,10 +2,10 @@ import type { Duration } from '@julr/tenace/types'
 
 import { backoff, Tenace } from '@julr/tenace'
 
-import type { BuilderOptions, NotificationSendResult } from '../types/index.js'
-import type { SenderInput, PrepareNotificationFn } from '../types/senders.js'
-import type { NotificationSender } from './notification_sender.js'
-import { chunk } from '../utils/chunk.js'
+import type { BuilderOptions, NotificationSendResult } from '../types/index.ts'
+import type { SenderInput, PrepareNotificationFn } from '../types/senders.ts'
+import type { NotificationSender } from './notification_sender.ts'
+import { chunk } from '../utils/chunk.ts'
 
 /**
  * Handles bulk notification sending using orchestration mode.

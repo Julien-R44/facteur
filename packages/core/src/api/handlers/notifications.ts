@@ -1,5 +1,5 @@
-import { checkAuthorization, parseJsonSafe, UNAUTHORIZED_RESPONSE } from './utils.js'
-import { defineRoute } from '../index.js'
+import { checkAuthorization, parseJsonSafe, UNAUTHORIZED_RESPONSE } from './utils.ts'
+import { defineRoute } from '../index.ts'
 
 /**
  * Get all notifications for a given user

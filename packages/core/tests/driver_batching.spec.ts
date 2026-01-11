@@ -8,8 +8,8 @@ import {
   type Channel,
   type ChannelSendParams,
   type BatchSendResult,
-} from '../src/types/index.js'
-import { Facteur } from '../src/facteur.js'
+} from '../src/types/index.ts'
+import { Facteur } from '../src/facteur.ts'
 
 type TestUser = { id: string; email: string } & Notifiable
 

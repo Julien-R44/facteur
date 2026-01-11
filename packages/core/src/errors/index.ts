@@ -1,6 +1,6 @@
 import { createError } from '@poppinss/exception'
 
-import { E_DUPLICATE_NOTIFICATION } from './duplicate_notification_exception.js'
+import { E_DUPLICATE_NOTIFICATION } from './duplicate_notification_exception.ts'
 
 /**
  * Thrown when the notification targets for a channel cannot be determined

@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 
-import { FacteurOptions } from '../src/options.js'
+import { FacteurOptions } from '../src/options.ts'
 
 test.group('Options', () => {
   test('Correctly resolve default preferences', ({ assert }) => {

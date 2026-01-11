@@ -2,18 +2,18 @@ import type { Duration } from '@julr/tenace/types'
 
 import { backoff, Tenace } from '@julr/tenace'
 
-import type { Identifier } from '../database/types.js'
-import type { BuilderOptions, ChannelName, ChannelSendResult, NotificationSendResult } from '../types/index.js'
+import type { Identifier } from '../database/types.ts'
+import type { BuilderOptions, ChannelName, ChannelSendResult, NotificationSendResult } from '../types/index.ts'
 import type {
   SenderInput,
   PreparedRecipient,
   PrepareNotificationFn,
   PrepareRecipientsOptions,
   SendBatchesOptions,
-} from '../types/senders.js'
-import type { NotificationSender, PreparedMessage } from './notification_sender.js'
-import type { ChannelResolver } from './channel_resolver.js'
-import { chunk } from '../utils/chunk.js'
+} from '../types/senders.ts'
+import type { NotificationSender, PreparedMessage } from './notification_sender.ts'
+import type { ChannelResolver } from './channel_resolver.ts'
+import { chunk } from '../utils/chunk.ts'
 
 /**
  * Handles bulk notification sending using driver batching mode.

@@ -1,1 +1,1 @@
-export { FacteurClient, createFacteurClient } from './client.js'
+export { FacteurClient, createFacteurClient } from './client.ts'

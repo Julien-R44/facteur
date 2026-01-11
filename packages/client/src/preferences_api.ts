@@ -1,6 +1,6 @@
 import type { KyInstance } from 'ky'
 
-import type { PreferencesData, UpdatePreferencesOptions } from './types.js'
+import type { PreferencesData, UpdatePreferencesOptions } from './types.ts'
 
 export class PreferencesApi {
   #client: KyInstance

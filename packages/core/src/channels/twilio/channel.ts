@@ -1,10 +1,10 @@
 import Twilio from 'twilio'
 
-import type { TwilioConfig, TwilioTargets } from './types.js'
-import type { TwilioMessage } from './message.js'
+import type { TwilioConfig, TwilioTargets } from './types.ts'
+import type { TwilioMessage } from './message.ts'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-import { errors } from '../../errors/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.ts'
+import { errors } from '../../errors/index.ts'
 
 export function twilioChannel(config: TwilioConfig) {
   return new TwilioChannel(config)

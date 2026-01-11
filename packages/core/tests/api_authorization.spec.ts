@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 
-import { createFacteurWithDb, createMockRequest } from './helpers/index.js'
-import { routes } from '../src/api/index.js'
+import { createFacteurWithDb, createMockRequest } from './helpers/index.ts'
+import { routes } from '../src/api/index.ts'
 
 test.group('API Authorization | getPreferencesRoute', () => {
   test('should return 403 when authorization fails', async ({ assert }) => {

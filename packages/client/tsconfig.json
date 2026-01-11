@@ -1,6 +1,7 @@
 {
   "extends": "@julr/tooling-configs/tsconfigs/tsconfig.node",
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rewriteRelativeImportExtensions": true
   }
 }

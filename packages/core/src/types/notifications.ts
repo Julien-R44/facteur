@@ -2,9 +2,9 @@
 
 import type { Awaitable } from '@julr/utils/types'
 
-import type { ExtractChannelTargets, MessageCtx, NotificationOptions } from './options.js'
-import type { ChannelName, NotificationChannels } from './index.js'
-import type { Identifier } from '../database/types.js'
+import type { ExtractChannelTargets, MessageCtx, NotificationOptions } from './options.ts'
+import type { ChannelName, NotificationChannels } from './index.ts'
+import type { Identifier } from '../database/types.ts'
 
 /**
  * Constructor type for notification classes

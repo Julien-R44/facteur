@@ -2,7 +2,8 @@
   "extends": "@adonisjs/tsconfig/tsconfig.package.json",
   "compilerOptions": {
     "outDir": "./build",
-    "stripInternal": true
+    "stripInternal": true,
+    "rewriteRelativeImportExtensions": true
   },
   "exclude": ["dist", "build"]
 }

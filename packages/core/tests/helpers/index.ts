@@ -4,17 +4,17 @@ import type {
   DatabaseAdapter,
   GetPreferencesParams,
   Preferences,
-} from '../../src/database/types.js'
-import type { HTTPRequest } from '../../src/api/types.js'
+} from '../../src/database/types.ts'
+import type { HTTPRequest } from '../../src/api/types.ts'
 
 import {
   kTargetSymbol,
   Notification,
   type Channel,
   type ChannelSendParams,
-} from '../../src/types/index.js'
-import { Facteur } from '../../src/facteur.js'
-import { FacteurDatabase } from '../../src/database/database.js'
+} from '../../src/types/index.ts'
+import { Facteur } from '../../src/facteur.ts'
+import { FacteurDatabase } from '../../src/database/database.ts'
 
 class TestProvider implements Channel<any, any, any, any> {
   name = 'test' as const;

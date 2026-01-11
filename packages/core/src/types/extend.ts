@@ -1,5 +1,5 @@
-import type { FacteurConfiguration } from './options.js'
-import type { Facteur } from '../facteur.js'
+import type { FacteurConfiguration } from './options.ts'
+import type { Facteur } from '../facteur.ts'
 
 /**
  * List of available channels

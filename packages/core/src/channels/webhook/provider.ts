@@ -1,12 +1,12 @@
 import ky, { HTTPError } from 'ky'
 
-import type { WebhookOptions, WebhookTargets } from './types.js'
-import type { WebhookMessage } from './message.js'
+import type { WebhookOptions, WebhookTargets } from './types.ts'
+import type { WebhookMessage } from './message.ts'
 
-import { WebhookRequestException } from './exceptions.js'
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-import { errors } from '../../errors/index.js'
-import { HTTPErrorExtractor } from '../../errors/http_error.js'
+import { WebhookRequestException } from './exceptions.ts'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.ts'
+import { errors } from '../../errors/index.ts'
+import { HTTPErrorExtractor } from '../../errors/http_error.ts'
 
 export function webhookChannel<Options extends WebhookOptions<any>>(
   options: Options & { name: string },

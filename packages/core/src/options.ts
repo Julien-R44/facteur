@@ -11,10 +11,10 @@ import type {
   ResolvedDefaultPreferences,
   NotificationResolver,
   RetryConfig,
-} from './types/index.js'
-import type { DatabaseAdapter } from './database/types.js'
+} from './types/index.ts'
+import type { DatabaseAdapter } from './database/types.ts'
 
-import { errors } from './errors/index.js'
+import { errors } from './errors/index.ts'
 
 export class FacteurOptions<
   KnownChannels extends Record<string, Channel>,

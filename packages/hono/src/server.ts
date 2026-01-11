@@ -3,9 +3,9 @@ import type { Facteur } from '@facteurjs/core'
 
 import { createFacteurServer } from '@facteurjs/core/api'
 
-import type { HonoAuthorizationCallback } from './types.js'
+import type { HonoAuthorizationCallback } from './types.ts'
 
-import { HonoServerAdapter } from './adapter.js'
+import { HonoServerAdapter } from './adapter.ts'
 
 export interface CreateHonoFacteurServerOptions {
   app: Hono

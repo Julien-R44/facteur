@@ -1,2 +1,2 @@
-export { TransmitMessage } from './message.js'
-export { transmitChannel, TransmitChannel } from './channel.js'
+export { TransmitMessage } from './message.ts'
+export { transmitChannel, TransmitChannel } from './channel.ts'

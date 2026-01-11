@@ -1,9 +1,9 @@
 import type { FacteurEvents } from '@facteurjs/core/types'
 import type { ApplicationService } from '@adonisjs/core/types'
 
-import type { defineConfig } from '../define_config.js'
+import type { defineConfig } from '../define_config.ts'
 
-import { NotificationManager } from '../manager.js'
+import { NotificationManager } from '../manager.ts'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {

@@ -1,2 +1,2 @@
-export { AwsSnsMessage } from './message.js'
-export { awsSnsChannel, AwsSnsChannel } from './channel.js'
+export { AwsSnsMessage } from './message.ts'
+export { awsSnsChannel, AwsSnsChannel } from './channel.ts'

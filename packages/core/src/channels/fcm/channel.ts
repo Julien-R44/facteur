@@ -1,8 +1,8 @@
 import { getMessaging, Messaging } from 'firebase-admin/messaging'
 import { initializeApp, cert } from 'firebase-admin/app'
 
-import type { FcmConfig, FcmTargets } from './types.js'
-import type { FcmMessage } from './message.js'
+import type { FcmConfig, FcmTargets } from './types.ts'
+import type { FcmMessage } from './message.ts'
 
 import {
   kTargetSymbol,
@@ -10,8 +10,8 @@ import {
   type BatchSendResult,
   type Channel,
   type ChannelSendParams,
-} from '../../types/index.js'
-import { errors } from '../../errors/index.js'
+} from '../../types/index.ts'
+import { errors } from '../../errors/index.ts'
 
 export function fcmChannel(config: FcmConfig) {
   return new FcmChannel(config)

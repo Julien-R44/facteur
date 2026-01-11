@@ -1,8 +1,8 @@
-import type { TransmitConfig, TransmitTargets } from './types.js'
-import type { TransmitMessage } from './message.js'
+import type { TransmitConfig, TransmitTargets } from './types.ts'
+import type { TransmitMessage } from './message.ts'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-import { errors } from '../../errors/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.ts'
+import { errors } from '../../errors/index.ts'
 
 export function transmitChannel(config: TransmitConfig) {
   return new TransmitChannel(config)

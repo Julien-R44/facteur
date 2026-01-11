@@ -1,9 +1,9 @@
-import type { DiscordResponse } from './types.js'
-import type { DiscordMessage } from './message.js'
-import type { WebhookOptions, WebhookTargets } from '../webhook/types.js'
-import type { Channel } from '../../types/index.js'
+import type { DiscordResponse } from './types.ts'
+import type { DiscordMessage } from './message.ts'
+import type { WebhookOptions, WebhookTargets } from '../webhook/types.ts'
+import type { Channel } from '../../types/index.ts'
 
-import { WebhookChannel } from '../webhook/provider.js'
+import { WebhookChannel } from '../webhook/provider.ts'
 
 export function discordWebhookChannel<Options extends WebhookOptions<any>>(options: Options) {
   return new DiscordProvider({ name: 'discord', ...options })

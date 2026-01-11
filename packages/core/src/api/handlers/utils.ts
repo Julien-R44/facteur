@@ -1,5 +1,5 @@
-import type { HTTPRequest, HTTPResponse } from '../types.js'
-import type { DefineRouteOptions } from '../index.js'
+import type { HTTPRequest, HTTPResponse } from '../types.ts'
+import type { DefineRouteOptions } from '../index.ts'
 
 export const UNAUTHORIZED_RESPONSE: HTTPResponse = { status: 403, body: { error: 'Unauthorized' } }
 

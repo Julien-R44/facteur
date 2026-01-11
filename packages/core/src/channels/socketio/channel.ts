@@ -1,10 +1,10 @@
 import type { Server as SocketIOServer } from 'socket.io'
 
-import type { SocketIOConfig, SocketIOTargets } from './types.js'
-import type { SocketIoMessage } from './message.js'
+import type { SocketIOConfig, SocketIOTargets } from './types.ts'
+import type { SocketIoMessage } from './message.ts'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-import { errors } from '../../errors/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.ts'
+import { errors } from '../../errors/index.ts'
 
 export function socketIoChannel(config: SocketIOConfig) {
   return new SocketIOChannel(config)

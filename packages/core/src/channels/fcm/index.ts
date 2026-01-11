@@ -1,2 +1,2 @@
-export { FcmMessage } from './message.js'
-export { fcmChannel, FcmChannel } from './channel.js'
+export { FcmMessage } from './message.ts'
+export { fcmChannel, FcmChannel } from './channel.ts'

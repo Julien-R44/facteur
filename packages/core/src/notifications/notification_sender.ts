@@ -11,17 +11,17 @@ import type {
   ChannelSendParams,
   BatchSendResult,
   InternalSendOptions,
-} from '../types/index.js'
-import type { Identifier } from '../database/types.js'
+} from '../types/index.ts'
+import type { Identifier } from '../database/types.ts'
 
 import { backoff, Tenace } from '@julr/tenace'
 
-import { ChannelResolver, type ResolvedChannel } from './channel_resolver.js'
-import { capitalizeFirstLetter } from '../helpers.js'
-import { facteurEvents } from '../events/events.js'
-import { errors } from '../errors/index.js'
-import { chunk } from '../utils/chunk.js'
-import debug from '../debug.js'
+import { ChannelResolver, type ResolvedChannel } from './channel_resolver.ts'
+import { capitalizeFirstLetter } from '../helpers.ts'
+import { facteurEvents } from '../events/events.ts'
+import { errors } from '../errors/index.ts'
+import { chunk } from '../utils/chunk.ts'
+import debug from '../debug.ts'
 
 export interface PreparedMessage {
   channelName: string

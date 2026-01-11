@@ -1,10 +1,10 @@
-import type { DatabaseAdapter, DatabaseConfig, Identifier } from './types.js'
-import type { DatabaseMessage } from './message.js'
+import type { DatabaseAdapter, DatabaseConfig, Identifier } from './types.ts'
+import type { DatabaseMessage } from './message.ts'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types/index.js'
-import { errors } from '../errors/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../types/index.ts'
+import { errors } from '../errors/index.ts'
 
-export { DatabaseMessage } from './message.js'
+export { DatabaseMessage } from './message.ts'
 
 export function databaseChannel(options: DatabaseConfig) {
   return new DatabaseChannel(options)

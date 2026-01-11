@@ -1,9 +1,9 @@
 import { test } from '@japa/runner'
 
-import { FakeNotification, testProvider } from './helpers/index.js'
-import { Notification, type Notifiable } from '../src/types/notifications.js'
-import { errors } from '../src/index.js'
-import { Facteur } from '../src/facteur.js'
+import { FakeNotification, testProvider } from './helpers/index.ts'
+import { Notification, type Notifiable } from '../src/types/notifications.ts'
+import { errors } from '../src/index.ts'
+import { Facteur } from '../src/facteur.ts'
 
 type TestUser = { id: string; email: string } & Notifiable
 

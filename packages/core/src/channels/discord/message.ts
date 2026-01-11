@@ -3,9 +3,9 @@ import type {
   DiscordEmbedField,
   DiscordEmbedFooter,
   HexadecimalColor,
-} from './types.js'
+} from './types.ts'
 
-import { WebhookMessage } from '../webhook/message.js'
+import { WebhookMessage } from '../webhook/message.ts'
 
 export class DiscordMessage extends WebhookMessage {
   #body = ''

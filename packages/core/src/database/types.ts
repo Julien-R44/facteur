@@ -1,7 +1,7 @@
 import type { Kysely } from 'kysely'
 import type { Knex } from 'knex'
 
-import type { ChannelName } from '../types/index.js'
+import type { ChannelName } from '../types/index.ts'
 
 export type NotificationStatus = 'read' | 'seen' | 'unread' | 'unseen'
 export type Identifier = string | number

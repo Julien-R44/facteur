@@ -1,17 +1,17 @@
 import type { Duration } from '@julr/tenace/types'
 
-import type { NotificationClass, NotificationSendResult } from '../types/notifications.js'
+import type { NotificationClass, NotificationSendResult } from '../types/notifications.ts'
 import type {
   ExtractParams,
   ExtractNotifiable,
   ChannelSpecificConfig,
-} from '../types/options.js'
-import type { Identifier } from '../database/types.js'
+} from '../types/options.ts'
+import type { Identifier } from '../database/types.ts'
 import type {
   BuilderOptions,
   BuilderState,
   NotificationBuilder as NotificationBuilderType,
-} from '../types/builder.js'
+} from '../types/builder.ts'
 
 type SendFn = (options: BuilderOptions<any>) => Promise<NotificationSendResult>
 

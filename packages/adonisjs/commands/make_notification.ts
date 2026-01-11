@@ -4,7 +4,7 @@ import StringBuilder from '@poppinss/utils/string_builder'
 import string from '@poppinss/utils/string'
 import { BaseCommand, args } from '@adonisjs/core/ace'
 
-import { stubsRoot } from '../stubs/index.js'
+import { stubsRoot } from '../stubs/index.ts'
 
 export default class MakeNotification extends BaseCommand {
   static override commandName = 'make:notification'

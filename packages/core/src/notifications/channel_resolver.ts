@@ -7,9 +7,9 @@ import type {
   Notifiable,
   NotificationOptions,
   ChannelSpecificConfig,
-} from '../types/index.js'
-import type { Identifier } from '../database/types.js'
-import type { FacteurDatabase } from '../database/database.js'
+} from '../types/index.ts'
+import type { Identifier } from '../database/types.ts'
+import type { FacteurDatabase } from '../database/database.ts'
 
 export interface ResolveChannelsOptions {
   notification: new (...args: any[]) => Notification<any, any>

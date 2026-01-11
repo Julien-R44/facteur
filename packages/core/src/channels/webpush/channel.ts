@@ -1,10 +1,10 @@
 import webpush from 'web-push'
 
-import type { WebpushConfig, WebpushTargets } from './types.js'
-import type { WebpushMessage } from './message.js'
+import type { WebpushConfig, WebpushTargets } from './types.ts'
+import type { WebpushMessage } from './message.ts'
 
-import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.js'
-import { errors } from '../../errors/index.js'
+import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.ts'
+import { errors } from '../../errors/index.ts'
 
 export function webpushChannel(config: WebpushConfig) {
   return new WebpushChannel(config)

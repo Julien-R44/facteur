@@ -5,7 +5,7 @@ import type {
   NotificationsList,
   MarkAsOptions,
   MarkAllAsOptions,
-} from './types.js'
+} from './types.ts'
 
 export class NotificationsApi<DatabaseContent> {
   #client: KyInstance

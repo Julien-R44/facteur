@@ -15,16 +15,16 @@ import { RuntimeException } from '@adonisjs/core/exceptions'
 /// <reference types="@adonisjs/mail/mail_provider" />
 import { configProvider } from '@adonisjs/core'
 
-import type { WebpushChannel } from './channels/webpush.js'
-import type { TwilioChannel } from './channels/twilio.js'
-import type { TransmitChannel } from './channels/transmit.js'
-import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.js'
-import type { MailChannel } from './channels/mail.js'
-import type { FcmChannel } from './channels/fcm.js'
-import type { DiscordProvider } from './channels/discord.js'
-import type { DatabaseChannel } from './channels/database.js'
-import type { KyselyConfig } from './channels/database.js'
-import type { AwsSnsChannel, AwsSnsConfig } from './channels/aws-sns.js'
+import type { WebpushChannel } from './channels/webpush.ts'
+import type { TwilioChannel } from './channels/twilio.ts'
+import type { TransmitChannel } from './channels/transmit.ts'
+import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.ts'
+import type { MailChannel } from './channels/mail.ts'
+import type { FcmChannel } from './channels/fcm.ts'
+import type { DiscordProvider } from './channels/discord.ts'
+import type { DatabaseChannel } from './channels/database.ts'
+import type { KyselyConfig } from './channels/database.ts'
+import type { AwsSnsChannel, AwsSnsConfig } from './channels/aws-sns.ts'
 
 export interface DatabaseConfig {
   connectionName?: string

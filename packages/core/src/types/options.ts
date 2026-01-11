@@ -2,13 +2,13 @@ import type { Awaitable } from '@julr/utils/types'
 import type { Logger } from '@julr/utils/logger'
 import type { Duration } from '@julr/tenace/types'
 
-import type { QueueAdapter } from './queue.js'
-import type { DefaultPreferences } from './preferences.js'
-import type { Notifiable, Notification, NotificationClass } from './index.js'
-import type { ChannelName, NotificationChannels } from './extend.js'
-import type { Emitter } from './events.js'
-import type { Channel } from './channel.js'
-import type { DatabaseAdapter, Identifier } from '../database/types.js'
+import type { QueueAdapter } from './queue.ts'
+import type { DefaultPreferences } from './preferences.ts'
+import type { Notifiable, Notification, NotificationClass } from './index.ts'
+import type { ChannelName, NotificationChannels } from './extend.ts'
+import type { Emitter } from './events.ts'
+import type { Channel } from './channel.ts'
+import type { DatabaseAdapter, Identifier } from '../database/types.ts'
 
 /**
  * Type for values that can be a single item or an array of items

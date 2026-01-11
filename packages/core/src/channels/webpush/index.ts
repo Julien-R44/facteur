@@ -1,2 +1,2 @@
-export { WebpushMessage } from './message.js'
-export { webpushChannel, WebpushChannel } from './channel.js'
+export { WebpushMessage } from './message.ts'
+export { webpushChannel, WebpushChannel } from './channel.ts'

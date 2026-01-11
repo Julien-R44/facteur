@@ -1,8 +1,8 @@
-import type { Channel } from './types/channel.js'
+import type { Channel } from './types/channel.ts'
 
-export { errors } from './errors/index.js'
-export { createFacteur, Facteur } from './facteur.js'
-export * from './errors/index.js'
+export { errors } from './errors/index.ts'
+export { createFacteur, Facteur } from './facteur.ts'
+export * from './errors/index.ts'
 
 /**
  * Define a new provider

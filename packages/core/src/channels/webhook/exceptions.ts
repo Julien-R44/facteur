@@ -1,4 +1,4 @@
-import type { HTTPErrorInfo } from '../../errors/http_error.js'
+import type { HTTPErrorInfo } from '../../errors/http_error.ts'
 
 /**
  * Exception thrown when a webhook request fails

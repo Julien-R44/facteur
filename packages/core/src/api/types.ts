@@ -1,4 +1,4 @@
-import type { Identifier } from '../database/types.js'
+import type { Identifier } from '../database/types.ts'
 
 export type HTTPMethod = 'get' | 'post' | 'put' | 'patch'
 

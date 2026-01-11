@@ -2,8 +2,8 @@ import { fileURLToPath } from 'node:url'
 import { fsReadAll } from '@poppinss/utils/fs'
 import { isScriptFile } from '@poppinss/utils'
 
-import { Notification } from '../types/index.js'
-import { errors } from '../errors/index.js'
+import { Notification } from '../types/index.ts'
+import { errors } from '../errors/index.ts'
 
 export interface NotificationDiscovererConfig {
   /**

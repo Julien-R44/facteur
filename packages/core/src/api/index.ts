@@ -1,12 +1,12 @@
-import type { AuthorizationCallback, RouteDefinition, ServerAdapter } from './types.js'
-import type { Facteur } from '../facteur.js'
+import type { AuthorizationCallback, RouteDefinition, ServerAdapter } from './types.ts'
+import type { Facteur } from '../facteur.ts'
 
-import { getPreferencesRoute, updatePreferencesRoute } from './handlers/preferences.js'
+import { getPreferencesRoute, updatePreferencesRoute } from './handlers/preferences.ts'
 import {
   getNotificationRoute,
   markAllNotificationsAsRoute,
   markNotificationAsRoute,
-} from './handlers/notifications.js'
+} from './handlers/notifications.ts'
 
 export interface DefineRouteOptions {
   facteur: Facteur<any, any>
