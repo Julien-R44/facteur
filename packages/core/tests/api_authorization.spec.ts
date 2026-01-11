@@ -330,3 +330,90 @@ test.group('API Authorization | authorization is required', () => {
     )
   })
 })
+
+test.group('API Validation | updatePreferencesRoute', () => {
+  test('should reject non-boolean preference values', async ({ assert }) => {
+    const { facteur } = createFacteurWithDb()
+
+    const allRoutes = routes({ facteur, authorize: () => true })
+
+    const updatePreferencesRoute = allRoutes.find(
+      (r) =>
+        r.route === '/notifications/notifiable/:notifiableId/preferences' && r.method === 'post',
+    )!
+
+    const response = await updatePreferencesRoute.handler(
+      createMockRequest({
+        params: { notifiableId: 'user-123' },
+        body: { preferences: { email: 'yes' } },
+      }),
+    )
+
+    assert.equal(response.status, 400)
+    assert.deepEqual(response.body, {
+      error: 'Channel "email" preference must be a boolean, got string',
+    })
+  })
+
+  test('should reject array as preferences', async ({ assert }) => {
+    const { facteur } = createFacteurWithDb()
+
+    const allRoutes = routes({ facteur, authorize: () => true })
+
+    const updatePreferencesRoute = allRoutes.find(
+      (r) =>
+        r.route === '/notifications/notifiable/:notifiableId/preferences' && r.method === 'post',
+    )!
+
+    const response = await updatePreferencesRoute.handler(
+      createMockRequest({
+        params: { notifiableId: 'user-123' },
+        body: { preferences: [true, false] },
+      }),
+    )
+
+    assert.equal(response.status, 400)
+    assert.deepEqual(response.body, { error: 'Preferences must be an object' })
+  })
+
+  test('should reject null as preferences', async ({ assert }) => {
+    const { facteur } = createFacteurWithDb()
+
+    const allRoutes = routes({ facteur, authorize: () => true })
+
+    const updatePreferencesRoute = allRoutes.find(
+      (r) =>
+        r.route === '/notifications/notifiable/:notifiableId/preferences' && r.method === 'post',
+    )!
+
+    const response = await updatePreferencesRoute.handler(
+      createMockRequest({
+        params: { notifiableId: 'user-123' },
+        body: { preferences: null },
+      }),
+    )
+
+    assert.equal(response.status, 400)
+    assert.deepEqual(response.body, { error: 'Preferences are required' })
+  })
+
+  test('should accept valid boolean preferences', async ({ assert }) => {
+    const { facteur } = createFacteurWithDb()
+
+    const allRoutes = routes({ facteur, authorize: () => true })
+
+    const updatePreferencesRoute = allRoutes.find(
+      (r) =>
+        r.route === '/notifications/notifiable/:notifiableId/preferences' && r.method === 'post',
+    )!
+
+    const response = await updatePreferencesRoute.handler(
+      createMockRequest({
+        params: { notifiableId: 'user-123' },
+        body: { preferences: { email: true, sms: false } },
+      }),
+    )
+
+    assert.equal(response.status, 204)
+  })
+})

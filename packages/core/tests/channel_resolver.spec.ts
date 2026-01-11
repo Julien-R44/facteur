@@ -1,12 +1,28 @@
 import { test } from '@japa/runner'
 
 import { FakeDatabase } from './helpers/index.ts'
-import { Notification, type NotificationOptions } from '../src/types/index.ts'
+import { Notification, type NotificationOptions, type ResolvedDefaultPreferences } from '../src/types/index.ts'
 import { ChannelResolver } from '../src/notifications/channel_resolver.ts'
 
 class NotifA extends Notification<any> {
   static override options: NotificationOptions<any> = {
     name: 'FakeNotification',
+    deliverBy: { email: true, sms: true },
+  }
+}
+
+class CriticalNotif extends Notification<any> {
+  static override options: NotificationOptions<any> = {
+    name: 'CriticalNotification',
+    critical: true,
+    deliverBy: { email: true, sms: true },
+  }
+}
+
+class BillingNotif extends Notification<any> {
+  static override options: NotificationOptions<any> = {
+    name: 'BillingNotification',
+    category: 'billing',
     deliverBy: { email: true, sms: true },
   }
 }
@@ -310,6 +326,167 @@ test.group('Channel resolver | preferences', () => {
     assert.deepEqual(result, {
       email: { shouldSend: true, target: null },
       sms: { shouldSend: false, target: null },
+    })
+  })
+})
+
+test.group('Channel resolver | critical notifications', () => {
+  test('should bypass user preferences when notification is critical', async ({ assert }) => {
+    const db = new FakeDatabase({
+      global: {
+        global: { channels: { email: false, sms: false } },
+        notifications: [],
+      },
+    })
+
+    const result = await new ChannelResolver(db).resolveChannels({
+      to: { id: 'user-123' } as any,
+      notification: CriticalNotif,
+      params: {},
+    })
+
+    assert.deepEqual(result, {
+      email: { shouldSend: true, target: null },
+      sms: { shouldSend: true, target: null },
+    })
+  })
+
+  test('should still respect deliverBy configuration for critical notifications', async ({
+    assert,
+  }) => {
+    class CriticalWithDisabledChannel extends Notification<any> {
+      static override options: NotificationOptions<any> = {
+        name: 'CriticalWithDisabled',
+        critical: true,
+        deliverBy: { email: true, sms: false },
+      }
+    }
+
+    const db = new FakeDatabase({
+      global: {
+        global: { channels: { email: true, sms: true } },
+        notifications: [],
+      },
+    })
+
+    const result = await new ChannelResolver(db).resolveChannels({
+      to: { id: 'user-123' } as any,
+      notification: CriticalWithDisabledChannel,
+      params: {},
+    })
+
+    assert.deepEqual(result, {
+      email: { shouldSend: true, target: null },
+      sms: { shouldSend: false, target: null },
+    })
+  })
+})
+
+test.group('Channel resolver | category preferences', () => {
+  test('should apply category preferences from default config', async ({ assert }) => {
+    const defaultPreferences: ResolvedDefaultPreferences<any> = {
+      enabled: true,
+      global: { channels: { email: true, sms: true } },
+      categories: {
+        billing: { channels: { email: true, sms: false } },
+      },
+    }
+
+    const result = await new ChannelResolver(undefined, defaultPreferences).resolveChannels({
+      to: { id: 'user-123' } as any,
+      notification: BillingNotif,
+      params: {},
+    })
+
+    assert.deepEqual(result, {
+      email: { shouldSend: true, target: null },
+      sms: { shouldSend: false, target: null },
+    })
+  })
+
+  test('should allow user preferences to override category preferences', async ({ assert }) => {
+    const defaultPreferences: ResolvedDefaultPreferences<any> = {
+      enabled: true,
+      global: { channels: { email: true, sms: true } },
+      categories: {
+        billing: { channels: { email: true, sms: false } },
+      },
+    }
+
+    const db = new FakeDatabase({
+      global: {
+        global: { channels: { sms: true } },
+        notifications: [],
+      },
+    })
+
+    const result = await new ChannelResolver(db, defaultPreferences).resolveChannels({
+      to: { id: 'user-123' } as any,
+      notification: BillingNotif,
+      params: {},
+    })
+
+    assert.deepEqual(result, {
+      email: { shouldSend: true, target: null },
+      sms: { shouldSend: true, target: null },
+    })
+  })
+
+  test('should apply category boolean (false = disable all channels)', async ({ assert }) => {
+    const defaultPreferences: ResolvedDefaultPreferences<any> = {
+      enabled: true,
+      global: { channels: { email: true, sms: true } },
+      categories: {
+        billing: { channels: { email: false, sms: false } },
+      },
+    }
+
+    const result = await new ChannelResolver(undefined, defaultPreferences).resolveChannels({
+      to: { id: 'user-123' } as any,
+      notification: BillingNotif,
+      params: {},
+    })
+
+    assert.deepEqual(result, {
+      email: { shouldSend: false, target: null },
+      sms: { shouldSend: false, target: null },
+    })
+  })
+})
+
+test.group('Channel resolver | anonymous notifications', () => {
+  test('should not crash when to is undefined', async ({ assert }) => {
+    const result = await new ChannelResolver().resolveChannels({
+      to: undefined,
+      notification: NotifA,
+      params: {},
+    })
+
+    assert.deepEqual(result, {
+      email: { shouldSend: true, target: null },
+      sms: { shouldSend: true, target: null },
+    })
+  })
+
+  test('should use only deliverBy for anonymous notifications (no preferences lookup)', async ({
+    assert,
+  }) => {
+    const db = new FakeDatabase({
+      global: {
+        global: { channels: { email: false, sms: false } },
+        notifications: [],
+      },
+    })
+
+    const result = await new ChannelResolver(db).resolveChannels({
+      to: undefined,
+      notification: NotifA,
+      params: {},
+    })
+
+    assert.deepEqual(result, {
+      email: { shouldSend: true, target: null },
+      sms: { shouldSend: true, target: null },
     })
   })
 })

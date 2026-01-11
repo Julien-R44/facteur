@@ -6,6 +6,8 @@ import type {
   GetPreferencesParams,
   Preferences,
   UpdatePreferencesParams,
+  RawPreferenceRow,
+  NotificationsPreferences,
 } from './types.ts'
 import type { FacteurOptions } from '../options.ts'
 import type { NotificationDiscoverer } from '../notifications/notification_discoverer.ts'
@@ -73,13 +75,14 @@ export class FacteurDatabase {
     return preferences
   }
 
-  #processPreferenceRow(row: any, preferences: Preferences, tenantId?: string | number) {
+  #processPreferenceRow(row: RawPreferenceRow, preferences: Preferences) {
     const channels = row.channels
     const notificationName = row.notification_name
+    const rowTenantId = row.tenant_id
 
-    if (tenantId && preferences.tenants) {
-      this.#updateTenantPreferences(preferences.tenants[tenantId], notificationName, channels)
-    } else {
+    if (rowTenantId && preferences.tenants?.[rowTenantId]) {
+      this.#updateTenantPreferences(preferences.tenants[rowTenantId], notificationName, channels)
+    } else if (!rowTenantId) {
       this.#updateGlobalPreferences(preferences.global, notificationName, channels)
     }
   }
@@ -94,15 +97,15 @@ export class FacteurDatabase {
     const preferences = await this.#createEmptyPreferences(options.tenantId)
 
     for (const row of rawPreferences) {
-      this.#processPreferenceRow(row, preferences, options.tenantId)
+      this.#processPreferenceRow(row, preferences)
     }
 
     return preferences
   }
 
   #updateTenantPreferences(
-    tenantPrefs: any,
-    notificationName: string | null,
+    tenantPrefs: NotificationsPreferences,
+    notificationName: string | null | undefined,
     channels: Record<string, boolean>,
   ) {
     if (!notificationName) {
@@ -113,8 +116,8 @@ export class FacteurDatabase {
   }
 
   #updateGlobalPreferences(
-    globalPrefs: any,
-    notificationName: string | null,
+    globalPrefs: NotificationsPreferences,
+    notificationName: string | null | undefined,
     channels: Record<string, boolean>,
   ) {
     if (!notificationName) {
@@ -125,21 +128,21 @@ export class FacteurDatabase {
   }
 
   #updateNotificationPreferences(
-    notifications: any[],
+    notifications: NotificationsPreferences['notifications'],
     notificationName: string,
     channels: Record<string, boolean>,
   ) {
-    let notifPref = notifications.find((n) => n.notification.name === notificationName)
+    let notificationPref = notifications.find((n) => n.notification.name === notificationName)
 
-    if (!notifPref) {
-      notifPref = {
-        notification: { name: notificationName },
-        channels: {},
+    if (!notificationPref) {
+      notificationPref = {
+        notification: { name: notificationName, identifier: notificationName },
+        channels: {} as Record<string, boolean>,
       }
-      notifications.push(notifPref)
+      notifications.push(notificationPref)
     }
 
-    Object.assign(notifPref.channels, channels)
+    Object.assign(notificationPref.channels, channels)
   }
 
   updatePreferences(options: UpdatePreferencesParams) {

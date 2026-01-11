@@ -139,11 +139,8 @@ class KnexAdapter implements DatabaseAdapter {
       .table(this.#preferencesTableName)
       .where('user_id', options.notifiableId)
       .andWhere((builder) => {
-        if (options.tenantId) {
-          builder.where('tenant_id', options.tenantId)
-        } else {
-          builder.whereNull('tenant_id')
-        }
+        builder.whereNull('tenant_id')
+        if (options.tenantId) builder.orWhere('tenant_id', options.tenantId)
       })
       .select('*')
 

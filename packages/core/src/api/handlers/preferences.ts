@@ -1,6 +1,20 @@
 import { checkAuthorization, UNAUTHORIZED_RESPONSE } from './utils.ts'
 import { defineRoute } from '../index.ts'
 
+function validatePreferences(preferences: unknown): { valid: true } | { valid: false; error: string } {
+  if (!preferences || typeof preferences !== 'object' || Array.isArray(preferences)) {
+    return { valid: false, error: 'Preferences must be an object' }
+  }
+
+  for (const [channel, value] of Object.entries(preferences)) {
+    if (typeof value !== 'boolean') {
+      return { valid: false, error: `Channel "${channel}" preference must be a boolean, got ${typeof value}` }
+    }
+  }
+
+  return { valid: true }
+}
+
 export const getPreferencesRoute = defineRoute(({ facteur, authorize }) => ({
   method: 'get',
   route: '/notifications/notifiable/:notifiableId/preferences',
@@ -30,6 +44,11 @@ export const updatePreferencesRoute = defineRoute(({ facteur, authorize }) => ({
 
     if (!preferences) {
       return { status: 400, body: { error: 'Preferences are required' } }
+    }
+
+    const validation = validatePreferences(preferences)
+    if (!validation.valid) {
+      return { status: 400, body: { error: validation.error } }
     }
 
     await facteur.db.updatePreferences({

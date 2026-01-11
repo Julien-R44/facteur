@@ -134,8 +134,12 @@ class KyselyAdapter implements DatabaseAdapter {
       .selectFrom(this.#preferencesTableName)
       .selectAll()
       .where('user_id', '=', options.notifiableId)
-      .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
-      .$if(!options.tenantId, (qb) => qb.where('tenant_id', 'is', null))
+      .where((eb) =>
+        eb.or([
+          eb('tenant_id', 'is', null),
+          ...(options.tenantId ? [eb('tenant_id', '=', options.tenantId)] : []),
+        ]),
+      )
       .execute()
 
     return results.map((row: any) => ({

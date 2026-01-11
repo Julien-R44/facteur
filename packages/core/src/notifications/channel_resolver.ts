@@ -7,6 +7,9 @@ import type {
   Notifiable,
   NotificationOptions,
   ChannelSpecificConfig,
+  ResolvedDefaultPreferences,
+  Channel,
+  DeliverByOptions,
 } from '../types/index.ts'
 import type { Identifier } from '../database/types.ts'
 import type { FacteurDatabase } from '../database/database.ts'
@@ -28,9 +31,14 @@ export type ResolvedChannels = Record<string, ResolvedChannel>
 
 export class ChannelResolver {
   #database: FacteurDatabase | null = null
+  #defaultPreferences: ResolvedDefaultPreferences<Record<string, Channel>> | null = null
 
-  constructor(database?: FacteurDatabase) {
+  constructor(
+    database?: FacteurDatabase,
+    defaultPreferences?: ResolvedDefaultPreferences<Record<string, Channel>>,
+  ) {
     this.#database = database || null
+    this.#defaultPreferences = defaultPreferences || null
   }
 
   /**
@@ -64,23 +72,13 @@ export class ChannelResolver {
     if (via) return this.#resolveVia(options)
 
     /**
-     * Get preferences for the notifiable and tenant
-     */
-    const preferences = await this.#database?.getPreferences({
-      // @ts-ignore Maybe this .id should be configurable ?
-      notifiableId: to.id as Identifier,
-      tenantId: tenantId as Identifier,
-    })
-
-    /**
      * Resolve channels based on deliverBy options
      */
     const fromDeliverBy = mapEntries(notificationOptions.deliverBy, (channelName, deliverBy) => {
       const shouldSend = invoke(() => {
         if (typeof deliverBy === 'boolean') return deliverBy
-
-        // @ts-ignore
-        return deliverBy.if({ to, params, preferences })
+        if (!to) return true
+        return (deliverBy as DeliverByOptions).if({ to, params })
       })
 
       const target = notifiableTargets?.[channelName] || null
@@ -88,7 +86,32 @@ export class ChannelResolver {
     })
 
     /**
-     * And then we can apply user preferences
+     * If the notification is critical, bypass all user preferences
+     */
+    if (notificationOptions.critical) return fromDeliverBy
+
+    /**
+     * Get preferences for the notifiable and tenant.
+     * Skip if no notifiable (anonymous notification) or no database.
+     */
+    const notifiableId = (to as any)?.id as Identifier | undefined
+    const preferences = notifiableId
+      ? await this.#database?.getPreferences({
+          notifiableId,
+          tenantId: tenantId as Identifier,
+        })
+      : undefined
+
+    /**
+     * Get category preferences from default config
+     */
+    const category = notificationOptions.category
+    const categoryPreferences = category
+      ? this.#defaultPreferences?.categories[category]?.channels
+      : undefined
+
+    /**
+     * Apply user preferences with priority order
      */
     const currentTenant = preferences?.tenants?.[tenantId || -1]
     const tenantPreferences = currentTenant?.global
@@ -102,16 +125,22 @@ export class ChannelResolver {
     )
 
     return mapEntries(fromDeliverBy, (channelName, { shouldSend, target }) => {
-      if (shouldSend === false) {
-        return [channelName, { shouldSend: false, target }]
-      }
+      if (shouldSend === false) return [channelName, { shouldSend: false, target }]
 
-      // Check preferences in priority order (most specific to least specific)
+      /**
+       * Check preferences in priority order (most specific to least specific):
+       * 1. Notification-specific tenant preference
+       * 2. Tenant global preference
+       * 3. Notification-specific global preference
+       * 4. Global user preference
+       * 5. Category preference (from default config)
+       */
       const preferencesSources = [
         notificationTenantPreference?.channels[channelName],
         tenantPreferences?.channels[channelName],
         notificationGlobalPreference?.channels[channelName],
         globalPreferences?.channels[channelName],
+        categoryPreferences?.[channelName],
       ]
 
       shouldSend = preferencesSources.find((preference) => !is.undefined(preference)) ?? shouldSend

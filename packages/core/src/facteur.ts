@@ -46,9 +46,9 @@ export class Facteur<
     if (this.#options.databaseAdapter) {
       const options = this.#options as FacteurOptions<KnownChannels, DatabaseAdapter>
       this.#db = new FacteurDatabase(options, this.#discoverer)
-      channelResolver = new ChannelResolver(this.#db)
+      channelResolver = new ChannelResolver(this.#db, this.#options.defaultPreferences)
     } else {
-      channelResolver = new ChannelResolver()
+      channelResolver = new ChannelResolver(undefined, this.#options.defaultPreferences)
     }
 
     this.#sender = new NotificationSender(
