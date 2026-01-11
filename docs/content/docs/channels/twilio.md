@@ -1,6 +1,10 @@
 # Twilio SMS Channel
 
-The Twilio channel allows you to send SMS notifications via the Twilio service. This channel supports regular phone numbers, Twilio messaging services, and alphanumeric senders.
+The Twilio channel allows you to send SMS notifications via the Twilio service. This channel supports regular phone numbers, Twilio messaging services, and alphanumeric senders. It uses the Twilio Programmable SMS API.
+
+## Batching
+
+This channel does **not support batching**. Each SMS is sent individually.
 
 ## Configuration
 

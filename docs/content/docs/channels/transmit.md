@@ -1,6 +1,10 @@
 # Transmit Channel
 
-The Transmit channel allows you to send real-time notifications through AdonisJS Transmit, enabling WebSocket-based communication to connected clients. This channel is perfect for real-time updates, live notifications, and instant messaging features.
+The Transmit channel allows you to send real-time notifications through AdonisJS Transmit, enabling WebSocket-based communication to connected clients. This channel is perfect for real-time updates, live notifications, and instant messaging features. It uses the `@adonisjs/transmit` package.
+
+## Batching
+
+This channel does **not support batching**. Each notification is broadcast individually.
 
 ## Configuration
 

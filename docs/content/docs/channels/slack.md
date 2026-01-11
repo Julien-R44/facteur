@@ -1,6 +1,10 @@
 # Slack Channel
 
-The Slack channel allows you to send notifications to Slack channels via webhooks. This channel is built on top of the [Webhook channel](./webhook.md) and supports all webhook features.
+The Slack channel allows you to send notifications to Slack channels via webhooks. This channel is built on top of the [Webhook channel](./webhook.md) and supports all webhook features. It uses the Slack Incoming Webhooks API.
+
+## Batching
+
+This channel does **not support batching**. Each notification is sent individually.
 
 ## Configuration
 

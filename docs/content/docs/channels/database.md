@@ -1,6 +1,10 @@
 # Database Channel
 
-The Database channel allows you to store notifications directly in your database. This channel is perfect for creating notification centers, audit trails, and persistent notification history that users can access later.
+The Database channel allows you to store notifications directly in your database. This channel is perfect for creating notification centers, audit trails, and persistent notification history that users can access later. It supports Knex and Kysely database adapters.
+
+## Batching
+
+This channel does **not support batching**. Each notification is inserted individually.
 
 ## Configuration
 

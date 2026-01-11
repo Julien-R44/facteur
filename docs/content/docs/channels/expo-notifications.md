@@ -1,6 +1,10 @@
 # Expo Notifications Channel
 
-The Expo channel allows you to send push notifications to mobile devices through Expo's push notification service. This channel is perfect for React Native applications built with Expo.
+The Expo channel allows you to send push notifications to mobile devices through Expo's push notification service. This channel is perfect for React Native applications built with Expo. It uses the Expo Push Notifications API (`expo-server-sdk`).
+
+## Batching
+
+This channel **supports batching** with a maximum of **100 messages** per batch. When sending to multiple recipients, Facteur will automatically batch your notifications for optimal performance.
 
 ## Configuration
 
