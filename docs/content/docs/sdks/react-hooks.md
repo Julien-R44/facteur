@@ -34,6 +34,16 @@ function App() {
 
 - `apiUrl` (string, required): Your Facteur API URL
 - `notifiableId` (string|number): Connected user ID
+- Plus any [ky options](https://github.com/sindresorhus/ky#options) (`timeout`, `headers`, `hooks`, etc.)
+
+```tsx
+<FacteurProvider
+  apiUrl="https://your-api.com"
+  notifiableId={currentUser.id}
+  timeout={5000}
+  headers={{ 'Authorization': `Bearer ${token}` }}
+>
+```
 
 ## Type Safety
 
