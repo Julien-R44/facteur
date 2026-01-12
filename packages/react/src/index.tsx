@@ -1,9 +1,9 @@
-import { type PropsWithChildren, useMemo } from 'react'
 import { createContext, useContext } from 'react'
-import { createFacteurClient } from '@facteurjs/client'
-import { FacteurClient } from '@facteurjs/client'
+import { type PropsWithChildren, useMemo } from 'react'
+import { type FacteurClientConfig } from '@facteurjs/client/types'
+import { createFacteurClient, FacteurClient } from '@facteurjs/client'
 
-interface FacteurProviderProps extends PropsWithChildren {
+interface FacteurProviderProps extends PropsWithChildren, Omit<FacteurClientConfig, 'apiUrl'> {
   notifiableId?: string | number
   apiUrl: string
 }
@@ -16,7 +16,12 @@ export interface DatabaseContent {}
 export type TypedFacteurClient = FacteurClient<DatabaseContent>
 
 export const FacteurContext = createContext<TypedFacteurClient | undefined>(undefined)
-export function FacteurProvider({ children, notifiableId, apiUrl }: FacteurProviderProps) {
+export function FacteurProvider({
+  children,
+  notifiableId,
+  apiUrl,
+  ...kyOptions
+}: FacteurProviderProps) {
   const client = useMemo(() => {
     if (!notifiableId) return
 
@@ -25,6 +30,7 @@ export function FacteurProvider({ children, notifiableId, apiUrl }: FacteurProvi
       // Disabling retries since Tanstack Query has its own retry mechanism
       retry: 0,
       notifiableId: notifiableId.toString(),
+      ...kyOptions,
     })
   }, [notifiableId, apiUrl])
 
