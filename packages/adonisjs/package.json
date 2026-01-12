@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/adonisjs",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.4",
   "description": "AdonisJS integration for Facteur - Send notifications via multiple channels in your AdonisJS application",
   "keywords": [
     "adonis",
@@ -34,6 +34,7 @@
     "./channels/twilio": "./src/channels/twilio.ts",
     "./channels/webhook": "./src/channels/webhook.ts",
     "./channels/webpush": "./src/channels/webpush.ts",
+    "./channels/mail": "./src/channels/mail.ts",
     "./database": "./src/database/index.ts",
     "./facteur_provider": "./src/providers/facteur_provider.ts",
     "./services/main": "./src/services/main.ts",
@@ -55,6 +56,7 @@
       "./channels/twilio": "./dist/channels/twilio.mjs",
       "./channels/webhook": "./dist/channels/webhook.mjs",
       "./channels/webpush": "./dist/channels/webpush.mjs",
+      "./channels/mail": "./dist/channels/mail.mjs",
       "./database": "./dist/database.mjs",
       "./facteur_provider": "./dist/facteur_provider.mjs",
       "./services/main": "./dist/services/main.mjs",

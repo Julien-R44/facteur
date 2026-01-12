@@ -10,6 +10,7 @@
   },
   "changesets": [
     "fix-stubs-to-attribute",
+    "gentle-birds-unite",
     "legal-lamps-worry"
   ]
 }

@@ -1,5 +1,11 @@
 # @facteurjs/adonisjs
 
+## 2.0.0-beta.4
+
+### Patch Changes
+
+- Add missing `./channels/mail` export to package.json
+
 ## 2.0.0-beta.3
 
 ### Patch Changes
