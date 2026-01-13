@@ -42,6 +42,12 @@
     "category": "Guides"
   },
   {
+    "permalink": "testing",
+    "title": "Testing",
+    "contentPath": "./testing.md",
+    "category": "Guides"
+  },
+  {
     "permalink": "database",
     "title": "Database",
     "contentPath": "./channels/database.md",
