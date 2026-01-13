@@ -151,7 +151,5 @@ All good. Your user just received a SMS and a WebPush notification saying that t
 Now that you have a basic understanding of how to create and send notifications with FacteurJS, you can explore more advanced features like :
 
 - [In-app notifications](./in-app-notifications.md)
-- [Scheduling notifications](./scheduling-notifications.md)
-- [Using custom channels](./custom-channels.md)
-- [Preferences and user settings](./preferences.md)
-- [Frontend integration](./frontend-integration.md)
+- [Custom channels](./deep/custom-channels.md)
+- [Frontend SDK](./sdks/frontend-sdk.md)

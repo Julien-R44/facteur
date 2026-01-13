@@ -42,6 +42,12 @@
     "category": "Guides"
   },
   {
+    "permalink": "bulk-sending",
+    "title": "Bulk Sending",
+    "contentPath": "./bulk-sending.md",
+    "category": "Guides"
+  },
+  {
     "permalink": "testing",
     "title": "Testing",
     "contentPath": "./testing.md",
@@ -126,9 +132,9 @@
     "category": "Digging Deeper"
   },
   {
-    "permalink": "custom-providers",
-    "title": "Custom Providers",
-    "contentPath": "./deep/custom-providers.md",
+    "permalink": "custom-channels",
+    "title": "Custom Channels",
+    "contentPath": "./deep/custom-channels.md",
     "category": "Digging Deeper"
   },
   {
