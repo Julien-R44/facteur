@@ -55,7 +55,7 @@ export class NotificationSender {
   /**
    * Build the message content by calling the notification's `as<ChannelName>Message` method
    */
-  #buildMessageContent(options: BuildMessageContentOptions): MessageContentResult | null {
+  async #buildMessageContent(options: BuildMessageContentOptions): Promise<MessageContentResult | null> {
     const { notification, channelName, sendOptions } = options
     const capitalizedChannelName = capitalizeFirstLetter(channelName as string)
     const channelMethodName = `as${capitalizedChannelName}Message` as const
@@ -65,7 +65,7 @@ export class NotificationSender {
       throw new errors.E_MISSING_MESSAGE_METHOD([capitalizedChannelName])
     }
 
-    const content = messageBuilder.call(notification, {
+    const content = await messageBuilder.call(notification, {
       to: sendOptions.to,
       params: sendOptions.params,
       tenantId: sendOptions.tenantId,
@@ -195,7 +195,7 @@ export class NotificationSender {
     const { notification, channelName, options: sendOptions, channelConfig } = options
 
     const channel = this.#getChannel(channelName)
-    const messageResult = this.#buildMessageContent({ notification, channelName, sendOptions })
+    const messageResult = await this.#buildMessageContent({ notification, channelName, sendOptions })
     if (!messageResult) return null
 
     const { content: messageContent } = messageResult
@@ -386,17 +386,17 @@ export class NotificationSender {
    * Prepare a message for a specific channel without sending it.
    * Returns null if the message should not be sent.
    */
-  prepareMessage(options: {
+  async prepareMessage(options: {
     notification: Notification<any, any>
     channelName: ChannelName
     sendOptions: InternalSendOptions
     channelConfig: ResolvedChannel
-  }): PreparedMessage | null {
+  }): Promise<PreparedMessage | null> {
     const { notification, channelName, sendOptions, channelConfig } = options
 
     this.#getChannel(channelName)
 
-    const messageResult = this.#buildMessageContent({ notification, channelName, sendOptions })
+    const messageResult = await this.#buildMessageContent({ notification, channelName, sendOptions })
     if (!messageResult) return null
 
     const { content: messageContent } = messageResult

@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import Twilio from 'twilio'
 
 import type { TwilioConfig, TwilioTargets } from './types.ts'
@@ -90,6 +92,6 @@ export class TwilioChannel implements Channel<TwilioConfig, TwilioMessage, any, 
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asTwilioMessage(): TwilioMessage
+    asTwilioMessage(): Awaitable<TwilioMessage>
   }
 }

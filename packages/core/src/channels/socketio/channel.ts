@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import type { Server as SocketIOServer } from 'socket.io'
 
 import type { SocketIOConfig, SocketIOTargets } from './types.ts'
@@ -45,6 +47,6 @@ export class SocketIOChannel implements Channel<
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asSocketIoMessage(): SocketIoMessage
+    asSocketIoMessage(): Awaitable<SocketIoMessage>
   }
 }

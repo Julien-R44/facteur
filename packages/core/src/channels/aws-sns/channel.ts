@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns'
 
 import type { AwsSnsConfig, AwsSnsTargets } from './types.ts'
@@ -49,6 +51,6 @@ export class AwsSnsChannel implements Channel<AwsSnsConfig, AwsSnsMessage, any, 
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asAwsSnsMessage(): AwsSnsMessage
+    asAwsSnsMessage(): Awaitable<AwsSnsMessage>
   }
 }

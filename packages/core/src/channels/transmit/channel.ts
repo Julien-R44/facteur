@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import type { TransmitConfig, TransmitTargets } from './types.ts'
 import type { TransmitMessage } from './message.ts'
 
@@ -35,6 +37,6 @@ export class TransmitChannel implements Channel<
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asTransmitMessage(): TransmitMessage
+    asTransmitMessage(): Awaitable<TransmitMessage>
   }
 }

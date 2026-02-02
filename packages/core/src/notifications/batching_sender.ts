@@ -92,7 +92,7 @@ export class BatchingSender {
       ...(options.timeout && { timeout: options.timeout }),
     })
 
-    const messagesByChannel = this.#groupByChannel(preparedRecipients)
+    const messagesByChannel = await this.#groupByChannel(preparedRecipients)
 
     return this.#sendBatches({
       messagesByChannel,
@@ -146,14 +146,14 @@ export class BatchingSender {
   /**
    * Groups prepared messages by channel name for batch sending
    */
-  #groupByChannel(preparedRecipients: PreparedRecipient[]): Map<string, PreparedMessage[]> {
+  async #groupByChannel(preparedRecipients: PreparedRecipient[]): Promise<Map<string, PreparedMessage[]>> {
     const messagesByChannel = new Map<string, PreparedMessage[]>()
 
     for (const prepared of preparedRecipients) {
       for (const [channelName, channelConfig] of Object.entries(prepared.resolvedChannels)) {
         if (!channelConfig.shouldSend || !channelConfig.target) continue
 
-        const message = this.#sender.prepareMessage({
+        const message = await this.#sender.prepareMessage({
           notification: prepared.notification,
           channelName: channelName as ChannelName,
           sendOptions: prepared.options,

@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import { Expo } from 'expo-server-sdk'
 
 import type { ExpoConfig, ExpoTargets } from './types.ts'
@@ -92,6 +94,6 @@ export class ExpoChannel implements Channel<ExpoConfig, ExpoMessage, any, ExpoTa
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asExpoMessage(): ExpoMessage
+    asExpoMessage(): Awaitable<ExpoMessage>
   }
 }

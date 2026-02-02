@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import type { SlackOptions, SlackTargets } from './types.ts'
 import type { SlackMessage } from './message.ts'
 import type { Channel } from '../../types/index.ts'
@@ -18,6 +20,6 @@ export class SlackWebhookChannel<T extends SlackOptions<any>>
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asSlackMessage(): SlackMessage
+    asSlackMessage(): Awaitable<SlackMessage>
   }
 }

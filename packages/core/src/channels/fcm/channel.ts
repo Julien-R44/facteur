@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import { getMessaging, Messaging } from 'firebase-admin/messaging'
 import { initializeApp, cert } from 'firebase-admin/app'
 
@@ -100,6 +102,6 @@ export class FcmChannel implements Channel<FcmConfig, FcmMessage, any, FcmTarget
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asFcmMessage(): FcmMessage
+    asFcmMessage(): Awaitable<FcmMessage>
   }
 }

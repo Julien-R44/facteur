@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import webpush from 'web-push'
 
 import type { WebpushConfig, WebpushTargets } from './types.ts'
@@ -73,6 +75,6 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asWebpushMessage(): WebpushMessage
+    asWebpushMessage(): Awaitable<WebpushMessage>
   }
 }

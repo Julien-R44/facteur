@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import type { DatabaseAdapter, DatabaseConfig, Identifier } from './types.ts'
 import type { DatabaseMessage } from './message.ts'
 
@@ -61,6 +63,6 @@ export class DatabaseChannel implements Channel<
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asDatabaseMessage(): DatabaseMessage
+    asDatabaseMessage(): Awaitable<DatabaseMessage>
   }
 }

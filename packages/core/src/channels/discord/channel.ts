@@ -1,3 +1,5 @@
+import type { Awaitable } from '@julr/utils/types'
+
 import type { DiscordResponse } from './types.ts'
 import type { DiscordMessage } from './message.ts'
 import type { WebhookOptions, WebhookTargets } from '../webhook/types.ts'
@@ -18,6 +20,6 @@ export class DiscordProvider<T extends WebhookOptions<any>>
 
 declare module '@facteurjs/core/types' {
   interface Notification {
-    asDiscordMessage(): DiscordMessage
+    asDiscordMessage(): Awaitable<DiscordMessage>
   }
 }
