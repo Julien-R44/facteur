@@ -10,9 +10,6 @@ import type { Database } from '@adonisjs/lucid/database'
 import type { ConfigProvider } from '@adonisjs/core/types'
 
 import { RuntimeException } from '@adonisjs/core/exceptions'
-/// <reference types="@adonisjs/redis/redis_provider" />
-/// <reference types="@adonisjs/transmit/transmit_provider" />
-/// <reference types="@adonisjs/mail/mail_provider" />
 import { configProvider } from '@adonisjs/core'
 
 import type { WebpushChannel } from './channels/webpush.ts'
@@ -22,9 +19,13 @@ import type { SocketIOChannel, SocketIOConfig } from './channels/socketio.ts'
 import type { MailChannel } from './channels/mail.ts'
 import type { FcmChannel } from './channels/fcm.ts'
 import type { DiscordProvider } from './channels/discord.ts'
-import type { DatabaseChannel } from './channels/database.ts'
 import type { KyselyConfig } from './channels/database.ts'
+import type { DatabaseChannel } from './channels/database.ts'
 import type { AwsSnsChannel, AwsSnsConfig } from './channels/aws-sns.ts'
+
+/// <reference types="@adonisjs/redis/redis_provider" />
+/// <reference types="@adonisjs/transmit/transmit_provider" />
+/// <reference types="@adonisjs/mail/mail_provider" />
 
 export interface DatabaseConfig {
   connectionName?: string
