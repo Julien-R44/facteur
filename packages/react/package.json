@@ -45,11 +45,11 @@
     "@facteurjs/client": "workspace:*"
   },
   "devDependencies": {
-    "@japa/assert": "^4.0.1",
-    "@japa/runner": "^4.2.0",
-    "@tanstack/react-query": "^5.90.12",
-    "@types/react": "^19.2.7",
-    "react": "^19.2.3"
+    "@japa/assert": "^4.2.0",
+    "@japa/runner": "^5.3.0",
+    "@tanstack/react-query": "^5.90.20",
+    "@types/react": "^19.2.13",
+    "react": "^19.2.4"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",

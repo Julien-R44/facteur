@@ -41,6 +41,6 @@
     "quick:test": "tsx tests/index.ts"
   },
   "dependencies": {
-    "ky": "^1.14.2"
+    "ky": "^1.14.3"
   }
 }
