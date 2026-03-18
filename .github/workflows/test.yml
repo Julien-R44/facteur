@@ -3,9 +3,50 @@ on: [push, pull_request, workflow_call]
 
 jobs:
   lint:
-    uses: Julien-R44/.github/.github/workflows/lint.yml@main
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm lint
+
   typecheck:
-    uses: Julien-R44/.github/.github/workflows/typecheck.yml@main
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+          pnpm run build
+
+      - name: Typecheck
+        run: pnpm typecheck
 
   tests:
     runs-on: ubuntu-latest
@@ -31,10 +72,13 @@ jobs:
           corepack prepare pnpm@latest --activate
 
       - name: Install dependencies
-        run: pnpm install
+        run: |
+          pnpm install
+          pnpm run build
 
       - name: Run tests
         env:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-        run: FORCE_COLOR=1 pnpm test -r
+          FORCE_COLOR: 1
+        run: pnpm test -r
