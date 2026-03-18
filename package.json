@@ -12,6 +12,7 @@
     "lint": "oxlint",
     "stub": "pnpm -r --parallel run stub",
     "test": "FORCE_COLOR=1 pnpm -r --parallel run test",
+    "release": "pnpm run build && changeset publish",
     "checks": "pnpm lint && pnpm typecheck"
   },
   "devDependencies": {
@@ -32,7 +33,7 @@
     "wrangler": "^4.64.0"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=24.0.0"
   },
   "packageManager": "pnpm@10.29.2",
   "pnpm": {
