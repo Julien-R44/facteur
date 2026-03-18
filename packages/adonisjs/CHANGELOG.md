@@ -1,5 +1,13 @@
 # @facteurjs/adonisjs
 
+## 2.0.0-beta.6
+
+### Patch Changes
+
+- ad4f20a: Require Node.js >= 24
+- Updated dependencies [ad4f20a]
+  - @facteurjs/core@2.0.0-beta.1
+
 ## 2.0.0-beta.4
 
 ### Patch Changes

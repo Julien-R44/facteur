@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/react",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "React hooks and components for Facteur - Build notification centers in your React application",
   "keywords": [
     "hooks",
