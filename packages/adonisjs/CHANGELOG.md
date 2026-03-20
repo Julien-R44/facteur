@@ -1,5 +1,11 @@
 # @facteurjs/adonisjs
 
+## 2.0.0-beta.7
+
+### Patch Changes
+
+- 034c002: Remove leftover console.log in mail channel
+
 ## 2.0.0-beta.6
 
 ### Patch Changes
