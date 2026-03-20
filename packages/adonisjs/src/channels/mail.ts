@@ -37,7 +37,6 @@ export class MailChannel implements Channel<MailConfig, PossibleMailMessage, any
       throw new errors.E_UNAVAILABLE_TARGETS(['Mail'])
     }
 
-    console.log(options.message)
     if (options.message instanceof BaseMail) {
       options.message.message.to(targets.email)
       this.config.mailer.send(options.message)
