@@ -173,7 +173,7 @@ export class Facteur<
    * Enable fake mode for testing - captures sent notifications instead of sending
    */
   fake(): FacteurFake {
-    this.#fake = new FacteurFake()
+    this.#fake = new FacteurFake(() => this.restore())
 
     return this.#fake
   }

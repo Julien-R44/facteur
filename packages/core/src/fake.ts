@@ -11,6 +11,15 @@ export interface SentNotification<N extends Notification = Notification> {
 
 export class FacteurFake {
   #sentNotifications: SentNotification[] = []
+  #restoreFn: () => void
+
+  constructor(restoreFn: () => void) {
+    this.#restoreFn = restoreFn
+  }
+
+  [Symbol.dispose]() {
+    this.#restoreFn()
+  }
 
   /**
    * Record a notification as sent during fake mode

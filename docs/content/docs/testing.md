@@ -12,7 +12,7 @@ import { facteur } from '#services/facteur'
 import { WelcomeNotification } from '#notifications/welcome'
 
 test('sends welcome notification to new users', async () => {
-  const fake = facteur.fake()
+  using fake = facteur.fake()
 
   await facteur
     .notification(WelcomeNotification)
@@ -20,12 +20,18 @@ test('sends welcome notification to new users', async () => {
     .send()
 
   fake.assertSentCount(1)
-
-  facteur.restore()
 })
 ```
 
-Once done testing, you must call the `restore` method to restore the original sender.
+The `using` keyword automatically calls `facteur.restore()` when the variable goes out of scope, even if the test throws an error. You can also manually manage the lifecycle if you prefer:
+
+```typescript
+const fake = facteur.fake()
+
+// ... your test ...
+
+facteur.restore()
+```
 
 ## Assertions
 
