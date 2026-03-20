@@ -39,10 +39,10 @@ export class MailChannel implements Channel<MailConfig, PossibleMailMessage, any
 
     if (options.message instanceof BaseMail) {
       options.message.message.to(targets.email)
-      this.config.mailer.send(options.message)
+      await this.config.mailer.send(options.message)
     } else {
       options.message.to(targets.email)
-      this.config.mailer.send((message) => {
+      await this.config.mailer.send((message) => {
         Object.assign(message, options.message)
       })
     }
