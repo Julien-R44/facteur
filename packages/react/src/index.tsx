@@ -22,6 +22,7 @@ export function FacteurProvider({
   apiUrl,
   ...kyOptions
 }: FacteurProviderProps) {
+  const serializedKyOptions = JSON.stringify(kyOptions)
   const client = useMemo(() => {
     if (!notifiableId) return
 
@@ -32,7 +33,8 @@ export function FacteurProvider({
       notifiableId: notifiableId.toString(),
       ...kyOptions,
     })
-  }, [notifiableId, apiUrl])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifiableId, apiUrl, serializedKyOptions])
 
   return <FacteurContext.Provider value={client}>{children}</FacteurContext.Provider>
 }
