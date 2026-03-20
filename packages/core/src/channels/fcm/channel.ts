@@ -28,14 +28,18 @@ export class FcmChannel implements Channel<FcmConfig, FcmMessage, any, FcmTarget
   #messaging: Messaging
   #config: FcmConfig
 
-  constructor(config: FcmConfig) {
+  constructor(config: FcmConfig, messaging?: Messaging) {
     this.#config = config
 
-    const app = initializeApp({
-      ...config,
-      ...(config.serviceAccountKeyPath ? { credential: cert(config.serviceAccountKeyPath) } : {}),
-    })
-    this.#messaging = getMessaging(app)
+    if (messaging) {
+      this.#messaging = messaging
+    } else {
+      const app = initializeApp({
+        ...config,
+        ...(config.serviceAccountKeyPath ? { credential: cert(config.serviceAccountKeyPath) } : {}),
+      })
+      this.#messaging = getMessaging(app)
+    }
   }
 
   #resolveTargets(options: ChannelSendParams<FcmMessage, FcmTargets>): FcmTargets {
@@ -60,10 +64,13 @@ export class FcmChannel implements Channel<FcmConfig, FcmMessage, any, FcmTarget
     const message = options.message.serialize()
     const targets = this.#resolveTargets(options)
 
-    if (this.#config.debugToken) message.token = this.#config.debugToken
+    if (this.#config.debugToken) {
+      message.token = this.#config.debugToken
+      return message
+    }
 
     if (targets.token) {
-      message.token = this.#config.debugToken || targets.token
+      message.token = targets.token
     } else if (targets.topic) {
       message.topic = targets.topic
     } else if (targets.condition) {
