@@ -13,6 +13,7 @@
     "fix-stubs-to-attribute",
     "gentle-birds-unite",
     "legal-lamps-worry",
-    "node-24-upgrade"
+    "node-24-upgrade",
+    "remove-console-log"
   ]
 }
