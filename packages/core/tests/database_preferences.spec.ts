@@ -52,7 +52,7 @@ test.group('FacteurDatabase | getPreferences', () => {
     assert.lengthOf(notifications, 1)
     assert.equal(notifications[0].notification.name, 'Weekly Recap')
     assert.equal(notifications[0].notification.identifier, 'recap.weekly')
-    assert.isFalse(notifications[0].channels.email)
+    assert.isFalse((notifications[0].channels as Record<string, boolean>).email)
   })
 
   test('does not create duplicate when notification_name differs from name', async ({
@@ -99,7 +99,8 @@ test.group('FacteurDatabase | getPreferences', () => {
 
     const prefs = await db.getPreferences({ notifiableId: 'user-1' })
 
-    assert.isFalse(prefs.global.global.channels.email)
-    assert.isTrue(prefs.global.global.channels.sms)
+    const globalChannels = prefs.global.global.channels as Record<string, boolean>
+    assert.isFalse(globalChannels.email)
+    assert.isTrue(globalChannels.sms)
   })
 })
