@@ -10,10 +10,15 @@
   },
   "changesets": [
     "brave-foxes-dream",
+    "disposable-fake",
+    "fix-fcm-debug-token",
+    "fix-mail-await",
+    "fix-react-memo-deps",
     "fix-stubs-to-attribute",
     "gentle-birds-unite",
     "legal-lamps-worry",
     "node-24-upgrade",
+    "preferences-scopes",
     "remove-console-log"
   ]
 }

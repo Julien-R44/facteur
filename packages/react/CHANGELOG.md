@@ -1,5 +1,13 @@
 # @facteurjs/react
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- 8d6f7ad: Fix missing kyOptions dependency in FacteurProvider useMemo
+- Updated dependencies [5da38e9]
+  - @facteurjs/client@2.0.0-beta.2
+
 ## 2.0.0-beta.2
 
 ### Patch Changes

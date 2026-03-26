@@ -1,5 +1,15 @@
 # @facteurjs/adonisjs
 
+## 2.0.0-beta.8
+
+### Patch Changes
+
+- 1130e79: Fix missing await on mailer.send() in mail channel
+- Updated dependencies [65e2de5]
+- Updated dependencies [46ee77d]
+- Updated dependencies [5da38e9]
+  - @facteurjs/core@2.0.0-beta.2
+
 ## 2.0.0-beta.7
 
 ### Patch Changes

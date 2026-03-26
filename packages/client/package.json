@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/client",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "JavaScript client for Facteur - Fetch and manage notifications from your frontend application",
   "keywords": [
     "frontend",
