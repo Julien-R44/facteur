@@ -43,14 +43,26 @@ export interface MarkAllAsOptions {
   tenantId?: string
 }
 
-export interface PreferencesData {
-  [notificationName: string]: {
-    [channelName: string]: boolean
-  }
+export interface ChannelPreferences {
+  [channelName: string]: boolean
+}
+
+export interface NotificationsPreferences {
+  global: { channels: ChannelPreferences }
+  notifications: Array<{
+    notification: { name?: string; identifier: string }
+    channels: ChannelPreferences
+  }>
+}
+
+export interface Preferences {
+  global: NotificationsPreferences
+  tenants?: Record<Identifier, NotificationsPreferences>
 }
 
 export interface UpdatePreferencesOptions {
-  preferences: PreferencesData
+  preferences: ChannelPreferences
   tenantId?: string
   notificationName?: string
+  category?: string
 }

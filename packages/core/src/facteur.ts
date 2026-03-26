@@ -164,6 +164,7 @@ export class Facteur<
     return {
       discoverNotifications: () => this.#discoverer.discoverNotifications(),
       getNotifications: () => this.#discoverer.getNotifications(),
+      getNotificationIdentities: () => this.#discoverer.getNotificationIdentities(),
       getNotificationTags: () => this.#discoverer.getAllNotificationTags(),
       clearCache: () => this.#discoverer.clearCache(),
     }

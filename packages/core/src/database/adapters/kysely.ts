@@ -160,7 +160,8 @@ class KyselyAdapter implements DatabaseAdapter {
         .selectFrom(this.#preferencesTableName)
         .selectAll()
         .where('user_id', '=', options.notifiableId)
-        .where('notification_name', '=', options.notificationName)
+        .$if(!!options.notificationName, (qb) => qb.where('notification_name', '=', options.notificationName))
+        .$if(!options.notificationName, (qb) => qb.where('notification_name', 'is', null))
         .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
         .$if(!options.tenantId, (qb) => qb.where('tenant_id', 'is', null))
         .executeTakeFirst()
@@ -182,7 +183,7 @@ class KyselyAdapter implements DatabaseAdapter {
           .values({
             user_id: options.notifiableId,
             tenant_id: options.tenantId || null,
-            notification_name: options.notificationName,
+            notification_name: options.notificationName || null,
             channels: JSON.stringify(options.channelPreferences),
             created_at: new Date(),
             updated_at: new Date(),

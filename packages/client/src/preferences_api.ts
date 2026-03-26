@@ -1,6 +1,6 @@
 import type { KyInstance } from 'ky'
 
-import type { PreferencesData, UpdatePreferencesOptions } from './types.ts'
+import type { Preferences, UpdatePreferencesOptions } from './types.ts'
 
 export class PreferencesApi {
   #client: KyInstance
@@ -14,13 +14,13 @@ export class PreferencesApi {
   /**
    * Get notification preferences for the user
    */
-  async list(options: { tenantId?: string } = {}): Promise<PreferencesData> {
+  async list(options: { tenantId?: string } = {}): Promise<Preferences> {
     const searchParams = new URLSearchParams()
     if (options.tenantId) searchParams.set('tenantId', options.tenantId)
 
     return this.#client
       .get(`notifications/notifiable/${this.#notifiableId}/preferences`, { searchParams })
-      .json<PreferencesData>()
+      .json<Preferences>()
   }
 
   /**

@@ -38,23 +38,59 @@ export const updatePreferencesRoute = defineRoute(({ facteur, authorize }) => ({
     const notifiableId = request.params.notifiableId
     const tenantId = request.body.tenantId
     const preferences = request.body.preferences
+    const notificationName = request.body.notificationName
+    const category = request.body.category
 
     const isAuthorized = await checkAuthorization({ authorize, request, notifiableId, tenantId })
     if (!isAuthorized) return UNAUTHORIZED_RESPONSE
+
+    if (notificationName && category) {
+      return {
+        status: 400,
+        body: { error: 'Cannot specify both "notificationName" and "category"' },
+      }
+    }
 
     if (!preferences) {
       return { status: 400, body: { error: 'Preferences are required' } }
     }
 
     const validation = validatePreferences(preferences)
-    if (!validation.valid) {
-      return { status: 400, body: { error: validation.error } }
+    if (!validation.valid) return { status: 400, body: { error: validation.error } }
+
+    /**
+     * Per-category scope: resolve notifications in category and update each one
+     */
+    if (category) {
+      const identities = await facteur.discoverer.getNotificationIdentities()
+      const matching = identities.filter((n) => n.category === category)
+
+      if (matching.length === 0) {
+        return {
+          status: 400,
+          body: { error: `No notifications found for category "${category}"` },
+        }
+      }
+
+      for (const identity of matching) {
+        await facteur.db.updatePreferences({
+          notifiableId,
+          tenantId,
+          notificationName: identity.identifier,
+          channelPreferences: preferences,
+        })
+      }
+
+      return { status: 204, body: {} }
     }
 
+    /**
+     * Global scope (no notificationName) or per-notification scope
+     */
     await facteur.db.updatePreferences({
       notifiableId,
       tenantId,
-      notificationName: request.body.notificationName,
+      notificationName,
       channelPreferences: preferences,
     })
 

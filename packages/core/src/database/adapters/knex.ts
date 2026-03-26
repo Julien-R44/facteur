@@ -161,7 +161,10 @@ class KnexAdapter implements DatabaseAdapter {
       const existing = await trx
         .table(this.#preferencesTableName)
         .where('user_id', options.notifiableId)
-        .andWhere('notification_name', options.notificationName)
+        .andWhere((builder) => {
+          if (options.notificationName) builder.where('notification_name', options.notificationName)
+          else builder.whereNull('notification_name')
+        })
         .andWhere((builder) => {
           if (options.tenantId) {
             builder.where('tenant_id', options.tenantId)
@@ -185,7 +188,7 @@ class KnexAdapter implements DatabaseAdapter {
         await trx.table(this.#preferencesTableName).insert({
           user_id: options.notifiableId,
           tenant_id: options.tenantId || null,
-          notification_name: options.notificationName,
+          notification_name: options.notificationName || null,
           channels: JSON.stringify(options.channelPreferences),
           created_at: new Date(),
           updated_at: new Date(),

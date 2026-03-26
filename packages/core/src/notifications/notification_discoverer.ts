@@ -135,7 +135,7 @@ export class NotificationDiscoverer {
       const options = (NotificationClass as any).options || {}
       return {
         name: options.name,
-        identifier: NotificationClass.name || options.identifier,
+        identifier: options.identifier || NotificationClass.name,
         tags: options.tags || [],
         category: options.category,
       }

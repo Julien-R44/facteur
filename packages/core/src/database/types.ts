@@ -147,7 +147,7 @@ export interface SavePreferencesParams {
 export interface UpdatePreferencesParams {
   notifiableId: Identifier
   tenantId?: Identifier
-  notificationName: string
+  notificationName?: string
   channelPreferences: Record<ChannelName, boolean>
 }
 
