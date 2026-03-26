@@ -132,7 +132,9 @@ export class FacteurDatabase {
     notificationName: string,
     channels: Record<string, boolean>,
   ) {
-    let notificationPref = notifications.find((n) => n.notification.name === notificationName)
+    let notificationPref = notifications.find(
+      (n) => n.notification.name === notificationName || n.notification.identifier === notificationName,
+    )
 
     if (!notificationPref) {
       notificationPref = {
