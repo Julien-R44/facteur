@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/adonisjs",
-  "version": "2.0.0-beta.7",
+  "version": "2.0.0-beta.8",
   "description": "AdonisJS integration for Facteur - Send notifications via multiple channels in your AdonisJS application",
   "keywords": [
     "adonis",
