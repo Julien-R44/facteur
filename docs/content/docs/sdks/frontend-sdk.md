@@ -172,29 +172,32 @@ const preferences = await facteur.preferences.list({
 
 ### preferences.update()
 
-Updates the user's notification preferences.
+Updates the user's notification preferences. The `preferences` object is a flat map of channel names to booleans. You can scope the update to a specific notification, a category, or apply it globally.
 
 **Parameters:**
 
-- `preferences` (object, required): Object containing preferences by notification type and channel
-- `tenantId` (string, optional): Tenant ID for specific preferences
-- `notificationName` (string, optional): Name of the notification type to update
+- `preferences` (object, required): Channel preferences as `{ channelName: boolean }`
+- `tenantId` (string, optional): Tenant ID to scope the update
+- `notificationName` (string, optional): Update preferences for a specific notification
+- `category` (string, optional): Update preferences for all notifications in a category
+
+`notificationName` and `category` are mutually exclusive.
 
 ```ts
+// Disable email for a specific notification
 await facteur.preferences.update({
-  preferences: {
-    'order-notifications': {
-      email: true,
-      sms: false,
-      push: true
-    },
-    'marketing-notifications': {
-      email: false,
-      sms: false,
-      push: false
-    }
-  },
-  tenantId: 'tenant-123',
-  notificationName: 'order-notifications'
+  preferences: { email: false },
+  notificationName: 'order-shipped',
+})
+
+// Disable SMS for all billing notifications
+await facteur.preferences.update({
+  preferences: { sms: false },
+  category: 'billing',
+})
+
+// Disable email globally
+await facteur.preferences.update({
+  preferences: { email: false },
 })
 ```

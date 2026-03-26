@@ -106,7 +106,7 @@ All API endpoints accept a `tenantId` parameter:
 GET /notifications/notifiable/:notifiableId?tenantId=org-123
 GET /notifications/notifiable/:notifiableId/preferences?tenantId=org-123
 POST /notifications/notifiable/:notifiableId/preferences
-  { tenantId: 'org-123', channelPreferences: { email: false } }
+  { tenantId: 'org-123', preferences: { email: false } }
 ```
 
 ```ts

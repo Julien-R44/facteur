@@ -145,23 +145,27 @@ const { data: preferences, isLoading } = usePreferences({
 
 ## useUpdatePreferences()
 
-Hook to update notification preferences.
+Hook to update notification preferences. Accepts a flat map of channel booleans, with an optional scope (`notificationName` or `category`).
 
 ```ts
 const updatePreferences = useUpdatePreferences()
 
-const handleSave = (preferences) => {
-  updatePreferences.mutate({
-    preferences: {
-      'order-notifications': {
-        email: true,
-        sms: false,
-        push: true
-      }
-    },
-    tenantId: 'optional-tenant-id'
-  })
-}
+// Disable email for a specific notification
+updatePreferences.mutate({
+  preferences: { email: false },
+  notificationName: 'order-shipped',
+})
+
+// Disable SMS for all billing notifications
+updatePreferences.mutate({
+  preferences: { sms: false },
+  category: 'billing',
+})
+
+// Disable email globally
+updatePreferences.mutate({
+  preferences: { email: false },
+})
 ```
 
 ## useFacteur()
