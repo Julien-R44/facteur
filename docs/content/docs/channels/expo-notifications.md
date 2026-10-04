@@ -4,15 +4,16 @@ The Expo channel allows you to send push notifications to mobile devices through
 
 ## Batching
 
-This channel **supports batching** with a maximum of **100 messages** per batch. When sending to multiple recipients, Facteur will automatically batch your notifications for optimal performance.
+This channel **supports batching** with a maximum of **100 messages** per batch. Opt in with `.to(users).useDriverBatching().send()`; normal bulk sends call the channel individually.
 
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { expoChannel } from '@facteurjs/adonisjs/channels/expo'
+import { createFacteur } from '@facteurjs/core'
+import { expoChannel } from '@facteurjs/core/channels/expo'
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     expo: expoChannel(),
   },
@@ -21,7 +22,10 @@ export default defineConfig({
 
 ## Configuration Options
 
-Facteur accepts the `ExpoClientOptions` exported by your installed `expo-server-sdk` version.
+The configuration accepts `ExpoClientOptions` from the installed `expo-server-sdk`, including `accessToken`, `httpAgent` and `maxConcurrentRequests`. It has no `apiUrl` option.
+
+**Current limitation:** the channel validates `accessToken` using `Expo.isExpoPushToken()`, even though an access token is not a device push token. Authenticated Expo delivery needs a code fix; do not assume a valid access token will be accepted.
+
 All configuration options are optional. The channel works out of the box without any configuration.
 
 ### SDK version compatibility
@@ -55,18 +59,20 @@ await facteur
 
 ## Expo Push Token Format
 
-Expo push tokens have a specific format and are validated automatically:
+Expo push tokens have a specific format:
 
 - Format: `ExponentPushToken[...]` or `ExpoPushToken[...]`
-- The channel validates tokens before sending notifications
-- Invalid tokens will throw an error immediately
+- The channel forwards the target token to the Expo SDK; it does not independently validate `targets.expoToken`.
 
 ## Message Features
 
 When creating notifications for Expo, you can use rich push notification features:
 
 ```ts
-export default class ExpoNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { ExpoMessage } from '@facteurjs/core/channels/expo'
+
+export default class ExpoNotification extends Notification<undefined> {
   asExpoMessage() {
     return ExpoMessage.create()
       .setTitle('Notification Title')

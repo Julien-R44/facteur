@@ -12,6 +12,18 @@
     "category": "Getting Started"
   },
   {
+    "permalink": "configuration",
+    "title": "Configuration",
+    "contentPath": "./configuration.md",
+    "category": "Getting Started"
+  },
+  {
+    "permalink": "notifications",
+    "title": "Creating Notifications",
+    "contentPath": "./notifications.md",
+    "category": "Guides"
+  },
+  {
     "permalink": "in-app-notifications",
     "title": "In-App Notifications",
     "contentPath": "./in-app-notifications.md",
@@ -54,75 +66,114 @@
     "category": "Guides"
   },
   {
+    "permalink": "server-api",
+    "title": "Server API",
+    "contentPath": "./server-api.md",
+    "category": "Guides"
+  },
+  {
+    "permalink": "adonisjs",
+    "title": "AdonisJS",
+    "contentPath": "./integrations/adonisjs.md",
+    "icon": "brand:adonisjs",
+    "category": "Integrations"
+  },
+  {
+    "permalink": "hono",
+    "title": "Hono",
+    "contentPath": "./integrations/hono.md",
+    "icon": "brand:hono",
+    "category": "Integrations"
+  },
+  {
     "permalink": "database",
     "title": "Database",
     "contentPath": "./channels/database.md",
+    "icon": "tabler:database",
     "category": "Channels"
   },
   {
     "permalink": "transmit",
     "title": "Transmit",
     "contentPath": "./channels/transmit.md",
+    "icon": "tabler:broadcast",
+    "category": "Channels"
+  },
+  {
+    "permalink": "socketio",
+    "title": "Socket.IO",
+    "contentPath": "./channels/socketio.md",
+    "icon": "tabler:brand-socket-io",
     "category": "Channels"
   },
   {
     "permalink": "slack",
     "title": "Slack",
     "contentPath": "./channels/slack.md",
+    "icon": "tabler:brand-slack",
     "category": "Channels"
   },
   {
     "permalink": "discord",
     "title": "Discord",
     "contentPath": "./channels/discord.md",
+    "icon": "tabler:brand-discord",
     "category": "Channels"
   },
   {
     "permalink": "whatsapp",
     "title": "WhatsApp",
     "contentPath": "./channels/whatsapp.md",
-    "category": "Channels"
-  },
-  {
-    "permalink": "teams",
-    "title": "Microsoft Teams",
-    "contentPath": "./channels/teams.md",
+    "icon": "tabler:brand-whatsapp",
     "category": "Channels"
   },
   {
     "permalink": "twilio",
     "title": "Twilio SMS",
     "contentPath": "./channels/twilio.md",
+    "icon": "tabler:phone",
+    "category": "Channels"
+  },
+  {
+    "permalink": "aws-sns",
+    "title": "AWS SNS",
+    "contentPath": "./channels/aws-sns.md",
+    "icon": "tabler:brand-aws",
     "category": "Channels"
   },
   {
     "permalink": "expo-notifications",
     "title": "Expo Notifications",
     "contentPath": "./channels/expo-notifications.md",
+    "icon": "tabler:device-mobile",
     "category": "Channels"
   },
   {
     "permalink": "webpush",
     "title": "Web Push",
     "contentPath": "./channels/webpush.md",
+    "icon": "tabler:bell",
     "category": "Channels"
   },
   {
     "permalink": "fcm",
     "title": "Firebase Cloud Messaging",
     "contentPath": "./channels/fcm.md",
+    "icon": "tabler:brand-firebase",
     "category": "Channels"
   },
   {
     "permalink": "webhook",
     "title": "Webhook",
     "contentPath": "./channels/webhook.md",
+    "icon": "tabler:webhook",
     "category": "Channels"
   },
   {
     "permalink": "mail",
     "title": "AdonisJS Mail",
     "contentPath": "./channels/mail.md",
+    "icon": "tabler:mail",
     "category": "Channels"
   },
   {

@@ -9,14 +9,14 @@
           "name": "Kysely",
           "description": "Store notifications using Kysely query builder",
           "icon": "tabler:database",
-          "docLink": "/docs/kysely"
+          "docLink": "/docs/database#kysely-adapter"
         },
         {
           "id": "knex",
           "name": "Knex",
           "description": "Store notifications using Knex.js query builder",
           "icon": "tabler:database",
-          "docLink": "/docs/knex"
+          "docLink": "/docs/database#knex-adapter"
         }
       ]
     },
@@ -47,7 +47,7 @@
         {
           "id": "transmit",
           "name": "Transmit",
-          "description": "Real-time notifications using WebSocket connections",
+          "description": "Real-time notifications using Server-Sent Events",
           "icon": "tabler:broadcast",
           "docLink": "/docs/transmit"
         }
@@ -70,13 +70,6 @@
           "description": "Send notifications to Discord servers and channels",
           "icon": "tabler:brand-discord",
           "docLink": "/docs/discord"
-        },
-        {
-          "id": "teams",
-          "name": "Microsoft Teams",
-          "description": "Send notifications to Microsoft Teams channels",
-          "icon": "tabler:brand-teams",
-          "docLink": "/docs/teams"
         }
       ]
     },
@@ -96,7 +89,7 @@
           "name": "AWS SNS",
           "description": "Send SMS notifications using AWS SNS messaging service",
           "icon": "tabler:brand-aws",
-          "docLink": "/docs/sns"
+          "docLink": "/docs/aws-sns"
         }
       ]
     },

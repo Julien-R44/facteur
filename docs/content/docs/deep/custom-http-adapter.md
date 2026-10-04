@@ -1,10 +1,8 @@
 # Custom HTTP Adapter
 
-As a reminder, Facteur comes with a full set of pre-configured HTTP routes to handle notifications, user preferences, etc. in a generic way: these routes are not coupled to any particular HTTP framework.
+Facteur provides framework-independent route definitions through `@facteurjs/core/api`. Built-in integrations are available for [Hono](../integrations/hono.md) and [AdonisJS](../integrations/adonisjs.md). For another framework, implement `ServerAdapter.setRoutes()`.
 
-We have 2 built-in adapters: one for Hono, and one for AdonisJS. But you can very easily write your own adapter for any HTTP framework, like Express, Fastify, etc.
-
-Here's an example of an adapter for Hono:
+The following Hono implementation illustrates the adapter contract (normally use `@facteurjs/hono`):
 
 ```ts
 import type { RouteDefinition, ServerAdapter } from '@facteurjs/core/api/types'
@@ -16,44 +14,43 @@ export class HonoServerAdapter implements ServerAdapter {
 
   setRoutes(routes: RouteDefinition[]) {
     for (const route of routes) {
-      const method = route.method.toUpperCase()
-      const pattern = route.route
-
-      this.app[method.toLowerCase() as 'get' | 'post'](pattern, async (c) => {
+      this.app.on(route.method.toUpperCase(), route.route, async (ctx) => {
+        const body = route.method === 'get' ? {} : await ctx.req.json()
         const result = await route.handler({
-          body: c.req.json(),
-          params: c.req.param(),
-          query: c.req.query(),
-          headers: c.req.header(),
+          body,
+          params: ctx.req.param(),
+          query: ctx.req.query(),
+          headers: ctx.req.header(),
+          context: ctx,
         })
 
-        return c.json(result.body, result.status as ContentfulStatusCode)
+        if (result.status === 204) return ctx.body(null, 204)
+        return ctx.json(result.body, result.status as ContentfulStatusCode)
       })
     }
   }
 }
 ```
 
-Several things to note:
+Parse and **await** the JSON body before calling a handler, map URL parameters/query/headers, and forward the framework context for authentication. Handle invalid JSON and exceptions using your framework's error handling. A `204` response should have no body. `setRoutes()` only registers handlers; it does not start a server.
 
-- We need to implement Facteur's `ServerAdapter` interface, which requires us to define the `setRoutes` method.
-- `setRoutes` receives an array of `RouteDefinition`, which contains the HTTP method, the route pattern, and the handler to call.
-- Then it's simple, just use your HTTP framework's methods to register the routes. Here we use Hono, but you can do the same with Express, Fastify, etc.
-
-Once the adapter is created, we can use it to create our Facteur server in our application:
+## Register the routes
 
 ```ts
-import { createFacteurServer } from '@facteurjs/core/api'
-import { HonoServerAdapter } from './hono-server-adapter.ts'
-import { facteur } from './facteur.ts'
-
 import { Hono } from 'hono'
+import { createFacteurServer } from '@facteurjs/core/api'
+import { HonoServerAdapter } from './hono-server-adapter.js'
+import { facteur } from './facteur.js'
+import { authorizeNotificationRequest } from './authorization.js'
 
 const app = new Hono()
-import { serve } from 'hono/http'
 
-const adapter = new HonoServerAdapter(app)
-const server = createFacteurServer({ adapter, facteur, })
+createFacteurServer({
+  adapter: new HonoServerAdapter(app),
+  facteur,
+  authorize: ({ notifiableId, tenantId, request }) =>
+    authorizeNotificationRequest({ notifiableId, tenantId, request }),
+})
 ```
 
-All good. Happy to accept Pull Requests to add adapters for other HTTP frameworks.
+`authorize` is mandatory. Your application helper must authenticate the caller and validate access to user/tenant resources. The generic callback receives `request.context`, not a top-level `ctx`. For `mark-as`, also verify ownership of the body’s notification ID; the built-in update is scoped only by ID. See [Server API](../server-api.md) for routes and security limitations.

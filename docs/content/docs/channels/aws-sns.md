@@ -9,10 +9,11 @@ This channel does **not support batching**. Each SMS is sent individually.
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { awsSnsChannel } from '@facteurjs/adonisjs/channels/aws-sns'
+import { createFacteur } from '@facteurjs/core'
+import { awsSnsChannel } from '@facteurjs/core/channels/aws-sns'
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     awsSns: awsSnsChannel({
       // Required: AWS credentials
@@ -22,7 +23,7 @@ export default defineConfig({
 
       // Optional: Session token (for temporary credentials)
       sessionToken: 'your-session-token',
-    })
+    }),
   },
 })
 ```
@@ -36,10 +37,7 @@ export default defineConfig({
 
 ### AWS Credentials
 
-You can obtain AWS credentials from:
-- IAM user access keys
-- IAM role (for EC2/Lambda)
-- AWS STS temporary credentials
+The current channel explicitly constructs AWS credentials from `accessKeyId` and `secretAccessKey` (plus an optional STS session token). It does not use the SDK's default IAM role credential chain. Load credentials from your environment or secret manager, not committed source files.
 
 Make sure your IAM policy includes the `sns:Publish` permission.
 
@@ -54,10 +52,7 @@ await facteur
     awsSns: {
       // Phone number in E.164 format (required)
       to: '+14155552671',
-
-      // Override sender ID for this message (optional)
-      senderId: 'MyApp'
-    }
+    },
   })
   .send()
 ```
@@ -65,16 +60,18 @@ await facteur
 ### Target Properties
 
 - **`to`** (required): The recipient's phone number in E.164 format (e.g., `+14155552671`)
-- **`senderId`** (optional): Override the sender ID for this specific message
+- `senderId` exists in the target type but is not forwarded to SNS by the current implementation.
 
 ### E.164 Format
 
 Phone numbers must be in E.164 format:
+
 - Start with `+`
 - Country code (e.g., `1` for US, `33` for France)
 - Phone number without spaces or dashes
 
 Examples:
+
 - US: `+14155552671`
 - UK: `+447911123456`
 - France: `+33612345678`
@@ -84,10 +81,12 @@ Examples:
 When creating notifications for AWS SNS, you set the SMS content:
 
 ```ts
-export default class SmsNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { AwsSnsMessage } from '@facteurjs/core/channels/aws-sns'
+
+export default class SmsNotification extends Notification<undefined> {
   asAwsSnsMessage() {
-    return AwsSnsMessage.create()
-      .setMessage('Your verification code is: 123456')
+    return AwsSnsMessage.create().setMessage('Your verification code is: 123456')
   }
 }
 ```
@@ -99,6 +98,7 @@ export default class SmsNotification extends Notification {
 ## SMS Limits
 
 Be aware of AWS SNS SMS limits:
+
 - SMS messages are limited to 160 characters for GSM encoding
 - Longer messages are split into multiple segments (up to 1600 characters)
 - Pricing varies by destination country

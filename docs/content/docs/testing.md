@@ -1,10 +1,10 @@
 # Testing
 
-Facteur provides a fake implementation to capture notifications during tests instead of sending them. This allows you to verify that notifications are being sent correctly without actually delivering them.
+Facteur provides a fake to capture send requests without contacting providers. This verifies that application code requested a notification, not that channel formatting, preferences or provider delivery are correct.
 
 ## Fake notifications
 
-You can use the `fake` method to swap the notification sender with a fake implementation. All notifications sent after calling `fake` will be captured and stored in memory.
+After `fake()`, recipient sends record one notification per recipient. They skip the configured notification resolver, lifecycle hooks and channel/preference resolution. Anonymous sends still run preparation and `shouldSend()` before recording. Test lifecycle and routing separately using controlled channel/database adapters when those behaviors matter.
 
 ```typescript
 import { test } from '@japa/runner'
@@ -14,10 +14,7 @@ import { WelcomeNotification } from '#notifications/welcome'
 test('sends welcome notification to new users', async () => {
   using fake = facteur.fake()
 
-  await facteur
-    .notification(WelcomeNotification)
-    .to(user)
-    .send()
+  await facteur.notification(WelcomeNotification).to(user).send()
 
   fake.assertSentCount(1)
 })

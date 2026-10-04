@@ -1,0 +1,45 @@
+<div class="docs_sidebar_wrapper" x-data>
+  <div
+    class="docs_sidebar_overlay md_hidden"
+    :class="{ visible: $store.offcanvasMenu.active }"
+    @click="$store.offcanvasMenu.hide()"
+  ></div>
+
+  <div class="docs_sidebar" :class="{ visible: $store.offcanvasMenu.active }">
+    <div class="docs_sidebar_container">
+      <nav aria-label="Documentation">
+        <ul>
+          @each(section in sections)
+            <li class="sidebar_section expanded">
+              @if(section.title.toLowerCase() !== 'root')
+                <button class="sidebar_section_title">
+                  <span>{{ section.title }}</span>
+                </button>
+              @end
+              <ul class="sidebar_section_items">
+                @each(item in section.items)
+                  <li class="sidebar_section_item">
+                    <a
+                      href="{{ item.href }}"
+                      up-preload
+                      up-focus="false"
+                      up-target="[layout-main]"
+                      class="{{ item.isActive ? 'up-current' : '' }}"
+                      aria-current="{{ item.isActive ? 'page' : 'false' }}"
+                      @click="$store.offcanvasMenu.hide()"
+                    >
+                      @if(item.icon)
+                        @svg(item.icon, { class: 'sidebar_provider_icon', width: 18, height: 18, 'aria-hidden': 'true', focusable: 'false' })
+                      @end
+                      <span>{{ item.title }}</span>
+                    </a>
+                  </li>
+                @end
+              </ul>
+            </li>
+          @end
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

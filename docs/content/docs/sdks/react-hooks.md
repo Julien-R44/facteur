@@ -19,10 +19,7 @@ const queryClient = new QueryClient()
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <FacteurProvider
-        apiUrl="https://your-api.com"
-        notifiableId={currentUser.id}
-      >
+      <FacteurProvider apiUrl="https://your-api.com" notifiableId={currentUser.id}>
         <YourApp />
       </FacteurProvider>
     </QueryClientProvider>
@@ -41,8 +38,8 @@ function App() {
   apiUrl="https://your-api.com"
   notifiableId={currentUser.id}
   timeout={5000}
-  headers={{ 'Authorization': `Bearer ${token}` }}
->
+  headers={{ Authorization: `Bearer ${token}` }}
+/>
 ```
 
 ## Type Safety
@@ -51,6 +48,8 @@ For better type safety with your custom notification data:
 
 ```ts
 // types/facteur.ts
+import '@facteurjs/react'
+
 declare module '@facteurjs/react' {
   interface DatabaseContent {
     orderId?: number
@@ -72,12 +71,17 @@ Hook to retrieve the list of notifications with automatic caching.
 - `limit` (number, optional): Number of items per page
 - `status` (string, optional): Filter by status (`'read'` | `'seen'` | `'unread'` | `'unseen'`)
 - `tenantId` (string, optional): Tenant ID
+- `tags` (string[], optional): Tag filter
 
 ```ts
-const { data: notifications, isLoading, error } = useNotifications({
+const {
+  data: notifications,
+  isLoading,
+  error,
+} = useNotifications({
   page: 1,
   limit: 10,
-  status: 'unread'
+  status: 'unread',
 })
 ```
 
@@ -85,11 +89,13 @@ const { data: notifications, isLoading, error } = useNotifications({
 
 Hook to mark a notification as read with automatic cache invalidation.
 
+Convert numeric database IDs to strings for marking methods. The mutation uses the current server's `mark-as` route, which requires an application-level ownership check; see [Server API](../server-api.md#authorization-is-required).
+
 ```ts
 const markAsRead = useMarkAsRead()
 
 const handleMarkAsRead = () => {
-  markAsRead.mutate({ notificationId: notification.id })
+  markAsRead.mutate({ notificationId: String(notification.id) })
 }
 ```
 
@@ -101,7 +107,7 @@ Hook to mark a notification as seen with automatic cache invalidation.
 const markAsSeen = useMarkAsSeen()
 
 const handleMarkAsSeen = () => {
-  markAsSeen.mutate({ notificationId: notification.id })
+  markAsSeen.mutate({ notificationId: String(notification.id) })
 }
 ```
 
@@ -139,7 +145,7 @@ Hook to retrieve notification preferences with caching.
 
 ```ts
 const { data: preferences, isLoading } = usePreferences({
-  tenantId: 'tenant-123'
+  tenantId: 'tenant-123',
 })
 ```
 
@@ -179,7 +185,21 @@ const handleCustomAction = async () => {
   // Direct access to client for advanced use cases
   await facteur.notifications.markAs({
     notificationId: 'id',
-    status: 'read'
+    status: 'read',
   })
 }
 ```
+
+## Generic mutations and query options
+
+`useMarkNotification()` accepts `{ notificationId: string, status: 'read' | 'seen' }`. `useMarkAllNotifications()` accepts `{ status: 'read' | 'seen', tenantId?: string }`. They invalidate notification queries after success, as do the convenience marking hooks. `useUpdatePreferences()` invalidates preference queries.
+
+For prefetching or custom queries/mutations, the package also exports `listNotificationsQueryOptions(options, client)`, `listPreferencesQueryOptions(options, client)`, `markNotificationMutationOptions(client)` and `markAllNotificationsMutationOptions(client)`. Get `client` from `useFacteur()`.
+
+`useInfiniteNotifications()` is exported, but its current page numbering starts at 0 while the backend defaults falsy page 0 to page 1, so it can request the first page twice. Use explicit one-based pagination with `useNotifications({ page, limit })` until that is fixed.
+
+## Tenant and realtime context
+
+`FacteurProvider` accepts **no `tenantId` prop**. Pass the tenant to `useNotifications`, `usePreferences`, preference updates and mark-all mutations separately. Single-notification marking does not expose a tenant parameter. Do not mount hook-using children until a valid `notifiableId` is available; without a client, `useFacteur()` throws.
+
+The hooks use HTTP, not realtime subscriptions. Connect your Socket.IO/Transmit client separately and invalidate or refetch queries after realtime messages.

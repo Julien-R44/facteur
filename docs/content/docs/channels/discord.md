@@ -9,10 +9,11 @@ This channel does **not support batching**. Each notification is sent individual
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { discordWebhookChannel } from '@facteurjs/adonisjs/channels/discord'
+import { createFacteur } from '@facteurjs/core'
+import { discordWebhookChannel } from '@facteurjs/core/channels/discord'
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     discord: discordWebhookChannel({
       // You can define multiple Discord webhooks, each with a unique name
@@ -21,10 +22,7 @@ export default defineConfig({
         alerts: 'https://discord.com/api/webhooks/YOUR/ALERT/WEBHOOK',
         announcements: 'https://discord.com/api/webhooks/YOUR/ANNOUNCEMENT/WEBHOOK',
       },
-
-      // Or just a single default webhook
-      webhookUrl: 'https://discord.com/api/webhooks/YOUR/DEFAULT/WEBHOOK',
-    })
+    }),
   },
 })
 ```
@@ -38,7 +36,7 @@ Since the Discord channel uses the webhook channel internally, it supports the s
 - **`webhooks`** (optional): An object defining multiple named Discord webhooks
 - **`webhookUrl`** (optional): A single default Discord webhook URL
 
-You must provide either `webhooks` or `webhookUrl`.
+Provide either `webhooks` or `webhookUrl`, not both. If both exist at runtime, `webhookUrl` takes precedence.
 
 ## Targets
 
@@ -51,9 +49,8 @@ await facteur
   .via({
     discord: {
       general: true,
-      alerts: false,
-      announcements: true
-    }
+      announcements: true,
+    },
   })
   .send()
 
@@ -62,15 +59,15 @@ await facteur
   .notification(MyNotification)
   .via({
     discord: {
-      webhookUrl: 'https://discord.com/api/webhooks/CUSTOM/WEBHOOK'
-    }
+      webhookUrl: 'https://discord.com/api/webhooks/CUSTOM/WEBHOOK',
+    },
   })
   .send()
 ```
 
 ### Target Properties
 
-- **Named webhooks**: Boolean values for each webhook defined in configuration
+- **Named webhooks**: Include only the names to call. The current implementation selects keys even when their value is `false`; omit a name to exclude it.
 - **`webhookUrl`** (optional): Send to an arbitrary Discord webhook URL
 
 ## Discord Message Features
@@ -78,21 +75,23 @@ await facteur
 When creating notifications for Discord, you can use rich embed features:
 
 ```ts
-export default class DiscordNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { DiscordMessage } from '@facteurjs/core/channels/discord'
+
+export default class DiscordNotification extends Notification<undefined> {
   asDiscordMessage() {
     return DiscordMessage.create()
-      .setContent('Hello from Facteur!')
-      .addEmbed({
-        title: 'Notification Title',
-        description: 'This is a rich embed',
-        color: '#5865F2',
-        fields: [
-          { name: 'Field 1', value: 'Value 1', inline: true },
-          { name: 'Field 2', value: 'Value 2', inline: true }
-        ]
+      .setBody('Hello from Facteur!')
+      .addEmbed((embed) => {
+        embed
+          .setTitle('Notification Title')
+          .setDescription('This is a rich embed')
+          .setColor('#5865F2')
+          .addField({ name: 'Field 1', value: 'Value 1', inline: true })
+          .addField({ name: 'Field 2', value: 'Value 2', inline: true })
       })
-      .setUsername('Bot Name')
-      .setAvatarUrl('https://example.com/avatar.png')
+      .setBotUsername('Bot Name')
+      .setBotAvatar('https://example.com/avatar.png')
   }
 }
 ```

@@ -1,6 +1,6 @@
 # Transmit Channel
 
-The Transmit channel allows you to send real-time notifications through AdonisJS Transmit, enabling WebSocket-based communication to connected clients. This channel is perfect for real-time updates, live notifications, and instant messaging features. It uses the `@adonisjs/transmit` package.
+The Transmit channel broadcasts realtime notifications over **Server-Sent Events (SSE)**, not WebSockets. The core channel accepts a `@boringnode/transmit` instance; the AdonisJS integration resolves `@adonisjs/transmit` for you.
 
 ## Batching
 
@@ -9,23 +9,18 @@ This channel does **not support batching**. Each notification is broadcast indiv
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { transmitChannel } from '@facteurjs/adonisjs/channels/transmit'
-import transmit from '@adonisjs/transmit/services/main'
+import { defineConfig, channels } from '@facteurjs/adonisjs'
 
 export default defineConfig({
   channels: {
-    transmit: transmitChannel({
-      // Pass your Transmit instance
-      transmit: transmit,
-    })
+    transmit: channels.transmit(),
   },
 })
 ```
 
 ## Configuration Options
 
-- **`transmit`** (required): Your AdonisJS Transmit instance
+`channels.transmit()` resolves the AdonisJS service. For manual core setup, import `transmitChannel` from `@facteurjs/core/channels/transmit` and provide `{ transmit }`. Register the transport's subscription routes and authorization separately from Facteur's notification HTTP API.
 
 ## Targets
 
@@ -37,8 +32,8 @@ await facteur
   .via({
     transmit: {
       // Channel name to broadcast to (required)
-      channel: 'user-123'
-    }
+      channel: 'user-123',
+    },
   })
   .send()
 ```
@@ -52,19 +47,21 @@ await facteur
 When creating notifications for Transmit, the message content is broadcast directly:
 
 ```ts
-export default class TransmitNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { TransmitMessage } from '@facteurjs/core/channels/transmit'
+
+export default class TransmitNotification extends Notification<undefined> {
   asTransmitMessage() {
-    return TransmitMessage.create()
-      .setContent({
-        type: 'notification',
-        title: 'New Message',
-        body: 'You have received a new message',
-        data: {
-          userId: 123,
-          timestamp: Date.now(),
-          priority: 'high'
-        }
-      })
+    return TransmitMessage.create().setContent({
+      type: 'notification',
+      title: 'New Message',
+      body: 'You have received a new message',
+      data: {
+        userId: 123,
+        timestamp: Date.now(),
+        priority: 'high',
+      },
+    })
   }
 }
 ```
@@ -74,12 +71,16 @@ export default class TransmitNotification extends Notification {
 On the client side, you can listen for notifications using Transmit:
 
 ```ts
-// Subscribe to a channel
-transmit.subscribe('user-123')
+import { Transmit } from '@adonisjs/transmit-client'
 
-// Listen for notifications
-transmit.on('user-123', (data) => {
+const transmit = new Transmit({ baseUrl: window.location.origin })
+const subscription = transmit.subscription('user-123')
+await subscription.create()
+
+subscription.onMessage((data) => {
   console.log('Received notification:', data)
   // Handle the notification (show toast, update UI, etc.)
 })
 ```
+
+Install `@adonisjs/transmit-client` in your frontend and authorize subscriptions on the server. Knowing a channel name does not grant access by itself. The React hooks do not subscribe to Transmit automatically.

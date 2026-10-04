@@ -9,23 +9,18 @@ This channel does **not support batching**. Each email is sent individually.
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { mailChannel } from '@facteurjs/adonisjs/channels/mail'
-import mail from '@adonisjs/mail/services/main'
+import { defineConfig, channels } from '@facteurjs/adonisjs'
 
 export default defineConfig({
   channels: {
-    mail: mailChannel({
-      // Pass your AdonisJS mail service instance
-      mailer: mail,
-    })
+    mail: channels.mail(),
   },
 })
 ```
 
 ## Configuration Options
 
-- **`mailer`** (required): Your AdonisJS Mail service instance
+`channels.mail()` resolves your AdonisJS Mail service automatically. The lower-level `mailChannel({ mailer })` factory from `@facteurjs/adonisjs/channels/mail` accepts a mail service instance for manual core configuration.
 
 The mail channel uses your existing AdonisJS mail configuration. Make sure you have `@adonisjs/mail` configured in your application.
 
@@ -38,8 +33,8 @@ await facteur
   .notification(MyNotification)
   .via({
     mail: {
-      email: 'user@example.com'
-    }
+      email: 'user@example.com',
+    },
   })
   .send()
 ```
@@ -55,16 +50,20 @@ You can create mail notifications in two ways:
 ### Using MailMessage (Simple)
 
 ```ts
+import { Notification } from '@facteurjs/core/types'
 import { MailMessage } from '@facteurjs/adonisjs/channels/mail'
 
-export default class OrderShippedNotification extends Notification {
+export default class OrderShippedNotification extends Notification<
+  undefined,
+  { orderId: number; trackingNumber: string }
+> {
   asMailMessage() {
     return MailMessage.create()
       .from('noreply@example.com')
       .subject('Your order has been shipped!')
       .htmlView('emails/order_shipped', {
-        orderId: this.order.id,
-        trackingNumber: this.order.trackingNumber,
+        orderId: this.params.orderId,
+        trackingNumber: this.params.trackingNumber,
       })
   }
 }
@@ -76,25 +75,30 @@ For more complex emails, you can use AdonisJS Mail classes:
 
 ```ts
 import { BaseMail } from '@adonisjs/mail'
+import { Notification } from '@facteurjs/core/types'
 
 class OrderShippedMail extends BaseMail {
   subject = 'Your order has been shipped!'
 
+  constructor(private orderId: number) {
+    super()
+  }
+
   prepare() {
-    this.message
-      .from('noreply@example.com')
-      .htmlView('emails/order_shipped', {
-        orderId: this.order.id,
-      })
+    this.message.from('noreply@example.com').htmlView('emails/order_shipped', {
+      orderId: this.orderId,
+    })
   }
 }
 
-export default class OrderShippedNotification extends Notification {
+export default class OrderShippedNotification extends Notification<undefined, { orderId: number }> {
   asMailMessage() {
-    return new OrderShippedMail()
+    return new OrderShippedMail(this.params.orderId)
   }
 }
 ```
+
+Both examples are anonymous notifications: use `.via({ mail: { email: 'user@example.com' } })` and supply the required `.params(...)` before `.send()`.
 
 ### Available Methods (MailMessage)
 

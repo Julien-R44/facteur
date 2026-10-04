@@ -9,21 +9,20 @@ This channel does **not support batching**. Each notification is emitted individ
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { socketIoChannel } from '@facteurjs/adonisjs/channels/socketio'
+import { createFacteur } from '@facteurjs/core'
+import { socketIoChannel } from '@facteurjs/core/channels/socketio'
 import { Server } from 'socket.io'
 
 const io = new Server(httpServer)
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     socketIo: socketIoChannel({
       // Pass your Socket.IO server instance
-      server: io,
-
-      // Or pass a function that returns the server (for lazy initialization)
+      // Or pass the instance directly: server: io
       server: () => io,
-    })
+    }),
   },
 })
 ```
@@ -47,8 +46,8 @@ await facteur
       event: 'notification',
 
       // Namespace to emit to (optional, defaults to '/')
-      namespace: '/admin'
-    }
+      namespace: '/admin',
+    },
   })
   .send()
 ```
@@ -63,18 +62,25 @@ await facteur
 When creating notifications for Socket.IO, you set the data payload:
 
 ```ts
-export default class SocketIONotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { SocketIoMessage } from '@facteurjs/core/channels/socketio'
+
+export default class SocketIONotification extends Notification<
+  undefined,
+  { orderId: number; status: string }
+> {
   asSocketIoMessage() {
-    return SocketIoMessage.create()
-      .setData({
-        type: 'order-update',
-        orderId: this.order.id,
-        status: this.order.status,
-        timestamp: Date.now(),
-      })
+    return SocketIoMessage.create().setData({
+      type: 'order-update',
+      orderId: this.params.orderId,
+      status: this.params.status,
+      timestamp: Date.now(),
+    })
   }
 }
 ```
+
+For this anonymous notification, send with `.via({ socketIo: { event: 'notification' } }).params({ orderId: 123, status: 'shipped' }).send()`.
 
 ### Available Methods
 
@@ -103,15 +109,4 @@ adminSocket.on('notification', (data) => {
 
 ## Targeting Specific Clients
 
-The Socket.IO channel emits to all clients in the specified namespace. For targeting specific users, combine with rooms:
-
-```ts
-// In your Socket.IO setup
-io.on('connection', (socket) => {
-  const userId = socket.handshake.auth.userId
-  socket.join(`user:${userId}`)
-})
-
-// Then in your notification, use a room-specific namespace pattern
-// or implement custom targeting logic in a custom channel
-```
+The built-in channel emits to **all clients** in the specified namespace; it has no room or socket target. Joining a room does not narrow its broadcast. Use an authorized user-specific namespace or a [custom channel](../deep/custom-channels.md) that calls `.to(room)` for private delivery. Authenticate connections and verify namespace/room access on your server; never trust a client-supplied user ID alone.

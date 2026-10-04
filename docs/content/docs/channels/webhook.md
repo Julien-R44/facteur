@@ -9,10 +9,11 @@ This channel does **not support batching**. Each webhook is called individually.
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { webhookChannel } from '@facteurjs/adonisjs/channels/webhook'
+import { createFacteur } from '@facteurjs/core'
+import { webhookChannel } from '@facteurjs/core/channels/webhook'
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     webhook: webhookChannel({
       name: 'webhook',
@@ -23,10 +24,7 @@ export default defineConfig({
         slack: 'https://hooks.slack.com/services/xxx/yyy/zzz',
         custom: 'https://api.example.com/webhooks/notifications',
       },
-
-      // Or use a single default webhook
-      webhookUrl: 'https://api.example.com/webhook',
-    })
+    }),
   },
 })
 ```
@@ -37,7 +35,7 @@ export default defineConfig({
 - **`webhooks`** (optional): An object mapping webhook names to URLs
 - **`webhookUrl`** (optional): A single default webhook URL
 
-You must provide either `webhooks` or `webhookUrl`.
+Provide either `webhooks` or `webhookUrl`, not both. If both exist at runtime, `webhookUrl` takes precedence.
 
 ## Targets
 
@@ -51,8 +49,7 @@ await facteur
     webhook: {
       zapier: true,
       slack: true,
-      custom: false, // This one won't be called
-    }
+    },
   })
   .send()
 
@@ -61,18 +58,18 @@ await facteur
   .notification(MyNotification)
   .via({
     webhook: {
-      webhookUrl: 'https://custom-endpoint.example.com/notify'
-    }
+      webhookUrl: 'https://custom-endpoint.example.com/notify',
+    },
   })
   .send()
 ```
 
 ### Target Properties
 
-When using named webhooks:
-- **`[webhookName]: boolean`**: Set to `true` to send to that webhook
+When using named webhooks, include only the keys to call. **Current limitation:** keys are selected regardless of their boolean value. `custom: false` still calls `custom`; omit it to exclude it. This also applies to Slack and Discord.
 
 When using arbitrary URLs:
+
 - **`webhookUrl`**: The webhook URL to send to
 
 ## Message Features
@@ -80,15 +77,21 @@ When using arbitrary URLs:
 When creating webhook notifications, you can customize the HTTP request:
 
 ```ts
-export default class WebhookNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { WebhookMessage } from '@facteurjs/core/channels/webhook'
+
+export default class WebhookNotification extends Notification<
+  undefined,
+  { orderId: number; customer: { name: string; email: string } }
+> {
   asWebhookMessage() {
     return WebhookMessage.create()
       .setBody({
         event: 'order.shipped',
-        orderId: this.order.id,
+        orderId: this.params.orderId,
         customer: {
-          name: this.customer.name,
-          email: this.customer.email,
+          name: this.params.customer.name,
+          email: this.params.customer.email,
         },
         timestamp: new Date().toISOString(),
       })
@@ -110,14 +113,20 @@ export default class WebhookNotification extends Notification {
 
 ## Error Handling
 
-The webhook channel throws a `WebhookRequestException` when the HTTP request fails. You can catch and handle these errors:
+HTTP failures become `WebhookRequestException`, then the sender wraps channel failures in an aggregate error by default. Use `.throwOnError(false)` to inspect the underlying channel error:
 
 ```ts
-try {
-  await facteur.notification(MyNotification).via({ webhook: { zapier: true } }).send()
-} catch (error) {
+import { WebhookRequestException } from '@facteurjs/core/channels/webhook'
+
+const result = await facteur
+  .notification(MyNotification)
+  .via({ webhook: { zapier: true } })
+  .throwOnError(false)
+  .send()
+
+for (const { error } of result.results) {
   if (error instanceof WebhookRequestException) {
-    console.error('Webhook failed:', error.statusCode, error.body)
+    console.error('Webhook failed:', error.url, error.responseBody)
   }
 }
 ```
@@ -129,7 +138,7 @@ The webhook channel is designed to be extended. Discord and Slack channels are b
 ```ts
 import { webhookChannel } from '@facteurjs/core/channels/webhook'
 
-export function myServiceChannel(options: { apiKey: string; webhookUrl: string }) {
+export function myServiceChannel(options: { webhookUrl: string }) {
   return webhookChannel({
     name: 'myService',
     webhookUrl: options.webhookUrl,

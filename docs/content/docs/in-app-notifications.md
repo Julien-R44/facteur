@@ -1,262 +1,152 @@
 # In-App Notifications
 
-To begin with, what are “In‑App notifications”? In Facteur, In‑App notifications are notifications that appear in real time inside your application, typically like notifications on Twitter or Facebook. They’re often shown via a bell icon with a badge indicating the number of unread notifications.
+In-app notifications combine persistent storage with realtime delivery. This guide uses Hono, Knex/PostgreSQL, Socket.IO and React. You can substitute Kysely, AdonisJS or another HTTP/realtime adapter.
 
-These notifications are stored in your database with several pieces of metadata, such as the read/unread status, the content (entirely arbitrary depending on your application), the user ID of the recipient, and more.
+## Configuration
 
-Facteur makes this type of notification straightforward to manage. In this guide, we’ll use Hono, Socket.IO for real‑time notifications, PostgreSQL as the database, and React for the frontend. Note, however, that you can use any framework, any database, and any real‑time transport. Everything in Facteur is decoupled, and it’s easy to write adapters if a given channel or framework isn’t supported yet.
+Install the backend dependencies:
 
-## Configuration setup
+```sh
+pnpm add @facteurjs/core @facteurjs/hono hono knex pg socket.io
+```
 
-The first step is to configure two notification channels: `database` and a real‑time transport channel, such as `transmit` for Server‑Sent Events (SSE).
-
-The `database` channel uses a database adapter such as `knex` or `kysely`, so make sure to use the adapter that matches the database library you already use in your app.
+Create a Knex connection and Socket.IO server using your application's normal setup, then configure Facteur:
 
 ```ts
-import { createFacteur } from '@facteurjs/core'
+import { Facteur } from '@facteurjs/core'
 import { databaseChannel } from '@facteurjs/core/database'
 import { knexAdapter } from '@facteurjs/core/database/adapters/knex'
-import { kyselyAdapter } from '@facteurjs/core/database/adapters/kysely'
+import { socketIoChannel } from '@facteurjs/core/channels/socketio'
+import { connection } from './database.js'
+import { ioServer } from './socketio.js'
 
-export const facteur = createFacteur({
-  channels: {
-    // Our database channel
-    db: databaseChannel({
-      adapter: knexAdapter({ connection: knex(...) }),
-      // or if you use Kysely
-      adapter: kyselyAdapter({ connection: kysely(...) }),
-    })
+const adapter = knexAdapter({ connection })
+const channels = {
+  database: databaseChannel({ adapter }),
+  socketIo: socketIoChannel({ server: ioServer }),
+}
 
-    // And one additional channel for real-time transmission. Transmit in our case
-    socketio: socketIoChannel({ server: ioServer }),
-  },
+export const facteur = new Facteur<typeof channels, typeof adapter>({
+  channels,
+  databaseAdapter: adapter,
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
 })
-```
 
-Perfect. We now have storage for notifications and a way to deliver them in real time to our frontend client.
+type AppChannels = typeof channels
 
-## Database schema
-
-You’ll need to add two new tables to your database: one for notifications and one for user preferences. Here’s a SQL example that you can adapt to your database:
-
-```sql
-CREATE TABLE notifications (
-  id SERIAL PRIMARY KEY,
-  notifiable_id TEXT NOT NULL,
-  tenant_id TEXT,
-  type TEXT NOT NULL,
-  content JSON NOT NULL,
-  status TEXT NOT NULL DEFAULT 'unseen',
-  tags JSON,
-  read_at TIMESTAMP,
-  seen_at TIMESTAMP,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  INDEX idx_notifiable_id (notifiable_id),
-  INDEX idx_tenant_id (tenant_id),
-  INDEX idx_status (status),
-  INDEX idx_notifiable_tenant (notifiable_id, tenant_id)
-);
-
-CREATE TABLE notification_preferences (
-  id SERIAL PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  tenant_id TEXT,
-  notification_name TEXT,
-  channels JSON NOT NULL,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP,
-  INDEX idx_user_id (user_id),
-  INDEX idx_tenant_id (tenant_id),
-  UNIQUE (user_id, tenant_id, notification_name)
-);
-```
-
-## Typing the data
-
-One particularity of these two channels is that you can transmit and store fully arbitrary data, both in the database and in real time. In the DB case, this data is stored in a JSONB field named `content` as shown above. It’s handy to have some type‑safety and autocomplete around that. Facteur lets you define an interface via module augmentation to type this data.
-
-Back in our `facteur.ts` file, add an interface for the notification data:
-
-```ts
 declare module '@facteurjs/core/types' {
+  interface NotificationChannels extends AppChannels {}
   interface DatabaseContent {
     message: string
     description?: string
     severity: 'info' | 'error' | 'success' | 'warning'
-    primaryAction?: {
-      label: string
-      url: string
-    }
-
-    secondaryAction?: {
-      label: string
-      url: string
-    }
   }
 }
+
+await facteur.discoverer.discoverNotifications()
 ```
 
-With this code, we clearly tell TypeScript that `notification.content` will contain this shape.
+The `database` channel stores messages, while the **top-level `databaseAdapter`** enables API reads and preferences. Configure both. Create the tables from the [Database channel schema](./channels/database.md#database-schema) and, if using preferences, [User Preferences](./user-preferences.md#how-it-works).
 
-## Creating an in‑app notification
+## Recipient targets
 
-Our setup is ready. We can now create a notification and define two messages: one for the database and one for the real‑time transport.
+Your recipient provides both storage and realtime targets:
 
 ```ts
-export default class InvoicePaidNotification extends Notification<User, InvoicePaidParams> {
-  static options: NotificationOptions<User> = {
-    name: 'Invoice Paid',
-    deliverBy: {
-      database: true,
-      transmit: true,
-    },
-  }
-
-  asTransmitMessage(): TransmitMessage {
-    return TransmitMessage.create().setContent({
-      title: 'Invoice Paid',
-      body: 'Your invoice has been successfully paid.',
-      timestamp: new Date().toISOString(),
-    })
-  }
-
-  asDatabaseMessage(): DatabaseMessage {
-    return DatabaseMessage.create().setContent({
-      message: 'Invoice Paid',
-      description: `Your invoice of $${this.params.amount} has been successfully paid.`,
-    })
+notificationTargets() {
+  return {
+    database: { notifiableId: this.id },
+    socketIo: { namespace: `/users/${this.id}`, event: 'notification' },
   }
 }
 ```
 
-Done! Our notification is ready to be sent.
+These are methods on your application's user model. **Socket.IO broadcasts to every client in the chosen namespace.** Authenticate connections and authorize namespace access in your Socket.IO setup. A user-specific namespace name alone does not secure it. The built-in channel does not target rooms; use a custom channel if you need that.
+
+## Notification content
+
+Save this class as `notifications/invoice_paid_notification.ts`:
+
+```ts
+import { Notification, type NotificationOptions } from '@facteurjs/core/types'
+import { DatabaseMessage } from '@facteurjs/core/database'
+import { SocketIoMessage } from '@facteurjs/core/channels/socketio'
+import type { User } from '../user.js'
+
+export default class InvoicePaidNotification extends Notification<User, { amount: number }> {
+  static options: NotificationOptions<User> = {
+    name: 'Invoice Paid',
+    identifier: 'invoice-paid',
+    deliverBy: { database: true, socketIo: true },
+  }
+
+  asDatabaseMessage() {
+    return DatabaseMessage.create()
+      .setType('invoice-paid')
+      .setContent({
+        message: 'Invoice Paid',
+        description: `Your invoice of $${this.params.amount} has been paid.`,
+        severity: 'success',
+      })
+  }
+
+  asSocketIoMessage() {
+    return SocketIoMessage.create().setData({ type: 'invoice-paid' })
+  }
+}
+```
+
+Send it with `facteur.notification(InvoicePaidNotification).to(user).params({ amount: 100 }).send()`. Database and realtime channels send independently; a realtime event is not proof that the database insert has completed. Your frontend should refresh notification data with that ordering in mind.
 
 ## API setup
 
-We’ll soon be able to set up the frontend, but one piece is missing: API routes to fetch notifications for the authenticated user.
-
-Facteur provides generic API route handlers; you plug in an adapter for your HTTP framework to actually register them in your app.
-
-Depending on the framework you use, you might need to create a small custom adapter for Facteur (PRs are welcome to add adapters for other frameworks!).
-
-Currently, Hono and AdonisJS are supported. Here’s an example adapter for Hono:
-
-```ts
-export class HonoServerAdapter implements ServerAdapter {
-  constructor(protected app: Hono) {}
-
-  setRoutes(routes: RouteDefinition[]) {
-    for (const route of routes) {
-      const method = route.method.toUpperCase()
-      const pattern = route.route
-
-      this.app[method.toLowerCase() as 'get' | 'post'](pattern, async (c) => {
-        const result = await route.handler({
-          body: c.req.json(),
-          params: c.req.param(),
-          query: c.req.query(),
-          headers: c.req.header(),
-        })
-
-        return c.json(result.body, result.status as ContentfulStatusCode)
-      })
-    }
-  }
-}
-```
-
-Let’s assume we’re using Hono here. Install `@facteurjs/hono`, then wire these routes into your app with `createFacteurServer`:
-
 ```ts
 import { Hono } from 'hono'
-import { ioServer } from './socketio.ts'
-import { HonoServerAdapter } from '@facteurjs/hono'
+import { createHonoFacteurServer } from '@facteurjs/hono'
+import { facteur } from './facteur.js'
+import { authorizeNotificationRequest } from './authorization.js'
 
 const app = new Hono()
 
-/**
- * Registering Facteur routes in Hono using the HonoServerAdapter.
- */
-createFacteurServer({ adapter: new HonoServerAdapter(app), facteur })
+createHonoFacteurServer({
+  app,
+  facteur,
+  authorize: ({ notifiableId, tenantId, ctx }) =>
+    authorizeNotificationRequest({ notifiableId, tenantId, ctx }),
+})
 
-/**
- * Serve the Hono app and attach the Socket.IO server.
- * SocketIO for real-time notifications.
- */
-const server = serve({ fetch: app.fetch, port: 3000 })
-ioServer.attach(server)
-
-console.log('Server is running on http://localhost:3000')
-console.log('WebSocket server is running on ws://localhost:3000/ws')
+export default app
 ```
 
-Great, we now have:
+Implement `authorizeNotificationRequest` in your application to authenticate the caller and verify access. **The built-in `mark-as` route does not scope its update by owner/tenant**, so also verify the body’s notification ID or use a scoped custom route. Read [Server API](./server-api.md#authorization-is-required) before exposing the API. Serve Hono and attach `ioServer` to your HTTP server separately.
 
-- Our Hono API with preconfigured Facteur routes to manage notifications.
-- Our Socket.IO server for real‑time notifications.
-
-Everything’s ready to build the frontend!
-
-## Frontend setup
-
-For the frontend, we’ll use React. If you use another framework, the principle is the same.
-
-We’ll use the `@facteurjs/react` package, which exposes TanStack Query hooks to interact with your own Facteur API. Internally, `@facteurjs/react` uses `@facteurjs/client`, a simple type‑safe SDK to talk to your API. You can use `@facteurjs/client` directly if you’re not using React, don’t want TanStack Query, or for other scenarios.
-
-First, install `@facteurjs/react`:
+## React frontend
 
 ```sh
-pnpm add @facteurjs/react
+pnpm add @facteurjs/react @tanstack/react-query
 ```
 
-Then add the `FacteurProvider` in your app to configure the Facteur client and provide TanStack Query hooks to your React components:
+Wrap your app in a TanStack `QueryClientProvider`, then configure the client:
 
 ```tsx
-<FacteurProvider
+import { FacteurProvider } from '@facteurjs/react'
+;<FacteurProvider
   apiUrl={import.meta.env.VITE_MY_API_URL}
   notifiableId={connectedUser.id}
+  credentials="include"
 >
-  {/* ... */}
+  <App />
 </FacteurProvider>
 ```
 
-Next, we need to re‑type the notification data so TypeScript can help with autocomplete. Since we’re in a different TypeScript project, we’ll add another module augmentation with the same interface as before:
-
-```ts
-declare module '@facteurjs/react' {
-  interface DatabaseContent {
-    message: string
-    description?: string
-    severity: 'info' | 'error' | 'success' | 'warning'
-
-    primaryAction?: {
-      label: string
-      url: string
-    }
-
-    secondaryAction?: {
-      label: string
-      url: string
-    }
-  }
-}
-```
-
-All good. Now you can use the TanStack Query hooks exposed by `@facteurjs/react` to interact with your Facteur API. A few examples:
+Use `credentials="include"` for cookie authentication, or provide an authorization header for your token-based API. See [React hooks](./sdks/react-hooks.md) for provider setup and `DatabaseContent` module augmentation in the frontend project.
 
 ```tsx
-import { useNotifications } from '@facteurjs/react'
+import { useNotifications, useMarkNotification, useMarkAllAsRead } from '@facteurjs/react'
 
 const { data: notifications, isLoading } = useNotifications()
 const { mutate: mark } = useMarkNotification()
-const { mutate: markAllAsRead } = useMarkAllNotificationsAsRead()
+const { mutate: markAllAsRead } = useMarkAllAsRead()
 ```
 
-From here, build the UI that displays these notifications, add buttons to mark notifications as read, and so on.
-
-There’s a fairly complete frontend example in the `playgrounds/adonisjs` folder of this repository—feel free to take a look to see how it all fits together. Overall, it’s quite simple.
-
-## Conclusion
-
-That was a high‑level overview of handling In‑App notifications with Facteur. For more details, refer to the documentation specific to each part.
+The hooks use HTTP and do not subscribe to Socket.IO automatically. Connect with `socket.io-client` and invalidate/refetch the notification query when you receive a realtime event. The [Socket.IO channel](./channels/socketio.md) describes the transport; [Frontend SDK](./sdks/frontend-sdk.md) covers non-React clients.

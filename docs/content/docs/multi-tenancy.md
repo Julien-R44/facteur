@@ -9,7 +9,7 @@ Imagine a SaaS application like Slack or Notion where users belong to different 
 - In Organization A, a user wants email + Slack notifications
 - In Organization B, the same user only wants in-app notifications
 
-Facteur handles this by scoping everything (notifications, preferences) to a `tenantId`.
+Facteur carries a `tenantId` through notification delivery and preference resolution. This context is not an authorization boundary: your application must validate tenant access, and the built-in API has the filtering limitations described below.
 
 ## Sending notifications for a tenant
 
@@ -20,30 +20,34 @@ await facteur
   .notification(InvoicePaidNotification)
   .params({ amount: 100 })
   .to(user)
-  .tenant('org-123')  // Scope to this tenant
+  .tenant('org-123') // Scope to this tenant
   .send()
 ```
 
 The `tenantId` is passed through the entire pipeline. Your notification can access it if needed:
 
 ```ts
+import { Notification, type NotificationOptions } from '@facteurjs/core/types'
+import { TwilioMessage } from '@facteurjs/core/channels/twilio'
+import { DatabaseMessage } from '@facteurjs/core/database'
+import type { User } from './user.js'
+
 export class InvoicePaidNotification extends Notification<User, { amount: number }> {
-  static options = {
+  static options: NotificationOptions<User> = {
     name: 'Invoice Paid',
-    deliverBy: { email: true, database: true },
+    deliverBy: { twilio: true, database: true },
   }
 
-  asEmailMessage({ tenantId, params }) {
-    const orgName = getOrgName(tenantId) // Use tenant info if needed
-
-    return EmailMessage.create()
-      .setSubject(`Invoice Paid - ${orgName}`)
-      .setBody(`Your invoice of $${params.amount} has been paid.`)
+  asTwilioMessage() {
+    return TwilioMessage.create().setBody(
+      `Invoice of $${this.params.amount} paid for organization ${this.tenantId}.`,
+    )
   }
 
-  asDatabaseMessage({ params }) {
-    return DatabaseMessage.create()
-      .setContent({ message: `Invoice of $${params.amount} paid` })
+  asDatabaseMessage() {
+    return DatabaseMessage.create().setContent({
+      message: `Invoice of $${this.params.amount} paid`,
+    })
   }
 }
 ```
@@ -57,11 +61,11 @@ Facteur supports a hierarchical preference system with 4 levels (from most to le
 3. **Notification-specific global preference** - "Disable email for Invoice Paid everywhere"
 4. **Global preference** - "Disable email for everything"
 
-The most specific preference always wins.
+The resolver orders sources this way, but generated default values can mask lower-priority settings. See [User Preferences](./user-preferences.md#resolution-priority) for the current limitations.
 
 ### Example
 
-```ts
+```text
 // User preferences structure in database
 {
   global: {
@@ -82,7 +86,7 @@ The most specific preference always wins.
 }
 ```
 
-With these preferences, when sending a notification scoped to `org-123`:
+With these already-resolved channel values, the priority order for a notification scoped to `org-123` is:
 
 - **Invoice Paid**: Email enabled (notification-specific tenant preference wins)
 - **Other notifications**: Email disabled (tenant global preference applies)
@@ -95,45 +99,38 @@ When using the `database` channel, notifications are stored with the `tenant_id`
 SELECT * FROM notifications WHERE notifiable_id = 'user-123' AND tenant_id = 'org-123';
 ```
 
-This ensures users only see notifications relevant to their current tenant/organization.
+Supplying a tenant to list/mark-all operations filters by that tenant. Omitting it does **not** filter to null-tenant notifications: the built-in adapters list or update notifications across the user's tenants. Validate tenant membership in your API authorization. The `mark-as` update is scoped only by notification ID and needs an additional ownership/tenant check; see [Server API](./server-api.md#authorization-is-required).
 
 ## API and SDK
 
 All API endpoints accept a `tenantId` parameter:
 
-```ts
+```http
 // Backend - using Facteur routes
-GET /notifications/notifiable/:notifiableId?tenantId=org-123
+GET /notifications/notifiable/:notifiableId/notifications?tenantId=org-123
 GET /notifications/notifiable/:notifiableId/preferences?tenantId=org-123
 POST /notifications/notifiable/:notifiableId/preferences
   { tenantId: 'org-123', preferences: { email: false } }
 ```
 
-```ts
+```tsx
 // Frontend - using the SDK
 import { FacteurProvider, useNotifications } from '@facteurjs/react'
 
-// Set tenantId in the provider
-<FacteurProvider
-  apiUrl={import.meta.env.VITE_API_URL}
-  notifiableId={user.id}
-  tenantId={currentOrganization.id}  // Current tenant
->
+// User identity belongs in the provider; tenant filters belong in calls.
+;<FacteurProvider apiUrl={import.meta.env.VITE_API_URL} notifiableId={user.id}>
   <App />
 </FacteurProvider>
 
-// Hooks automatically use the tenant context
-const { data: notifications } = useNotifications()
+const { data: notifications } = useNotifications({ tenantId: currentOrganization.id })
+// Also pass tenantId to preferences and mark-all calls.
 ```
 
 ## Without a tenant
 
-If you don't use `.tenant()`, notifications and preferences are stored/retrieved without tenant scoping. This is fine for single-tenant applications.
+If you don't use `.tenant()` and neither the database message nor target provides a tenant, new notifications have no tenant. Preference reads without a tenant return global preferences only; notification list/mark-all operations without a tenant cover all of the user's tenant scopes. This is fine for single-tenant applications but is not an isolation boundary for multi-tenant apps.
 
 ```ts
 // No tenant - works for single-tenant apps
-await facteur
-  .notification(WelcomeNotification)
-  .to(user)
-  .send()
+await facteur.notification(WelcomeNotification).to(user).send()
 ```

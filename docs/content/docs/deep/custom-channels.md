@@ -22,13 +22,13 @@ src/channels/acme-sms/
 
 **Targets** represent the destination address for a channel. Each channel has its own target type depending on how it delivers messages:
 
-| Channel | Target | Example |
-|---------|--------|---------|
-| SMS | Phone number | `{ phoneNumber: '+33612345678' }` |
-| Email | Email address | `{ email: 'user@example.com' }` |
-| Slack | Channel or user | `{ channel: '#general' }` |
-| FCM | Device token | `{ token: 'fcm_device_token_xxx' }` |
-| Webhook | URL | `{ webhookUrl: 'https://...' }` |
+| Channel       | Target               | Example                                         |
+| ------------- | -------------------- | ----------------------------------------------- |
+| Twilio SMS    | Phone number         | `{ to: '+33612345678' }`                        |
+| Email         | Email address        | `{ email: 'user@example.com' }`                 |
+| Slack webhook | Named webhook or URL | `{ webhookUrl: 'https://hooks.slack.com/...' }` |
+| FCM           | Device token         | `{ token: 'fcm_device_token_xxx' }`             |
+| Webhook       | URL                  | `{ webhookUrl: 'https://...' }`                 |
 
 Targets can be provided in two ways:
 
@@ -39,6 +39,7 @@ Targets can be provided in two ways:
 // Explicit targets
 await facteur
   .notification(OrderShippedNotification)
+  .to(user)
   .params({ trackingNumber: 'ABC123' })
   .via({ acmeSms: { phoneNumber: '+33612345678' } })
   .send()
@@ -46,7 +47,7 @@ await facteur
 // Implicit targets - resolved from the user
 await facteur
   .notification(OrderShippedNotification)
-  .to(user)  // user.notificationTargets() returns { acmeSms: { phoneNumber: '...' } }
+  .to(user) // user.notificationTargets() returns { acmeSms: { phoneNumber: '...' } }
   .params({ trackingNumber: 'ABC123' })
   .send()
 ```
@@ -122,10 +123,10 @@ export class AcmeSmsChannel implements Channel<
   AcmeSmsTargets
 > {
   /**
-   * Unique identifier for this channel. Used in `deliverBy` and for
-   * registering the `asAcmeSmsMessage()` method on notifications.
+   * Provider identifier. The configuration key determines the
+   * deliverBy key and asAcmeSmsMessage() method name.
    */
-  name = 'acmeSms' as const
+  name = 'acmeSms' as const;
 
   /**
    * Phantom property for TypeScript type inference.
@@ -163,7 +164,7 @@ export class AcmeSmsChannel implements Channel<
     const response = await fetch('https://api.acmesms.fake/send', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#config.apiKey}`,
+        Authorization: `Bearer ${this.#config.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -173,6 +174,7 @@ export class AcmeSmsChannel implements Channel<
       }),
     })
 
+    if (!response.ok) throw new Error(`AcmeSMS request failed: ${response.status}`)
     const result = await response.json()
     return { messageId: result.id }
   }
@@ -201,10 +203,12 @@ Add your channel to Facteur and register it with TypeScript:
 
 ```ts
 // facteur.ts
-import { createFacteur, type InferChannelsFromConfig } from '@facteurjs/core'
+import { createFacteur } from '@facteurjs/core'
+import type { InferChannelsFromConfig } from '@facteurjs/core/types'
 import { acmeSmsChannel } from './channels/acme-sms/index.ts'
 
 export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     acmeSms: acmeSmsChannel({
       apiKey: process.env.ACME_SMS_API_KEY!,
@@ -236,8 +240,9 @@ export class OrderShippedNotification extends Notification<User, { trackingNumbe
   }
 
   asAcmeSmsMessage() {
-    return AcmeSmsMessage.create()
-      .setBody(`Your order has shipped! Tracking: ${this.params.trackingNumber}`)
+    return AcmeSmsMessage.create().setBody(
+      `Your order has shipped! Tracking: ${this.params.trackingNumber}`,
+    )
   }
 }
 ```
@@ -263,12 +268,12 @@ export class AcmeSmsChannel implements Channel<
   { messageId: string },
   AcmeSmsTargets
 > {
-  name = 'acmeSms' as const
+  name = 'acmeSms' as const;
   [kTargetSymbol] = null as any as AcmeSmsTargets
 
   /**
-   * Batch configuration. When enabled, Facteur will group messages
-   * and call sendBatch() instead of send() for better performance.
+   * Batch configuration. When useDriverBatching() is selected,
+   * Facteur groups messages and calls sendBatch().
    */
   batchConfig: BatchConfig = { maxSize: 100, enabled: true }
 
@@ -285,7 +290,7 @@ export class AcmeSmsChannel implements Channel<
    * More efficient than calling send() multiple times.
    */
   async sendBatch(
-    messages: ChannelSendParams<AcmeSmsMessage, AcmeSmsTargets>[]
+    messages: ChannelSendParams<AcmeSmsMessage, AcmeSmsTargets>[],
   ): Promise<BatchSendResult> {
     const payload = messages.map((msg) => {
       const serialized = msg.message.serialize()
@@ -301,12 +306,13 @@ export class AcmeSmsChannel implements Channel<
     const response = await fetch('https://api.acmesms.fake/batch', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#config.apiKey}`,
+        Authorization: `Bearer ${this.#config.apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ messages: payload }),
     })
 
+    if (!response.ok) throw new Error(`AcmeSMS batch request failed: ${response.status}`)
     const result = await response.json()
 
     return {
@@ -328,9 +334,9 @@ Then enable batch mode when sending:
 ```ts
 await facteur
   .notification(OrderShippedNotification)
-  .to(users)  // Array of users
+  .to(users) // Array of users
   .params({ trackingNumber: 'ABC123' })
-  .useDriverBatching()  // Enable batch sending
+  .useDriverBatching() // Enable batch sending
   .send()
 ```
 

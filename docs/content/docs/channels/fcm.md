@@ -4,27 +4,24 @@ The FCM channel allows you to send push notifications to mobile devices and web 
 
 ## Batching
 
-This channel **supports batching** with a maximum of **500 messages** per batch. When sending to multiple recipients, Facteur will automatically batch your notifications for optimal performance.
+This channel **supports batching** with a maximum of **500 messages** per batch. Opt in with `.to(users).useDriverBatching().send()`; normal bulk sends call the channel individually.
 
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { fcmChannel } from '@facteurjs/adonisjs/channels/fcm'
+import { createFacteur } from '@facteurjs/core'
+import { fcmChannel } from '@facteurjs/core/channels/fcm'
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     fcm: fcmChannel({
       // Path to your service account key file
       serviceAccountKeyPath: './firebase-service-account.json',
 
-      // Or use Firebase AppOptions directly
-      projectId: 'your-project-id',
-      credential: cert(serviceAccount),
-
       // Debug mode - redirect all messages to this token
       debugToken: 'your-debug-device-token',
-    })
+    }),
   },
 })
 ```
@@ -36,7 +33,7 @@ export default defineConfig({
 - **`credential`** (optional): Firebase credential object (if not using service account file)
 - **`debugToken`** (optional): In debug mode, redirect all messages to this device token
 
-You must provide either `serviceAccountKeyPath` or the combination of `projectId` and `credential`.
+Alternatively, pass Firebase `AppOptions`, for example `{ projectId, credential: cert(serviceAccount) }` with `cert` imported from `firebase-admin/app`, or use Firebase's application-default credentials. The channel forwards these options to `initializeApp()`.
 
 ## Targets
 
@@ -48,8 +45,8 @@ await facteur
   .notification(MyNotification)
   .via({
     fcm: {
-      token: 'device-registration-token'
-    }
+      token: 'device-registration-token',
+    },
   })
   .send()
 
@@ -58,8 +55,8 @@ await facteur
   .notification(MyNotification)
   .via({
     fcm: {
-      topic: 'news'
-    }
+      topic: 'news',
+    },
   })
   .send()
 
@@ -68,8 +65,8 @@ await facteur
   .notification(MyNotification)
   .via({
     fcm: {
-      condition: "'news' in topics || 'weather' in topics"
-    }
+      condition: "'news' in topics || 'weather' in topics",
+    },
   })
   .send()
 ```
@@ -87,34 +84,39 @@ You must provide exactly one of these properties.
 When creating notifications for FCM, you can use rich notification features:
 
 ```ts
-export default class FcmNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { FcmMessage } from '@facteurjs/core/channels/fcm'
+
+export default class FcmNotification extends Notification<undefined> {
   asFcmMessage() {
-    return FcmMessage.create()
-      .setTitle('Notification Title')
-      .setBody('This is the notification body')
-      .setImage('https://example.com/image.png')
-      .setData({ orderId: '12345', type: 'order-update' })
-      // Platform-specific configurations
-      .setAndroid({
-        priority: 'high',
-        notification: {
-          channelId: 'high-priority',
-          sound: 'default',
-        }
-      })
-      .setApns({
-        payload: {
-          aps: {
+    return (
+      FcmMessage.create()
+        .setTitle('Notification Title')
+        .setBody('This is the notification body')
+        .setImage('https://example.com/image.png')
+        .setData({ orderId: '12345', type: 'order-update' })
+        // Platform-specific configurations
+        .setAndroid({
+          priority: 'high',
+          notification: {
+            channelId: 'high-priority',
             sound: 'default',
-            badge: 1,
-          }
-        }
-      })
-      .setWebpush({
-        notification: {
-          icon: 'https://example.com/icon.png',
-        }
-      })
+          },
+        })
+        .setApns({
+          payload: {
+            aps: {
+              sound: 'default',
+              badge: 1,
+            },
+          },
+        })
+        .setWebpush({
+          notification: {
+            icon: 'https://example.com/icon.png',
+          },
+        })
+    )
   }
 }
 ```

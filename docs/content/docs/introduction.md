@@ -1,182 +1,89 @@
 # FacteurJS
 
-Facteur is a notification library for Node.js that makes sending notifications across different channels simple and efficient. It's framework-agnostic, so you can use it with any Node.js application. Out of the box, it supports in-app notifications, web push, email, SMS, and chat platforms like Slack, Discord, and Teams.
+Facteur is a framework-agnostic notification library for Node.js. Define one notification class, format messages for each channel, and send to a recipient or a list of recipients.
 
-Whether you need something basic or complex, Facteur has you covered:
-
-- Want to send a quick Slack notification when someone signs up?
-- Need to send notifications through different channels based on user preferences?
-- Building complex notification flows with conditions, delays, and retries?
-- Want that classic real-time notification bubble in your web app, with read/unread status?
-
-**Facteur handles all of this**. From simple one-off notifications to sophisticated multi-channel workflows.
-
-Here's what you get out of the box:
-
-- 📱 Multiple notification channels: web push, email, SMS, and chat platforms
-- 🔌 Tons of supported providers (and you can build custom ones too)
-- ⚡ Real-time notifications via Server-Sent Events or WebSockets
-- ⚙️ Automatic user preference management
-- 🛣️ Auto-generated API routes for your app
-- 🎨 Frontend SDK for easy integration
-- 🎯 Unified API for creating messages
-- 🏢 Multi-tenancy support
+Current channels include database storage (Knex/Kysely), AdonisJS Mail, Twilio SMS, AWS SNS SMS, Web Push, Firebase Cloud Messaging, Expo, Slack/Discord webhooks, Socket.IO and Transmit (SSE). WhatsApp is planned, not implemented.
 
 ::include{template="partials/supported_providers"}
 
-## Features
+## Sending notifications
 
-Let's dive into what makes Facteur useful:
-
-### Sending Notifications
-
-Sending notifications with Facteur is straightforward:
+After [configuring Facteur](./quick-start.md), define a notification:
 
 ```ts
-export class UserRegisteredNotification extends Notification<User> {
+import { Notification } from '@facteurjs/core/types'
+import { SlackMessage } from '@facteurjs/core/channels/slack'
+
+export default class UserRegisteredNotification extends Notification<User> {
   static options = {
     name: 'User Registered',
     category: 'business',
-    deliverBy: {
-      slack: true,
-      email: true,
-    }
+    deliverBy: { slack: true },
   }
 
-  asSlackMessage({ notifiable }) {
-    return SlackMessage.create()
-      .setText(`A new user has registered: ${notifiable.name}`)
-      .setChannel('#general');
-  }
-
-  asEmailMessage({ notifiable }) {
-    return EmailMessage.create()
-      .setSubject('New User Registration')
-      .setBody(`A new user has registered: ${notifiable.name}`)
+  asSlackMessage() {
+    return SlackMessage.create().setText(`A new user registered: ${this.notifiable.name}`)
   }
 }
 ```
 
-```ts
-import facteur from './facteur.ts'
+`User` is your application's recipient model. It provides `notificationTargets()` with a Slack webhook destination (see [Slack](./channels/slack.md)).
 
-await facteur
-  .notification(UserRegisteredNotification)
-  .to(user)
-  .send()
+```ts
+await facteur.notification(UserRegisteredNotification).to(user).send()
 ```
 
-That's it. This notification gets sent through all the channels you specified in `deliverBy` (Slack and Email in this case).
+Use the fluent builder for explicit targets, parameters, tenants, retries and [bulk sending](./bulk-sending.md). FCM and Expo support native batches when you opt in with `.useDriverBatching()`.
 
-### In-App Notifications
+## In-app notifications
 
-We just saw how to send notifications to external services. Now let's look at in-app notifications, think Twitter or Facebook notifications that appear in real-time and get stored in your database with read/unread status.
+Combine database storage with a realtime channel to build a notification center. Store arbitrary JSON with `DatabaseMessage.create().setContent(...)`; send realtime data with `SocketIoMessage.create().setData(...)` or `TransmitMessage.create().setContent(...)`.
 
-Facteur handles this elegantly too.
+Facteur provides a [Server API](./server-api.md) to list notifications, mark them read/seen and manage preferences. Register it through Hono, AdonisJS, or a custom HTTP adapter. Authorization is required, and the current `mark-as` route additionally needs an application-level ownership check.
 
-You can combine the `database` channel with the `transmit` channel (SSE) to send real-time notifications to your app while storing them in the database:
+Follow [In-App Notifications](./in-app-notifications.md) for a complete setup.
 
-```ts
-export class UserMentionedNotification extends Notification<User> {
-  static options = {
-    name: 'User Mentioned',
-    category: 'social',
-    deliverBy: {
-      database: true,
-      transmit: true,
-    }
-  }
+## Preferences and tenants
 
-  asDatabaseMessage({ notifiable }) {
-    return DatabaseMessage.create()
-      .setTitle(`You were mentioned by ${notifiable.name}`)
-      .setBody(`Check out the post where you were mentioned!`)
-      .setData({ postId: '12345' });
-  }
+Database-backed [User Preferences](./user-preferences.md) expose global, per-notification and tenant-specific channel settings. Category updates apply to the currently discovered classes in that category. Critical notifications bypass preferences; explicit `via()` also bypasses them. See that guide for current resolution limitations.
 
-  asTransmitMessage({ notifiable }) {
-    return TransmitMessage.create().setData({ type: 'user_mentioned' });
-  }
-}
-```
+Use `.tenant(id)` to attach tenant context to a send. [Multi-tenancy](./multi-tenancy.md) explains storage, API filtering and tenant-access requirements.
 
-Send it the same way:
+## Frontend SDK and React hooks
+
+The framework-independent client lives in `@facteurjs/client`:
 
 ```ts
-import facteur from './facteur.ts'
+import { createFacteurClient } from '@facteurjs/client'
 
-await facteur
-  .notification(UserMentionedNotification)
-  .to(user)
-  .send()
-```
-
-After sending, the notification gets saved to your database and delivered in real-time via Server-Sent Events or WebSockets. Users can see it in your app and mark it as read.
-
-### User Preferences
-
-Facteur automatically handles user notification preferences. Users can choose which channels they want to receive notifications through, and Facteur respects those choices.
-
-For example, if a user wants email and Slack notifications but not SMS, Facteur will only send through their preferred channels.
-
-### Automatic API Routes
-
-Facteur comes with ready-to-use API routes for managing user preferences, listing notifications, marking them as read, and more.
-
-This means you can build your frontend faster without worrying about the backend plumbing.
-
-### Frontend SDK
-
-To make frontend integration even easier, Facteur provides a type-safe frontend SDK that works with your API (which exposes Facteur's automatic routes). Just install the SDK and start making API calls:
-
-```ts
-import facteur from '@facteurjs/sdk'
-
-const notifications = await facteur.notifications.list({
-  userId: '123',
-  tenantId: '456'
+const client = createFacteurClient({
+  apiUrl: 'https://api.example.com',
+  notifiableId: '123',
+  credentials: 'include',
 })
 
-await facteur.notifications.markAsRead({ notificationId: '789' })
-await facteur.preferences.update({
-  userId: '123',
-  preferences: { email: true, slack: false, sms: true }
-})
+const notifications = await client.notifications.list({ tenantId: '456' })
+await client.notifications.markAsRead({ notificationId: '789' })
+await client.preferences.update({ preferences: { slack: false } })
 ```
 
-### React hooks
+`@facteurjs/react` provides TanStack Query hooks inside `FacteurProvider` and `QueryClientProvider`:
 
-To make frontend integration even MORE easier, Facteur provides some React TanStack Query hooks.
+```tsx
+import { useNotifications, useMarkAsRead } from '@facteurjs/react'
 
-```ts
-import { useNotifications } from '@facteurjs/react'
-
-const { data, isLoading } = useNotifications({ userId: '123' })
-const { mutate } = useMarkNotificationAsRead()
-// And more hooks for marking all as read, updating preferences, etc.
+const { data, isLoading } = useNotifications({ tenantId: '456' })
+const { mutate: markAsRead } = useMarkAsRead()
 ```
 
-### Adapter-based
+See [Frontend SDK](./sdks/frontend-sdk.md) and [React hooks](./sdks/react-hooks.md). The hooks use HTTP; realtime subscriptions remain application code.
 
-Facteur is built on an adapter-based architecture for every part of the system. This means you can swap out components like the database adapter ( Knex, Kysely, Prisma ...), notification channels ( Socket.io ? SSE ? Pusher ? ), or event the HTTP Framework ( Hono, Express, Fastify ... ). Everything is supported! Doesn't means everything is implemented but you can really easily write your own adapters when needed.
+## Extending Facteur
 
-There's plenty more to explore, we'll cover it all in the following sections.
+Create [custom channels](./deep/custom-channels.md) and [HTTP adapters](./deep/custom-http-adapter.md) for services or frameworks not built in. Database adapters currently support Knex and Kysely; Prisma is not bundled.
 
-## What's Coming
-
-Facteur is actively being developed. Here's what's on the roadmap:
-
-- Notification queuing support
-- Debouncing and batching system
-- Diagnostic channels for tracing and monitoring
-- Topics.
-- Headless React/Vue components for even easier integration ( Shadcn registry ? )
-- Even more notification channels !
-
-If you're interested in a specific feature, feel free to open an issue on GitHub or contribute to the project.
-
-Our goal is to make Facteur the go-to notification solution for the Node.js ecosystem, a central hub for every notification channel you can think of. We need your help to make that happen!
+Queues, delayed delivery, debouncing, topics and headless UI components are not implemented in the current sending API. Native FCM/Expo batching and retries are already available.
 
 ## Sponsor
 
-If you like this project, please [consider supporting it by sponsoring it](https://github.com/sponsors/Julien-R44/). It helps a lot with maintenance and improvements. Thanks!
+If you find Facteur useful, [consider sponsoring the project](https://github.com/sponsors/Julien-R44/).

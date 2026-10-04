@@ -1,22 +1,22 @@
 # Quick setup
 
-You can install FacteurJS via your favorite package manager:
+Facteur requires Node.js 24 or later. Install FacteurJS and the optional provider SDKs used in this example:
 
 :::codegroup
 
 ```sh
 // title: npm
-npm i @facteurjs/core
+npm i @facteurjs/core twilio web-push
 ```
 
 ```sh
 // title: pnpm
-pnpm add @facteurjs/core
+pnpm add @facteurjs/core twilio web-push
 ```
 
 ```sh
 // title: yarn
-yarn add @facteurjs/core
+yarn add @facteurjs/core twilio web-push
 ```
 
 :::
@@ -27,15 +27,15 @@ Once installed, you can setup FacteurJS in your application as follows:
 
 ```ts
 import { createFacteur } from '@facteurjs/core'
+import type { InferChannelsFromConfig } from '@facteurjs/core/types'
 import { webpushChannel } from '@facteurjs/core/channels/webpush'
 import { twilioChannel } from '@facteurjs/core/channels/twilio'
 
-const facteur = createFacteur({
+export const facteur = createFacteur({
   discoverer: {
-    // Set the your src/ directory where FacteurJS will look for notification classes.
-    // Will explain later why this is needed.
+    // Discover default exports in files named *_notification.ts or *_notification.js.
     searchDirectory: new URL('./src', import.meta.url),
-  }
+  },
 
   channels: {
     // Define your different delivery channels here.
@@ -51,9 +51,15 @@ const facteur = createFacteur({
       vapidSubject: process.env.WEBPUSH_VAPID_SUBJECT!,
       vapidPublicKey: process.env.WEBPUSH_VAPID_PUBLIC_KEY!,
       vapidPrivateKey: process.env.WEBPUSH_VAPID_PRIVATE_KEY!,
-    })
-  }
+    }),
+  },
 })
+
+declare module '@facteurjs/core/types' {
+  interface NotificationChannels extends InferChannelsFromConfig<typeof facteur> {}
+}
+
+await facteur.discoverer.discoverNotifications()
 ```
 
 ## Creating your first notification
@@ -61,6 +67,11 @@ const facteur = createFacteur({
 Now that you have FacteurJS configured, you can create your first notification class. The role of a notification class is to define the content of the notification on the different channels.
 
 ```ts
+import { Notification, type NotificationOptions } from '@facteurjs/core/types'
+import { TwilioMessage } from '@facteurjs/core/channels/twilio'
+import { WebpushMessage } from '@facteurjs/core/channels/webpush'
+import type { User } from './user.js'
+
 interface InvoicePaidParams {
   amount: number
 }
@@ -72,22 +83,21 @@ export default class InvoicePaidNotification extends Notification<User, InvoiceP
     deliverBy: {
       twilio: true,
       webpush: true,
-    }
+    },
   }
 
   asTwilioMessage() {
-    return TwilioMessage.create()
-      .setBody(`Your invoice of $${this.params.amount} has been paid!`)
+    return TwilioMessage.create().setBody(`Your invoice of $${this.params.amount} has been paid!`)
   }
 
-  asWebPushMessage() {
-    return WebPushMessage.create()
+  asWebpushMessage() {
+    return WebpushMessage.create()
       .setTitle('Invoice Paid')
       .setBody(`Your invoice of $${this.params.amount} has been paid!`)
       .setIcon('https://example.com/icon.png')
       .setActions([
         { action: 'view', title: 'View Invoice' },
-        { action: 'pay', title: 'Pay Now' }
+        { action: 'pay', title: 'Pay Now' },
       ])
   }
 }
@@ -108,21 +118,24 @@ For that, our Notifiable entity (the `User` in this case) needs to implement the
 
 ```ts
 import type { Notifiable, NotifiableTargets } from '@facteurjs/core/types'
+import type { WebpushTargets } from '@facteurjs/core/channels/webpush/types'
 
 export class User implements Notifiable {
-  phoneNumber: string
-  webpushSubscription: Record<string, any>
-  email: string
+  constructor(
+    public phoneNumber: string,
+    public webpushSubscription: WebpushTargets['subscription'],
+  ) {}
 
   notificationTargets(): NotifiableTargets {
     return {
       twilio: { to: this.phoneNumber },
       webpush: { subscription: this.webpushSubscription },
-      email: { to: this.email },
     }
   }
 }
 ```
+
+Save the model as `src/user.ts` and the notification as `src/invoice_paid_notification.ts`. The configuration example belongs in `facteur.ts` at the project root.
 
 As you can see our `notificationTargets` method returns an object where the keys are the channel names and the values are the targets for each channel.
 
@@ -133,15 +146,13 @@ Now that this is done, Facteur will be able to automatically route the notificat
 To send the notification, will be as simple as:
 
 ```ts
-import { facteur } from './facteur.ts'
+import { facteur } from './facteur.js'
+import InvoicePaidNotification from './src/invoice_paid_notification.js'
 
-const user = await User.find(1)
+// Retrieve a recipient from your application (with notificationTargets()).
+const user = await findUser(1)
 
-await facteur
-  .notification(InvoicePaidNotification)
-  .to(user)
-  .params({ amount: 100 })
-  .send()
+await facteur.notification(InvoicePaidNotification).to(user).params({ amount: 100 }).send()
 ```
 
 All good. Your user just received a SMS and a WebPush notification saying that their invoice has been paid!
@@ -150,6 +161,9 @@ All good. Your user just received a SMS and a WebPush notification saying that t
 
 Now that you have a basic understanding of how to create and send notifications with FacteurJS, you can explore more advanced features like :
 
+- [Configuration](./configuration.md)
+- [Creating notifications](./notifications.md)
+- [AdonisJS integration](./integrations/adonisjs.md)
 - [In-app notifications](./in-app-notifications.md)
 - [Custom channels](./deep/custom-channels.md)
 - [Frontend SDK](./sdks/frontend-sdk.md)

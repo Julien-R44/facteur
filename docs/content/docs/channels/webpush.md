@@ -9,10 +9,11 @@ This channel does **not support batching**. Each notification is sent individual
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { webpushChannel } from '@facteurjs/adonisjs/channels/webpush'
+import { createFacteur } from '@facteurjs/core'
+import { webpushChannel } from '@facteurjs/core/channels/webpush'
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     webpush: webpushChannel({
       // Required: VAPID configuration
@@ -34,7 +35,7 @@ export default defineConfig({
 
       // Optional: Request timeout in milliseconds
       timeout: 30000,
-    })
+    }),
   },
 })
 ```
@@ -71,11 +72,11 @@ await facteur
         endpoint: 'https://fcm.googleapis.com/fcm/send/...',
         keys: {
           p256dh: 'user-public-key',
-          auth: 'user-auth-secret'
+          auth: 'user-auth-secret',
         },
-        expirationTime: null
-      }
-    }
+        expirationTime: null,
+      },
+    },
   })
   .send()
 ```
@@ -88,6 +89,10 @@ await facteur
   - **`keys.auth`**: The authentication secret
   - **`expirationTime`**: Optional expiration timestamp
 
+### Multiple devices
+
+`subscription` is **one object, not an array**. Each channel send calls `web-push.sendNotification()` once. `.to([...])` sends to multiple notifiables; it does not fan out to multiple subscriptions belonging to one user. For a user with several devices, iterate over subscriptions in application code with explicit targets, or implement a custom channel. Automatic per-user multi-subscription delivery is not implemented.
+
 ## Client-Side Setup
 
 To get a push subscription from the browser:
@@ -99,13 +104,13 @@ const registration = await navigator.serviceWorker.register('/sw.js')
 // Request push subscription
 const subscription = await registration.pushManager.subscribe({
   userVisibleOnly: true,
-  applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+  applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
 })
 
 // Send subscription to your server
 await fetch('/api/push-subscription', {
   method: 'POST',
-  body: JSON.stringify(subscription)
+  body: JSON.stringify(subscription),
 })
 ```
 
@@ -114,7 +119,10 @@ await fetch('/api/push-subscription', {
 When creating notifications for Web Push, you can use rich notification features:
 
 ```ts
-export default class WebpushNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { WebpushMessage } from '@facteurjs/core/channels/webpush'
+
+export default class WebpushNotification extends Notification<undefined> {
   asWebpushMessage() {
     return WebpushMessage.create()
       .setTitle('Notification Title')
@@ -127,7 +135,7 @@ export default class WebpushNotification extends Notification {
       .setData({ customData: 'value' })
       .setActions([
         { action: 'view', title: 'View', icon: '/icons/view.png' },
-        { action: 'dismiss', title: 'Dismiss' }
+        { action: 'dismiss', title: 'Dismiss' },
       ])
       .setRequireInteraction(true)
       .setSilent(false)

@@ -2,21 +2,21 @@
 
 Facteur includes a built-in preference system that lets users control how they receive notifications. Users can toggle channels on or off at different levels of granularity: globally, per category, or per notification.
 
-When sending a notification, Facteur automatically checks the recipient's preferences and skips channels that have been disabled. You don't need to handle this logic yourself — it's built into the channel resolution pipeline.
+Channel resolution reads database-backed preferences for recipients with an `id`, unless you use explicit `via()` targets or a critical notification. Configure a top-level `databaseAdapter` and call `facteur.discoverer.discoverNotifications()` before sending or serving preference reads. See [Configuration](./configuration.md).
 
 ## How it works
 
 Preferences are stored in your database as simple rows, each mapping a user to a set of channel toggles. A single preference entry looks like this:
 
-| user_id | tenant_id | notification_name | channels |
-|---------|-----------|-------------------|----------|
-| user-123 | null | null | `{"email": false, "sms": true}` |
-| user-123 | null | invoice-paid | `{"email": true}` |
+| user_id  | tenant_id | notification_name | channels                        |
+| -------- | --------- | ----------------- | ------------------------------- |
+| user-123 | null      | null              | `{"email": false, "sms": true}` |
+| user-123 | null      | invoice-paid      | `{"email": true}`               |
 
 - When `notification_name` is `NULL`, the preference applies **globally** to all notifications.
 - When `notification_name` is set, it applies only to **that specific notification**.
 
-If you already followed the [In-App Notifications](./in-app-notifications.md) guide, you already have the required `notification_preferences` table. If not, here's the schema:
+Create the `notification_preferences` table alongside the [notifications table](./channels/database.md#database-schema). This example uses PostgreSQL syntax; adapt it for your database:
 
 ```sql
 CREATE TABLE notification_preferences (
@@ -27,11 +27,14 @@ CREATE TABLE notification_preferences (
   channels JSON NOT NULL,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP,
-  INDEX idx_user_id (user_id),
-  INDEX idx_tenant_id (tenant_id),
   UNIQUE (user_id, tenant_id, notification_name)
 );
+
+CREATE INDEX idx_preferences_user_id ON notification_preferences (user_id);
+CREATE INDEX idx_preferences_tenant_id ON notification_preferences (tenant_id);
 ```
+
+`notification_name` should store the notification's `options.identifier` (or class name when omitted), not its display label. SQL databases generally allow duplicate nullable values in a unique constraint; if you need database-enforced uniqueness for global scopes, add dialect-appropriate null-aware indexes or constraints.
 
 ## Resolution priority
 
@@ -44,27 +47,28 @@ When Facteur resolves which channels to use for a notification, preferences are 
 5. **Category preference** — Defaults from your Facteur configuration
 6. **`deliverBy`** — The notification's own channel configuration
 
-The first defined preference in this chain wins. If no preference is set at any level, the notification's `deliverBy` configuration is used as the fallback.
+The resolver takes the first defined channel value from these sources, but never re-enables a channel whose `deliverBy` result is `false`.
 
-Critical notifications (`critical: true` in the notification options) bypass all user preferences entirely.
+**Current limitations:** preference reads prefill every discovered notification with `preferences.global.channels` (all configured channels default to `true`). These generated per-notification values can mask global user settings and category defaults lower in the chain, even when no notification-specific row exists. Do not rely on a global/category opt-out alone; verify actual delivery behavior for your configuration. The `preferences.enabled` option is currently not consulted by the resolver. AdonisJS's provider does not forward configured preference defaults at all.
+
+Critical notifications (`critical: true`) and explicit `.via()` bypass preferences. Critical notifications still respect `deliverBy` conditions and require targets.
 
 ## Default preferences
 
 You can configure default channel preferences in your Facteur configuration. These act as the baseline before any user preferences are applied.
 
 ```ts
-const facteur = createFacteur({
-  channels: { email: emailChannel(), sms: smsChannel() },
-  preferences: {
-    global: {
-      channels: { email: true, sms: true },
-    },
-    categories: {
-      marketing: { channels: { email: true, sms: false } },
-      billing: true, // All channels enabled
-    },
+// Pass this as the preferences option in your core configuration.
+// Here email and sms are application-defined channel keys.
+const preferences = {
+  global: {
+    channels: { email: true, sms: true },
   },
-})
+  categories: {
+    marketing: { channels: { email: true, sms: false } },
+    billing: true, // All channels enabled
+  },
+}
 ```
 
 Category preferences use the notification's `category` field:
@@ -88,7 +92,7 @@ Facteur's built-in API exposes a POST endpoint to update preferences. The reques
 
 Omit `notificationName` and `category` to update global preferences for all notifications:
 
-```ts
+```http
 POST /notifications/notifiable/:notifiableId/preferences
 {
   "preferences": { "email": false, "sms": true }
@@ -99,7 +103,7 @@ POST /notifications/notifiable/:notifiableId/preferences
 
 Pass `notificationName` to update preferences for a specific notification:
 
-```ts
+```http
 POST /notifications/notifiable/:notifiableId/preferences
 {
   "preferences": { "email": false },
@@ -111,7 +115,7 @@ POST /notifications/notifiable/:notifiableId/preferences
 
 Pass `category` to update preferences for all notifications that belong to a category:
 
-```ts
+```http
 POST /notifications/notifiable/:notifiableId/preferences
 {
   "preferences": { "sms": false },
@@ -119,7 +123,7 @@ POST /notifications/notifiable/:notifiableId/preferences
 }
 ```
 
-This resolves all registered notifications with `category: 'billing'` and updates each one individually.
+This resolves all currently discovered notifications with `category: 'billing'` and updates each one individually. It does not save a category rule for notifications added later. Updates replace the stored channel map for the selected scope; include all toggles you want to preserve.
 
 `notificationName` and `category` are mutually exclusive — providing both returns a `400` error.
 
@@ -127,7 +131,7 @@ This resolves all registered notifications with `category: 'billing'` and update
 
 Add `tenantId` to scope the update to a specific tenant:
 
-```ts
+```http
 POST /notifications/notifiable/:notifiableId/preferences
 {
   "preferences": { "email": false },
@@ -142,13 +146,13 @@ See [Multi-tenancy](./multi-tenancy.md) for more details on tenant-scoped prefer
 
 The GET endpoint returns the full preference structure for a user:
 
-```ts
+```http
 GET /notifications/notifiable/:notifiableId/preferences?tenantId=org-123
 ```
 
 The response includes all registered notifications with their current channel preferences, organized by scope:
 
-```ts
+```text
 {
   global: {
     global: { channels: { email: true, sms: true } },

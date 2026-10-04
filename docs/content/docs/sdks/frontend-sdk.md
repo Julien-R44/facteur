@@ -29,8 +29,8 @@ const facteur = createFacteurClient({
   // Here you can specify any additional options accepted by ky.
   // See their documentation for more details.
   headers: {
-    'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
-  }
+    Authorization: 'Bearer YOUR_ACCESS_TOKEN',
+  },
 })
 ```
 
@@ -48,6 +48,10 @@ const facteur = createFacteurClient<MyNotificationData>({
 
 All good! Your client is ready to be used. Here are the available methods
 
+`notifiableId` identifies the user for requests; it does not authenticate them. Configure cookies (`credentials: 'include'`) or headers and enforce authorization on your server. The current `mark-as` route needs an ownership check beyond the URL user; see [Server API](../server-api.md#authorization-is-required).
+
+The client has no default tenant setting. Pass `tenantId` in each list, preferences or mark-all call. Single-notification marking methods currently do not expose `tenantId`; ownership and tenant access must be verified by the server using the notification ID.
+
 ### notifications.list()
 
 Retrieves the list of notifications for the user.
@@ -55,18 +59,21 @@ Retrieves the list of notifications for the user.
 **Parameters:**
 
 - `page` (number, optional): Page number (default: 1)
-- `limit` (number, optional): Number of items per page
+- `limit` (number, optional): Number of items per page (default: 10, maximum: 100)
 - `status` (string, optional): Filter by status (`'read'` | `'seen'` | `'unread'` | `'unseen'`)
 - `tenantId` (string, optional): Tenant ID to filter notifications
+- `tags` (string[], optional): Filter by tags; the SDK JSON-encodes the array
 
 ```ts
 const notifications = await facteur.notifications.list({
   page: 1,
   limit: 20,
   status: 'unread',
-  tenantId: 'tenant-123'
+  tenantId: 'tenant-123',
 })
 ```
+
+Returns an array of notifications, not a pagination object. Timestamp fields are JSON strings. Omitting `tenantId` includes all of the user's tenants with the built-in adapters.
 
 ### notifications.markAsRead()
 
@@ -78,7 +85,7 @@ Marks a specific notification as read.
 
 ```ts
 await facteur.notifications.markAsRead({
-  notificationId: 'notification-id'
+  notificationId: 'notification-id',
 })
 ```
 
@@ -92,7 +99,7 @@ Marks a specific notification as seen.
 
 ```ts
 await facteur.notifications.markAsSeen({
-  notificationId: 'notification-id'
+  notificationId: 'notification-id',
 })
 ```
 
@@ -106,7 +113,7 @@ Marks all notifications as read.
 
 ```ts
 await facteur.notifications.markAllAsRead({
-  tenantId: 'tenant-123'
+  tenantId: 'tenant-123',
 })
 ```
 
@@ -120,7 +127,7 @@ Marks all notifications as seen.
 
 ```ts
 await facteur.notifications.markAllAsSeen({
-  tenantId: 'tenant-123'
+  tenantId: 'tenant-123',
 })
 ```
 
@@ -136,7 +143,7 @@ Marks a notification with a specific status (generic method).
 ```ts
 await facteur.notifications.markAs({
   notificationId: 'notification-id',
-  status: 'read'
+  status: 'read',
 })
 ```
 
@@ -152,7 +159,7 @@ Marks all notifications with a specific status (generic method).
 ```ts
 await facteur.notifications.markAllAs({
   status: 'seen',
-  tenantId: 'tenant-123'
+  tenantId: 'tenant-123',
 })
 ```
 
@@ -166,7 +173,7 @@ Retrieves the user's notification preferences.
 
 ```ts
 const preferences = await facteur.preferences.list({
-  tenantId: 'tenant-123'
+  tenantId: 'tenant-123',
 })
 ```
 
@@ -182,6 +189,8 @@ Updates the user's notification preferences. The `preferences` object is a flat 
 - `category` (string, optional): Update preferences for all notifications in a category
 
 `notificationName` and `category` are mutually exclusive.
+
+Use the stable notification identifier for `notificationName`. Updates replace the stored channel map for the scope, so include existing toggles that should be retained. Category updates apply only to currently discovered notification classes.
 
 ```ts
 // Disable email for a specific notification

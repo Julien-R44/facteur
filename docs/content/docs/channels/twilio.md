@@ -9,10 +9,11 @@ This channel does **not support batching**. Each SMS is sent individually.
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { twilioChannel } from '@facteurjs/adonisjs/channels/twilio'
+import { createFacteur } from '@facteurjs/core'
+import { twilioChannel } from '@facteurjs/core/channels/twilio'
 
-export default defineConfig({
+export const facteur = createFacteur({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   channels: {
     twilio: twilioChannel({
       // Required configuration
@@ -39,7 +40,7 @@ export default defineConfig({
 
       // Twilio error codes to ignore
       ignoredErrorCodes: [21614, '*'],
-    })
+    }),
   },
 })
 ```
@@ -69,8 +70,8 @@ await facteur
       to: '+1234567890',
 
       // Optional: override the sender for this specific message
-      from: '+0987654321'
-    }
+      from: '+0987654321',
+    },
   })
   .send()
 ```
@@ -79,3 +80,20 @@ await facteur
 
 - **`to`** (required): The recipient's phone number in international format
 - **`from`** (optional): Override the sender for this specific message
+
+## Message Features
+
+```ts
+import { Notification } from '@facteurjs/core/types'
+import { TwilioMessage } from '@facteurjs/core/channels/twilio'
+
+export default class SmsNotification extends Notification<undefined> {
+  asTwilioMessage() {
+    return TwilioMessage.create().setBody('Your verification code is: 123456')
+  }
+}
+```
+
+Use `.via({ twilio: { to: '+33612345678' } }).send()` for this anonymous notification. `TwilioMessage` also supports `setFrom()`, `setMessagingServiceSid()`, `setAlphanumericSender()`, `setMaxPrice()`, `setValidityPeriod()`, `setForceDelivery()`, `setProvideFeedback()` and `setApplicationSid()`.
+
+The sender priority is message `from`, target `from`, configured `from`, message alphanumeric sender, then configured alphanumeric sender. Ignored error codes are treated as successful sends; avoid `'*'` when you need delivery failures to be reported.

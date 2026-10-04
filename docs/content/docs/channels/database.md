@@ -9,34 +9,47 @@ This channel does **not support batching**. Each notification is inserted indivi
 ## Configuration
 
 ```ts
-import { defineConfig } from 'facteur'
-import { databaseChannel, knexAdapter } from '@facteurjs/adonisjs/channels/database'
-import { Database } from '@adonisjs/lucid/database'
+import { Facteur } from '@facteurjs/core'
+import { databaseChannel } from '@facteurjs/core/database'
+import { knexAdapter } from '@facteurjs/core/database/adapters/knex'
+import { connection } from './database.js'
 
-export default defineConfig({
-  channels: {
-    database: databaseChannel({
-      // Use Knex adapter
-      adapter: knexAdapter({
-        connection: Database.connection(),
-        tableNames: {
-          notifications: 'notifications',
-          preferences: 'notification_preferences'
-        }
-      })
+const adapter = knexAdapter({ connection })
+const channels = { database: databaseChannel({ adapter }) }
 
-      // Or use Kysely adapter
-      adapter: kyselyAdapter({
-        connection: kyselyInstance,
-        tableNames: {
-          notifications: 'notifications',
-          preferences: 'notification_preferences'
-        }
-      })
-    })
-  },
+export const facteur = new Facteur<typeof channels, typeof adapter>({
+  discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
+  databaseAdapter: adapter,
+  channels,
 })
+
+type AppChannels = typeof channels
+
+declare module '@facteurjs/core/types' {
+  interface NotificationChannels extends AppChannels {}
+}
+
+await facteur.discoverer.discoverNotifications()
 ```
+
+`connection` is your application's Knex instance. Install `knex` and your SQL driver alongside `@facteurjs/core`. The top-level `databaseAdapter` enables `facteur.db` and the HTTP API; the channel alone only stores messages. For Lucid configuration, use [AdonisJS](../integrations/adonisjs.md).
+
+### Knex adapter
+
+Import `knexAdapter` from `@facteurjs/core/database/adapters/knex`. `connection` accepts a Knex instance or a synchronous function returning one (useful for lazy connections).
+
+### Kysely adapter
+
+Install `kysely` and your SQL driver, then substitute this adapter in the configuration above:
+
+```ts
+import { kyselyAdapter } from '@facteurjs/core/database/adapters/kysely'
+import { connection } from './kysely.js'
+
+const adapter = kyselyAdapter({ connection })
+```
+
+Here `connection` is a Kysely instance, not a callback.
 
 ## Configuration Options
 
@@ -51,7 +64,7 @@ Both Knex and Kysely adapters support:
 
 ## Database Schema
 
-You need to create the required database tables. Here's the schema:
+Create the notifications table and optionally the preferences table. This SQL example uses PostgreSQL syntax; adapt identifier, JSON and timestamp types to your database.
 
 ### Notifications Table
 
@@ -63,33 +76,27 @@ CREATE TABLE notifications (
   type VARCHAR(255) NOT NULL,
   content JSON NOT NULL,
   status VARCHAR(50) DEFAULT 'unread',
-  tags JSON,
+  tags JSONB,
   read_at TIMESTAMP,
   seen_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  INDEX idx_notifiable_tenant (notifiable_id, tenant_id),
-  INDEX idx_status (status),
-  INDEX idx_created_at (created_at)
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_notifiable_tenant ON notifications (notifiable_id, tenant_id);
+CREATE INDEX idx_status ON notifications (status);
+CREATE INDEX idx_created_at ON notifications (created_at);
 ```
 
 ### Notification Preferences Table (Optional)
 
-```sql
-CREATE TABLE notification_preferences (
-  id SERIAL PRIMARY KEY,
-  notifiable_id VARCHAR(255) NOT NULL,
-  tenant_id VARCHAR(255),
-  channel VARCHAR(255) NOT NULL,
-  enabled BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+To use user preferences, create the `notification_preferences` table using the schema in
+[User Preferences](../user-preferences.md#how-it-works).
 
-  UNIQUE KEY unique_preference (notifiable_id, tenant_id, channel)
-);
-```
+In this table, `user_id` stores the notifiable identifier, `notification_name` is nullable for global
+preferences, and `channels` stores a JSON map of channel names to booleans (for example,
+`{"email": false, "sms": true}`). Unlike the `notifications` table, the identifier column is named
+`user_id`, not `notifiable_id`.
 
 ## Targets
 
@@ -104,8 +111,8 @@ await facteur
       notifiableId: '123',
 
       // Optional: Tenant ID for multi-tenancy
-      tenantId: 'tenant-456'
-    }
+      tenantId: 'tenant-456',
+    },
   })
   .send()
 ```
@@ -120,7 +127,10 @@ await facteur
 When creating notifications for the database, you can set various properties:
 
 ```ts
-export default class DatabaseNotification extends Notification {
+import { Notification } from '@facteurjs/core/types'
+import { DatabaseMessage } from '@facteurjs/core/database'
+
+export default class DatabaseNotification extends Notification<undefined> {
   asDatabaseMessage() {
     return DatabaseMessage.create()
       .setType('order-shipped')
@@ -128,7 +138,7 @@ export default class DatabaseNotification extends Notification {
         title: 'Order Shipped',
         body: 'Your order #12345 has been shipped',
         orderId: 12345,
-        trackingNumber: 'ABC123456'
+        trackingNumber: 'ABC123456',
       })
       .setStatus('unread')
       .setTags(['order', 'shipping'])
@@ -137,3 +147,5 @@ export default class DatabaseNotification extends Notification {
   }
 }
 ```
+
+`DatabaseMessage` defaults to `type: 'default'`, `status: 'unread'` and empty tags. It does not automatically copy the notification options' identifier/tags. Message-level notifiable/tenant IDs override targets; a target tenant overrides the builder's `.tenant()` value. Prefer recipient targets and `.tenant()` for ordinary delivery instead of hard-coding user IDs in reusable messages.
