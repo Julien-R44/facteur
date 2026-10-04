@@ -46,7 +46,7 @@
     "@facteurjs/core": "workspace:*"
   },
   "devDependencies": {
-    "hono": "^4.11.9"
+    "hono": "^4.13.13"
   },
   "peerDependencies": {
     "hono": "^4.0.0"
