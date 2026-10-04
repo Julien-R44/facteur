@@ -14,27 +14,24 @@ import { expoChannel } from '@facteurjs/adonisjs/channels/expo'
 
 export default defineConfig({
   channels: {
-    expo: expoChannel({
-      // Optional: Access token for additional features
-      accessToken: 'your-expo-access-token',
-
-      // Optional: Custom API URL (defaults to Expo's service)
-      apiUrl: 'https://exp.host/--/api/v2/push/send',
-
-      // Optional: Use FCM for Android (recommended)
-      useFcmV1: true,
-    })
+    expo: expoChannel(),
   },
 })
 ```
 
 ## Configuration Options
 
-- **`accessToken`** (optional): Your Expo access token for additional features and higher rate limits
-- **`apiUrl`** (optional): Custom Expo push API URL (defaults to Expo's official service)
-- **`useFcmV1`** (optional): Use FCM v1 API for Android notifications (recommended)
-
+Facteur accepts the `ExpoClientOptions` exported by your installed `expo-server-sdk` version.
 All configuration options are optional. The channel works out of the box without any configuration.
+
+### SDK version compatibility
+
+Facteur supports `expo-server-sdk` 3.15 and later 3.x releases, as well as versions 4, 5, 6, and 7.
+Upgrading the SDK is optional; existing installations can keep their current supported version.
+
+- **`useFcmV1`** is only available in SDK versions 3 and 4. Remove it when upgrading to version 5 or later; FCM v1 is always used.
+- **`httpAgent`** accepts a Node.js `http.Agent` in SDK versions 3 and 4, and an Undici `Dispatcher` in version 5 or later. Update custom agents when upgrading.
+- SDK versions 6 and 7 are ESM-only. Version 7 requires Node.js 22.12 or later.
 
 ## Targets
 
@@ -46,8 +43,8 @@ await facteur
   .via({
     expo: {
       // Expo push token (required)
-      expoToken: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]'
-    }
+      expoToken: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]',
+    },
   })
   .send()
 ```

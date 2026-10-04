@@ -37,7 +37,7 @@
     "@adonisjs/session": "^8.0.0-next.5",
     "@adonisjs/shield": "^9.0.0-next.2",
     "@adonisjs/static": "^2.0.0-next.1",
-    "@adonisjs/transmit": "^2.0.2",
+    "@adonisjs/transmit": "^3.0.2",
     "@adonisjs/transmit-client": "^1.1.0",
     "@adonisjs/vite": "^5.1.0-next.4",
     "@facteurjs/adonisjs": "workspace:*",
