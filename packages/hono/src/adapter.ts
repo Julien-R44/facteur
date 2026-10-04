@@ -20,6 +20,10 @@ export class HonoServerAdapter implements ServerAdapter {
           context: c,
         })
 
+        if (result.status === 204 || result.status === 205 || result.status === 304) {
+          return c.body(null, result.status)
+        }
+
         return c.json(result.body, result.status as ContentfulStatusCode)
       })
     }
