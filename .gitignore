@@ -16,3 +16,4 @@ yarn-error.log
 .idea
 dist
 service-account.json
+.amp/portals/*

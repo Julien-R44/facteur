@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Toolchains and dependencies persist in the snapshot. No authentication,
+# external services, or dependency installation is needed when this orb wakes.

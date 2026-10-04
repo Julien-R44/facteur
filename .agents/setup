@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+printf '\n==> Checking native build prerequisites\n'
+missing_packages=()
+for package in build-essential python3 curl ca-certificates; do
+  if [[ "$(dpkg-query -W -f='${db:Status-Status}' "$package" 2>/dev/null || true)" != installed ]]; then
+    missing_packages+=("$package")
+  fi
+done
+if (( ${#missing_packages[@]} )); then
+  time sudo apt-get update
+  time sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${missing_packages[@]}"
+fi
+
+printf '\n==> Installing the toolchain from mise.toml\n'
+mise_bin="$HOME/.local/bin/mise"
+if command -v mise >/dev/null 2>&1; then
+  mise_bin="$(command -v mise)"
+elif [[ ! -x "$mise_bin" ]]; then
+  time curl -fsSL https://mise.run | MISE_INSTALL_PATH="$mise_bin" sh
+fi
+"$mise_bin" trust "$repo_root/mise.toml"
+time "$mise_bin" install --yes
+mise_env="$("$mise_bin" env --shell bash)"
+eval "$mise_env"
+
+printf '\n==> Preparing pnpm from package.json\n'
+time corepack enable pnpm
+time corepack install
+node --version
+pnpm --version
+
+printf '\n==> Persisting tool activation for agents and supervised services\n'
+profile_marker="# Facteur orb toolchain: $repo_root"
+if ! grep -Fqx "$profile_marker" "$HOME/.bash_profile" 2>/dev/null; then
+  cat >> "$HOME/.bash_profile" <<EOF
+
+$profile_marker
+if [[ "\$PWD" == "$repo_root" || "\$PWD" == "$repo_root/"* ]]; then
+  # Keep the guard shell-local: /etc/profile resets PATH in child login shells.
+  if [[ "\${_facteur_orb_env_loaded:-}" != "$repo_root" ]]; then
+    _facteur_orb_env_loaded="$repo_root"
+    export FACTEUR_ORB_ENV_ROOT="$repo_root"
+    eval "\$("$mise_bin" --cd "$repo_root" env --shell bash)"
+  fi
+fi
+EOF
+fi
+
+printf '\n==> Installing workspace dependencies from the lockfile\n'
+time CI=true pnpm install --frozen-lockfile --prefer-offline --prod=false
+
+printf '\n==> Building workspace packages\n'
+# tsdown's export generation would otherwise rewrite tracked package manifests.
+time pnpm -r run build --no-exports
+
+printf '\n==> Copying the optional AdonisJS playground environment template\n'
+if [[ ! -f playgrounds/adonisjs/.env ]]; then
+  cp -- playgrounds/adonisjs/.env.example playgrounds/adonisjs/.env
+fi
+
+printf '\n==> Orb setup ready (playground credentials remain user-configured)\n'
