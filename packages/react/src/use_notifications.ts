@@ -24,9 +24,9 @@ export function useInfiniteNotifications(options: Omit<UseNotificationsOptions, 
   const client = useFacteur()
 
   return useInfiniteQuery({
-    initialPageParam: 0,
+    initialPageParam: 1,
     queryKey: ['facteur', 'notifications', 'infinite', client.notifiableId, options],
-    queryFn: ({ pageParam = 0 }) => client.notifications.list({ ...options, page: pageParam }),
+    queryFn: ({ pageParam }) => client.notifications.list({ ...options, page: pageParam }),
     getNextPageParam: (lastPage, _, lastPageParam) => {
       if (lastPage.length < (options.limit || 10)) return undefined
       return lastPageParam + 1
