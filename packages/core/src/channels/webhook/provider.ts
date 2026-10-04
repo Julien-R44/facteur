@@ -65,16 +65,18 @@ export class WebhookChannel<T extends WebhookOptions<any>> implements Channel<
       })
   }
 
-  #normalizeTargets(targets: WebhookTargets<any>) {
-    if (!targets) return [...this.#webhooksUrls.values()]
-
+  #normalizeTargets(targets: WebhookTargets<T>) {
     if ('webhookUrl' in targets && targets.webhookUrl) {
       return [this.#buildWebhookEntry('default', targets.webhookUrl)[1]]
     }
 
-    return Object.keys(targets)
-      .map((key) => this.#webhooksUrls.get(key)!)
-      .filter(Boolean)
+    return Object.entries(targets)
+      .filter(([, enabled]) => enabled === true)
+      .map(([key]) => {
+        const url = this.#webhooksUrls.get(key)
+        if (!url) throw new errors.E_UNAVAILABLE_TARGETS([this.#name])
+        return url
+      })
   }
 
   #resolveTargets(
