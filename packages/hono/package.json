@@ -16,13 +16,18 @@
   ],
   "license": "MIT",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Julien-R44/facteur.git",
+    "directory": "packages/hono"
+  },
   "files": [
     "dist"
   ],
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": "./src/index.ts",
     "./package.json": "./package.json"
@@ -30,7 +35,7 @@
   "publishConfig": {
     "access": "public",
     "exports": {
-      ".": "./dist/index.js",
+      ".": "./dist/index.mjs",
       "./package.json": "./package.json"
     }
   },

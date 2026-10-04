@@ -13,6 +13,11 @@
   ],
   "license": "MIT",
   "author": "Julien Ripouteau <julien@ripouteau.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Julien-R44/facteur.git",
+    "directory": "packages/react"
+  },
   "files": [
     "dist"
   ],
