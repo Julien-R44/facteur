@@ -1,3 +1,5 @@
+import { backoff, Tenace } from '@julr/tenace'
+
 import type {
   Channel,
   ChannelName,
@@ -14,13 +16,11 @@ import type {
 } from '../types/index.ts'
 import type { Identifier } from '../database/types.ts'
 
-import { backoff, Tenace } from '@julr/tenace'
-
 import { ChannelResolver, type ResolvedChannel } from './channel_resolver.ts'
+import { chunk } from '../utils/chunk.ts'
 import { capitalizeFirstLetter } from '../helpers.ts'
 import { facteurEvents } from '../events/events.ts'
 import { errors } from '../errors/index.ts'
-import { chunk } from '../utils/chunk.ts'
 import debug from '../debug.ts'
 
 export interface PreparedMessage {
@@ -55,7 +55,9 @@ export class NotificationSender {
   /**
    * Build the message content by calling the notification's `as<ChannelName>Message` method
    */
-  async #buildMessageContent(options: BuildMessageContentOptions): Promise<MessageContentResult | null> {
+  async #buildMessageContent(
+    options: BuildMessageContentOptions,
+  ): Promise<MessageContentResult | null> {
     const { notification, channelName, sendOptions } = options
     const capitalizedChannelName = capitalizeFirstLetter(channelName as string)
     const channelMethodName = `as${capitalizedChannelName}Message` as const
@@ -79,7 +81,10 @@ export class NotificationSender {
   /**
    * Execute a function with retry/timeout if configured
    */
-  async #executeWithRetry(fn: () => Promise<void>, options: RetryOptions): Promise<void> {
+  async #executeWithRetry(
+    fn: (context?: { signal?: AbortSignal }) => Promise<void>,
+    options: RetryOptions,
+  ): Promise<void> {
     const hasRetry = options.retries !== undefined || options.timeout !== undefined
     if (!hasRetry) return fn()
 
@@ -103,7 +108,7 @@ export class NotificationSender {
   /**
    * Emit notification sending event
    */
-  #emitNotificationSending(
+  emitNotificationSending(
     notification: Notification<any, any>,
     resolvedChannels: Record<string, any>,
   ) {
@@ -130,7 +135,11 @@ export class NotificationSender {
   /**
    * Emit message sending event
    */
-  #emitMessageSending(notification: Notification<any, any>, channelName: ChannelName, message: any) {
+  #emitMessageSending(
+    notification: Notification<any, any>,
+    channelName: ChannelName,
+    message: any,
+  ) {
     const event = facteurEvents.messageSending({ notification, channelName, message })
     this.emitter.emit(event.name, event.data)
   }
@@ -195,7 +204,11 @@ export class NotificationSender {
     const { notification, channelName, options: sendOptions, channelConfig } = options
 
     const channel = this.#getChannel(channelName)
-    const messageResult = await this.#buildMessageContent({ notification, channelName, sendOptions })
+    const messageResult = await this.#buildMessageContent({
+      notification,
+      channelName,
+      sendOptions,
+    })
     if (!messageResult) return null
 
     const { content: messageContent } = messageResult
@@ -229,7 +242,7 @@ export class NotificationSender {
   /**
    * Process results from sending messages and emit appropriate events
    */
-  async #processResults(options: {
+  async processResults(options: {
     results: Array<ChannelSendResult | null>
     throwOnError: boolean
     notification: Notification<any, any>
@@ -263,50 +276,38 @@ export class NotificationSender {
     channelName: ChannelName,
     channel: Channel,
     messages: PreparedMessage[],
-  ): Promise<ChannelSendResult[]> {
+    results: Map<PreparedMessage, ChannelSendResult>,
+    signal?: AbortSignal,
+  ): Promise<void> {
     const maxSize = channel.batchConfig?.maxSize ?? 100
     const batches = chunk(messages, maxSize)
-    const allResults: ChannelSendResult[] = []
 
     for (const batch of batches) {
+      signal?.throwIfAborted()
       debug(`Sending batch of ${batch.length} messages via ${channelName}`)
 
-      for (const msg of batch) {
-        this.#emitMessageSending(msg.notification, channelName, msg.messageContent)
+      let batchResult: BatchSendResult
+      try {
+        batchResult = await channel.sendBatch!(batch.map((m) => m.sendParams))
+      } catch (error) {
+        signal?.throwIfAborted()
+        for (const msg of batch) {
+          results.set(msg, { channel: channelName, status: 'failed', error })
+        }
+        continue
       }
 
-      try {
-        const batchResult: BatchSendResult = await channel.sendBatch!(batch.map((m) => m.sendParams))
-
-        for (const result of batchResult.results) {
-          const msg = batch[result.index]!
-
-          if (result.status === 'success') {
-            this.#emitMessageSent(msg.notification, channelName, msg.messageContent)
-          } else {
-            this.#emitMessageFailed(
-              msg.notification,
-              channelName,
-              msg.messageContent,
-              result.error || new Error('Unknown batch error'),
-            )
-          }
-
-          allResults.push({
-            channel: channelName,
-            status: result.status,
-            error: result.error,
-          })
-        }
-      } catch (error) {
-        for (const msg of batch) {
-          this.#emitMessageFailed(msg.notification, channelName, msg.messageContent, error as Error)
-          allResults.push({ channel: channelName, status: 'failed', error: error as Error })
-        }
+      signal?.throwIfAborted()
+      for (const result of batchResult.results) {
+        results.set(batch[result.index]!, {
+          channel: channelName,
+          status: result.status,
+          ...(result.status === 'failed' && {
+            error: result.error ?? new Error('Unknown batch error'),
+          }),
+        })
       }
     }
-
-    return allResults
   }
 
   /**
@@ -317,27 +318,28 @@ export class NotificationSender {
     channel: Channel,
     messages: PreparedMessage[],
     sendOptions: InternalSendOptions,
-  ): Promise<ChannelSendResult[]> {
+    results: Map<PreparedMessage, ChannelSendResult>,
+    signal?: AbortSignal,
+  ): Promise<void> {
     const retryOptions = this.#resolveRetryOptions(channelName as string, sendOptions)
-    const results: ChannelSendResult[] = []
 
     for (const msg of messages) {
+      signal?.throwIfAborted()
       debug(`Sending message via ${channelName}: %O`, msg.messageContent)
-      this.#emitMessageSending(msg.notification, channelName, msg.messageContent)
 
       try {
-        await this.#executeWithRetry(() => channel.send(msg.sendParams), retryOptions)
-
-        debug(`Message sent via ${channelName}`)
-        this.#emitMessageSent(msg.notification, channelName, msg.messageContent)
-        results.push({ channel: channelName, status: 'success' })
+        await this.#executeWithRetry(async () => {
+          signal?.throwIfAborted()
+          await channel.send(msg.sendParams)
+        }, retryOptions)
       } catch (error) {
-        this.#emitMessageFailed(msg.notification, channelName, msg.messageContent, error as Error)
-        results.push({ channel: channelName, status: 'failed', error: error as Error })
+        signal?.throwIfAborted()
+        results.set(msg, { channel: channelName, status: 'failed', error })
+        continue
       }
+      signal?.throwIfAborted()
+      results.set(msg, { channel: channelName, status: 'success' })
     }
-
-    return results
   }
 
   /**
@@ -358,7 +360,7 @@ export class NotificationSender {
     })
 
     debug(`Resolved channels: %O`, resolvedChannels)
-    this.#emitNotificationSending(notification, resolvedChannels)
+    this.emitNotificationSending(notification, resolvedChannels)
 
     const promises = Object.entries(resolvedChannels).map(async ([name, config]) => {
       if (!config.shouldSend || !config.target) return null
@@ -375,7 +377,7 @@ export class NotificationSender {
       })
     })
 
-    return await this.#processResults({
+    return await this.processResults({
       notification,
       results: await Promise.all(promises),
       throwOnError: options.throwOnError !== false,
@@ -396,7 +398,11 @@ export class NotificationSender {
 
     this.#getChannel(channelName)
 
-    const messageResult = await this.#buildMessageContent({ notification, channelName, sendOptions })
+    const messageResult = await this.#buildMessageContent({
+      notification,
+      channelName,
+      sendOptions,
+    })
     if (!messageResult) return null
 
     const { content: messageContent } = messageResult
@@ -426,12 +432,56 @@ export class NotificationSender {
     const { channelName, messages, sendOptions } = options
     const channel = this.#getChannel(channelName)
     const disableDriverBatch = sendOptions.disableDriverBatch === true
+    const { retries = 0, timeout, ...individualOptions } = sendOptions
+    const results = new Map<PreparedMessage, ChannelSendResult>()
 
-    if (channel.sendBatch && channel.batchConfig?.enabled !== false && !disableDriverBatch) {
-      return this.#sendWithBatchApi(channelName, channel, messages)
+    for (const msg of messages) {
+      this.#emitMessageSending(msg.notification, channelName, msg.messageContent)
     }
 
-    return this.#sendIndividually(channelName, channel, messages, sendOptions)
+    const sendAttempt = async ({ signal }: { signal?: AbortSignal } = {}) => {
+      // Keep confirmed successes, including those in earlier driver sub-batches.
+      const pending = messages.filter((msg) => results.get(msg)?.status !== 'success')
+      for (const msg of pending) results.delete(msg)
+
+      if (channel.sendBatch && channel.batchConfig?.enabled !== false && !disableDriverBatch) {
+        await this.#sendWithBatchApi(channelName, channel, pending, results, signal)
+      } else {
+        await this.#sendIndividually(
+          channelName,
+          channel,
+          pending,
+          individualOptions,
+          results,
+          signal,
+        )
+      }
+
+      const failures = [...results.values()].filter((result) => result.status === 'failed')
+      if (failures.length) throw new errors.E_SEND_NOTIFICATION_FAILED(failures.map((r) => r.error))
+    }
+
+    try {
+      // Timeout remains per channel-batch attempt, not per driver sub-batch.
+      await this.#executeWithRetry(sendAttempt, {
+        retries,
+        ...(timeout !== undefined && { timeout }),
+      })
+    } catch (error) {
+      for (const msg of messages) {
+        if (!results.has(msg)) results.set(msg, { channel: channelName, status: 'failed', error })
+      }
+    }
+
+    return messages.map((msg) => {
+      const result = results.get(msg)!
+      if (result.status === 'success') {
+        this.#emitMessageSent(msg.notification, channelName, msg.messageContent)
+      } else {
+        this.#emitMessageFailed(msg.notification, channelName, msg.messageContent, result.error)
+      }
+      return result
+    })
   }
 
   /**

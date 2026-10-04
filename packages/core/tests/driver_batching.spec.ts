@@ -1,5 +1,6 @@
-import { test } from '@japa/runner'
 import { setTimeout } from 'node:timers/promises'
+import EventEmitter from 'node:events'
+import { test } from '@japa/runner'
 
 import {
   kTargetSymbol,
@@ -432,9 +433,7 @@ test.group('Driver Batching | NotificationSender.sendChannelBatch', () => {
 
     // Single recipient uses individual channel.send, not batch
     // This is because the notification sender sends per-channel, not batched
-    assert.isTrue(
-      provider.getSentMessages().length === 1 || provider.getBatches().length === 1,
-    )
+    assert.isTrue(provider.getSentMessages().length === 1 || provider.getBatches().length === 1)
   })
 })
 
@@ -467,5 +466,666 @@ test.group('Driver Batching | async scenarios', () => {
 
     assert.equal(batchCount, 2) // 2 chunks
     assert.equal(provider.getTotalBatchedMessages(), 10)
+  })
+})
+
+function batchProvider(sendBatch: NonNullable<Channel['sendBatch']>, maxSize = 100): Channel {
+  return {
+    name: 'email',
+    [kTargetSymbol]: null,
+    batchConfig: { maxSize },
+    send() {
+      throw new Error('Expected batch API')
+    },
+    sendBatch,
+  }
+}
+
+function successfulBatch(messages: ChannelSendParams<any, any>[]): BatchSendResult {
+  return {
+    success: messages.length,
+    failed: 0,
+    results: messages.map((_, index) => ({ index, status: 'success' })),
+  }
+}
+
+test.group('Driver Batching | failures, retries and lifecycle', () => {
+  const discoverer = { searchDirectory: new URL('./notifications', import.meta.url) }
+
+  test('rejects by default, finalizes the current chunk and stops before the next chunk', async ({
+    assert,
+  }) => {
+    const failure = new Error('Rejected batch')
+    const batches: string[][] = []
+    const hooks: string[] = []
+    const progress: number[] = []
+    class HookNotification extends UserNotification {
+      override afterSend() {
+        hooks.push(this.notifiable.id)
+      }
+    }
+    const provider = batchProvider(async (messages) => {
+      batches.push(messages.map((m) => m.to.id))
+      throw failure
+    })
+    const facteur = new Facteur({ discoverer, channels: { email: provider } })
+
+    let caught: AggregateError | undefined
+    await assert.rejects(
+      () =>
+        facteur
+          .notification(HookNotification)
+          .params({ message: 'Hello' })
+          .to(createUsers(5))
+          .useDriverBatching()
+          .chunkSize(2)
+          .onProgress((completed) => progress.push(completed))
+          .send()
+          .catch((error) => {
+            caught = error
+            throw error
+          }),
+      AggregateError,
+    )
+
+    assert.deepEqual(caught?.errors, [failure])
+    assert.deepEqual(batches, [['1', '2']])
+    assert.sameMembers(hooks, ['1', '2'])
+    assert.deepEqual(progress, [])
+  })
+
+  test('throwOnError(false) returns rejected batches and progresses across chunks', async ({
+    assert,
+  }) => {
+    const failure = new Error('Rejected batch')
+    let attempts = 0
+    const progress: number[] = []
+    const facteur = new Facteur({
+      discoverer,
+      channels: {
+        email: batchProvider(async () => {
+          attempts++
+          throw failure
+        }),
+      },
+    })
+
+    const result = await facteur
+      .notification(UserNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(5))
+      .useDriverBatching()
+      .chunkSize(2)
+      .throwOnError(false)
+      .onProgress((completed) => progress.push(completed))
+      .send()
+
+    assert.equal(attempts, 3)
+    assert.equal(result.success, 0)
+    assert.equal(result.failed, 5)
+    assert.deepEqual(
+      result.results.map((r) => r.error),
+      Array(5).fill(failure),
+    )
+    assert.deepEqual(progress, [2, 4, 5])
+  })
+
+  for (const asynchronous of [false, true]) {
+    test(`retries ${asynchronous ? 'rejections' : 'synchronous exceptions'} twice`, async ({
+      assert,
+    }) => {
+      const batches: string[][] = []
+      const sendBatch = (messages: ChannelSendParams<any, any>[]) => {
+        batches.push(messages.map((m) => m.to.id))
+        if (batches.length < 3) throw new Error('Temporary failure')
+        return successfulBatch(messages)
+      }
+      const facteur = new Facteur({
+        discoverer,
+        channels: {
+          email: batchProvider(asynchronous ? async (messages) => sendBatch(messages) : sendBatch),
+        },
+      })
+
+      const result = await facteur
+        .notification(UserNotification)
+        .params({ message: 'Hello' })
+        .to(createUsers(3))
+        .useDriverBatching()
+        .retries(2)
+        .send()
+
+      assert.deepEqual(batches, [
+        ['1', '2', '3'],
+        ['1', '2', '3'],
+        ['1', '2', '3'],
+      ])
+      assert.equal(result.success, 3)
+      assert.equal(result.failed, 0)
+      assert.equal(result.results.length, 3)
+    })
+  }
+
+  test('retries only failed indexed messages across driver sub-batches', async ({ assert }) => {
+    const batches: string[][] = []
+    const attempts: Record<string, number> = {}
+    const facteur = new Facteur({
+      discoverer,
+      channels: {
+        email: batchProvider((messages) => {
+          batches.push(messages.map((m) => m.to.id))
+          const results = messages
+            .map((m, index) => {
+              attempts[m.to.id] = (attempts[m.to.id] ?? 0) + 1
+              const failed =
+                (m.to.id === '2' && attempts[m.to.id]! < 2) ||
+                (m.to.id === '4' && attempts[m.to.id]! < 3)
+              return { index, status: failed ? ('failed' as const) : ('success' as const) }
+            })
+            .reverse()
+          return { success: 0, failed: 0, results }
+        }, 2),
+      },
+    })
+
+    const result = await facteur
+      .notification(UserNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(5))
+      .useDriverBatching()
+      .retries(2)
+      .throwOnError(false)
+      .send()
+
+    assert.deepEqual(batches, [['1', '2'], ['3', '4'], ['5'], ['2', '4'], ['4']])
+    assert.deepEqual(attempts, { '1': 1, '2': 2, '3': 1, '4': 3, '5': 1 })
+    assert.equal(result.success, 5)
+    assert.equal(result.failed, 0)
+    assert.equal(result.results.length, 5)
+  })
+
+  test('keeps successes and the last error after exhausting partial-failure retries', async ({
+    assert,
+  }) => {
+    const batches: string[][] = []
+    const failures: Error[] = []
+    const facteur = new Facteur({
+      discoverer,
+      channels: {
+        email: batchProvider((messages) => {
+          batches.push(messages.map((m) => m.to.id))
+          const error = new Error(`Attempt ${batches.length}`)
+          failures.push(error)
+          return {
+            success: 0,
+            failed: 0,
+            results: messages
+              .map((m, index) => ({
+                index,
+                status: m.to.id === '2' ? ('failed' as const) : ('success' as const),
+                error,
+              }))
+              .reverse(),
+          }
+        }),
+      },
+    })
+
+    const result = await facteur
+      .notification(UserNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(3))
+      .useDriverBatching()
+      .retries(2)
+      .throwOnError(false)
+      .send()
+
+    assert.deepEqual(batches, [['1', '2', '3'], ['2'], ['2']])
+    assert.equal(result.success, 2)
+    assert.equal(result.failed, 1)
+    assert.deepEqual(
+      result.results.map((r) => r.status),
+      ['success', 'failed', 'success'],
+    )
+    assert.strictEqual(result.results[1]!.error, failures[2])
+  })
+
+  test('does not replay successful sub-batches when a later API call rejects', async ({
+    assert,
+  }) => {
+    const batches: string[][] = []
+    const facteur = new Facteur({
+      discoverer,
+      channels: {
+        email: batchProvider(async (messages) => {
+          batches.push(messages.map((m) => m.to.id))
+          if (batches.length === 2) throw new Error('Second sub-batch failed')
+          return successfulBatch(messages)
+        }, 2),
+      },
+    })
+
+    const result = await facteur
+      .notification(UserNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(5))
+      .useDriverBatching()
+      .retries(1)
+      .send()
+
+    assert.deepEqual(batches, [['1', '2'], ['3', '4'], ['5'], ['3', '4']])
+    assert.equal(result.success, 5)
+    assert.equal(result.failed, 0)
+  })
+
+  test('continueOnError preserves channel results and continues to later chunks', async ({
+    assert,
+  }) => {
+    const provider = new PartialFailBatchProvider([1])
+    const progress: number[] = []
+    const facteur = new Facteur({ discoverer, channels: { email: provider } })
+
+    const result = await facteur
+      .notification(UserNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(5))
+      .useDriverBatching()
+      .chunkSize(2)
+      .continueOnError()
+      .onProgress((completed) => progress.push(completed))
+      .send()
+
+    assert.equal(result.success, 3)
+    assert.equal(result.failed, 2)
+    assert.deepEqual(
+      result.results.map((r) => r.status),
+      ['success', 'failed', 'success', 'failed', 'success'],
+    )
+    assert.deepEqual(progress, [2, 4, 5])
+  })
+
+  for (const disableDriverBatch of [false, true]) {
+    test(`retries fallback messages without replaying successes (disabled=${disableDriverBatch})`, async ({
+      assert,
+    }) => {
+      const attempts: Record<string, number> = {}
+      const provider: Channel = {
+        name: 'email',
+        [kTargetSymbol]: null,
+        ...(disableDriverBatch && {
+          sendBatch() {
+            throw new Error('Batch API disabled')
+          },
+        }),
+        send(options) {
+          const id = options.to.id
+          attempts[id] = (attempts[id] ?? 0) + 1
+          if (id === '2' && attempts[id]! < 3) throw new Error('Temporary failure')
+        },
+      }
+      const facteur = new Facteur({ discoverer, channels: { email: provider } })
+
+      const result = await facteur
+        .notification(UserNotification)
+        .params({ message: 'Hello' })
+        .to(createUsers(3))
+        .useDriverBatching()
+        .disableDriverBatch(disableDriverBatch)
+        .retries(2)
+        .send()
+
+      assert.deepEqual(attempts, { '1': 1, '2': 3, '3': 1 })
+      assert.equal(result.success, 3)
+      assert.equal(result.failed, 0)
+    })
+  }
+
+  test('applies timeout to the whole channel attempt and ignores late sub-batch completion', async ({
+    assert,
+  }) => {
+    const batches: string[][] = []
+    const provider = batchProvider(async (messages) => {
+      batches.push(messages.map((m) => m.to.id))
+      await setTimeout(35)
+      return successfulBatch(messages)
+    }, 1)
+    const facteur = new Facteur({ discoverer, channels: { email: provider } })
+
+    const result = await facteur
+      .notification(UserNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(3))
+      .useDriverBatching()
+      .timeout(55)
+      .throwOnError(false)
+      .send()
+
+    assert.equal(result.success, 1)
+    assert.equal(result.failed, 2)
+    assert.deepEqual(
+      result.results.map((r) => r.status),
+      ['success', 'failed', 'failed'],
+    )
+    await setTimeout(60)
+    assert.deepEqual(batches, [['1'], ['2']])
+    assert.deepEqual(
+      result.results.map((r) => r.status),
+      ['success', 'failed', 'failed'],
+    )
+  })
+
+  test('retries timeouts without replaying earlier successes or emitting late events', async ({
+    assert,
+  }) => {
+    const batches: string[][] = []
+    const sent: string[] = []
+    const emitter = new EventEmitter()
+    emitter.on('facteur:message:sent', ({ message }) => sent.push(message.to))
+    class IdentifiedNotification extends UserNotification {
+      override asEmailMessage() {
+        return { ...super.asEmailMessage(), to: this.notifiable.id }
+      }
+    }
+    const facteur = new Facteur({
+      discoverer,
+      emitter,
+      channels: {
+        email: batchProvider(async (messages) => {
+          batches.push(messages.map((m) => m.to.id))
+          if (batches.length === 2) await setTimeout(100)
+          return successfulBatch(messages)
+        }, 1),
+      },
+    })
+
+    const result = await facteur
+      .notification(IdentifiedNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(3))
+      .useDriverBatching()
+      .timeout(25)
+      .retries(1)
+      .send()
+
+    assert.equal(result.success, 3)
+    assert.equal(result.failed, 0)
+    await setTimeout(120)
+    assert.deepEqual(batches, [['1'], ['2'], ['2'], ['3']])
+    assert.deepEqual(sent, ['1', '2', '3'])
+  })
+
+  test('finalizes per-notification multi-channel results and emits terminal events only once', async ({
+    assert,
+  }) => {
+    const emitter = new EventEmitter()
+    const events: Record<string, string[]> = {}
+    const terminal: Record<string, any> = {}
+    const before: string[] = []
+    const after: string[] = []
+    class LifecycleNotification extends MultiChannelNotification {
+      get id() {
+        return this.notifiable.id
+      }
+      override beforeSend() {
+        before.push(this.id)
+      }
+      override afterSend() {
+        events[this.id]!.push('afterSend')
+        after.push(this.id)
+      }
+      override shouldSend() {
+        return this.id !== '4'
+      }
+      override asEmailMessage() {
+        if (this.id === '3') return null as any
+        return super.asEmailMessage()
+      }
+    }
+    for (const name of [
+      'notification:sending',
+      'message:sending',
+      'message:sent',
+      'message:failed',
+      'notification:sent',
+      'notification:failed',
+    ]) {
+      emitter.on(`facteur:${name}`, (data) => {
+        const id = data.notification.id
+        ;(events[id] ??= []).push(name)
+        if (name === 'notification:sending')
+          assert.deepEqual(Object.keys(data.resolvedChannels), ['email', 'push'])
+        if (name === 'notification:sent' || name === 'notification:failed') terminal[id] = data
+      })
+    }
+    let attempts = 0
+    const failure = new Error('Permanent failure')
+    const facteur = new Facteur({
+      discoverer,
+      emitter,
+      channels: {
+        email: batchProvider((messages) => {
+          attempts++
+          return {
+            success: 0,
+            failed: 0,
+            results: messages
+              .map((m, index) => ({
+                index,
+                status:
+                  m.to.id === '2' || attempts === 1 ? ('failed' as const) : ('success' as const),
+                error: failure,
+              }))
+              .reverse(),
+          }
+        }),
+        push: new NonBatchProvider(),
+      },
+    })
+
+    const result = await facteur
+      .notification(LifecycleNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(4))
+      .useDriverBatching()
+      .retries(1)
+      .throwOnError(false)
+      .send()
+
+    assert.equal(result.success, 4)
+    assert.equal(result.failed, 1)
+    assert.deepEqual(before, ['1', '2', '3', '4'])
+    assert.sameMembers(after, ['1', '2', '3'])
+    assert.isUndefined(events['4'])
+    assert.deepEqual(terminal['1'].results, [
+      { channel: 'email', status: 'success' },
+      { channel: 'push', status: 'success' },
+    ])
+    assert.deepEqual(terminal['2'].errors, [failure])
+    assert.deepEqual(terminal['3'].results, [{ channel: 'push', status: 'success' }])
+    for (const id of ['1', '2', '3']) {
+      const trace = events[id]!
+      assert.equal(trace[0], 'notification:sending')
+      assert.equal(trace.at(-1), 'afterSend')
+      assert.equal(trace.at(-2), id === '2' ? 'notification:failed' : 'notification:sent')
+      assert.equal(trace.filter((e) => e === 'message:sending').length, id === '3' ? 1 : 2)
+      assert.equal(trace.filter((e) => e === 'message:failed').length, id === '2' ? 1 : 0)
+      assert.equal(trace.filter((e) => e === 'message:sent').length, id === '1' ? 2 : 1)
+    }
+  })
+
+  test('counts preparation exceptions, message-build errors and afterSend exceptions without retrying hooks', async ({
+    assert,
+  }) => {
+    const before: string[] = []
+    const after: string[] = []
+    const batches: string[][] = []
+    class ThrowingNotification extends UserNotification {
+      override beforeSend() {
+        before.push(this.notifiable.id)
+        if (this.notifiable.id === '1') throw new Error('beforeSend failed')
+      }
+      override asEmailMessage() {
+        if (this.notifiable.id === '2') throw new Error('Message build failed')
+        return super.asEmailMessage()
+      }
+      override afterSend() {
+        after.push(this.notifiable.id)
+        if (this.notifiable.id === '3') throw new Error('afterSend failed')
+      }
+    }
+    const facteur = new Facteur({
+      discoverer,
+      channels: {
+        email: batchProvider((messages) => {
+          batches.push(messages.map((m) => m.to.id))
+          return successfulBatch(messages)
+        }),
+      },
+    })
+
+    const result = await facteur
+      .notification(ThrowingNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(5))
+      .useDriverBatching()
+      .chunkSize(2)
+      .retries(2)
+      .continueOnError()
+      .send()
+
+    assert.equal(result.success, 2)
+    assert.equal(result.failed, 3)
+    assert.equal(result.results.length, 3)
+    assert.equal(result.results[0]!.error.message, 'Message build failed')
+    assert.deepEqual(before, ['1', '2', '3', '4', '5'])
+    assert.sameMembers(after, ['2', '3', '4', '5'])
+    assert.deepEqual(batches, [['3', '4'], ['5']])
+  })
+
+  test('rejects exhausted partial failures and supplies a missing driver error', async ({
+    assert,
+  }) => {
+    const batches: string[][] = []
+    const failedEvents: Error[] = []
+    const emitter = new EventEmitter()
+    emitter.on('facteur:notification:failed', ({ errors }) => failedEvents.push(...errors))
+    const facteur = new Facteur({
+      discoverer,
+      emitter,
+      channels: {
+        email: batchProvider((messages) => {
+          batches.push(messages.map((m) => m.to.id))
+          return {
+            success: 0,
+            failed: 0,
+            results: messages.map((m, index) => ({
+              index,
+              status: m.to.id === '2' ? ('failed' as const) : ('success' as const),
+            })),
+          }
+        }),
+      },
+    })
+
+    await assert.rejects(
+      () =>
+        facteur
+          .notification(UserNotification)
+          .params({ message: 'Hello' })
+          .to(createUsers(3))
+          .useDriverBatching()
+          .retries(2)
+          .send(),
+      AggregateError,
+    )
+
+    assert.deepEqual(batches, [['1', '2', '3'], ['2'], ['2']])
+    assert.equal(failedEvents.length, 1)
+    assert.instanceOf(failedEvents[0], Error)
+    assert.equal(failedEvents[0]!.message, 'Unknown batch error')
+  })
+
+  for (const disabled of [false, true]) {
+    test(`finalizes notifications without messages (channel disabled=${disabled})`, async ({
+      assert,
+    }) => {
+      const after: string[] = []
+      const sent: any[] = []
+      const emitter = new EventEmitter()
+      let messageEvents = 0
+      emitter.on('facteur:notification:sent', (data) => sent.push(data))
+      emitter.on('facteur:message:sending', () => messageEvents++)
+      class EmptyNotification extends UserNotification {
+        get id() {
+          return this.notifiable.id
+        }
+        override asEmailMessage() {
+          return null as any
+        }
+        override afterSend() {
+          after.push(this.id)
+        }
+      }
+      const facteur = new Facteur({
+        discoverer,
+        emitter,
+        channels: {
+          email: batchProvider(() => {
+            throw new Error('No messages to send')
+          }),
+        },
+      })
+
+      const result = await facteur
+        .notification(EmptyNotification)
+        .params({ message: 'Hello' })
+        .to(createUsers(2))
+        .via({ email: !disabled })
+        .useDriverBatching()
+        .send()
+
+      assert.deepEqual(result, { success: 0, failed: 0, results: [] })
+      assert.sameMembers(after, ['1', '2'])
+      assert.deepEqual(
+        sent.map((data) => [data.notification.id, data.results]),
+        [
+          ['1', []],
+          ['2', []],
+        ],
+      )
+      assert.equal(messageEvents, 0)
+    })
+  }
+
+  test('propagates afterSend exceptions even with throwOnError(false), without resending', async ({
+    assert,
+  }) => {
+    const after: string[] = []
+    const provider = new BatchableProvider()
+    class ThrowingHookNotification extends UserNotification {
+      override afterSend() {
+        after.push(this.notifiable.id)
+        if (this.notifiable.id === '2') throw new Error('Hook exception')
+      }
+    }
+    const facteur = new Facteur({ discoverer, channels: { email: provider } })
+
+    await assert.rejects(
+      () =>
+        facteur
+          .notification(ThrowingHookNotification)
+          .params({ message: 'Hello' })
+          .to(createUsers(5))
+          .useDriverBatching()
+          .chunkSize(2)
+          .retries(2)
+          .throwOnError(false)
+          .send(),
+      /Hook exception/,
+    )
+
+    assert.sameMembers(after, ['1', '2'])
+    assert.equal(provider.getBatches().length, 1)
+    assert.equal(provider.getTotalBatchedMessages(), 2)
   })
 })
