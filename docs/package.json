@@ -15,8 +15,8 @@
     "dev": "vite build && npm run serve"
   },
   "dependencies": {
-    "@adonisjs/core": "^7.0.0-next.28",
-    "@adonisjs/static": "^2.0.0-next.1",
+    "@adonisjs/core": "^7.5.2",
+    "@adonisjs/static": "^2.0.1",
     "@iconify-icons/tabler": "^1.2.96",
     "@iconify-json/tabler": "^1.2.41",
     "@radix-ui/colors": "^3.0.0",
@@ -26,9 +26,9 @@
     "tippy.js": "^6.3.7"
   },
   "devDependencies": {
-    "@adonisjs/assembler": "^8.0.0-next.32",
-    "@adonisjs/tsconfig": "^1.4.1",
-    "@adonisjs/vite": "^5.1.0-next.4",
+    "@adonisjs/assembler": "^8.5.2",
+    "@adonisjs/tsconfig": "catalog:",
+    "@adonisjs/vite": "^6.0.3",
     "@alpinejs/persist": "^3.17.4",
     "@dimerapp/content": "^5.2.1",
     "@dimerapp/docs-theme": "^6.1.3",
@@ -47,6 +47,6 @@
     "ts-node": "^10.9.2",
     "undici": "^7.30.0",
     "unpoly": "^3.14.3",
-    "vite": "^7.3.6"
+    "vite": "^8.3.2"
   }
 }
