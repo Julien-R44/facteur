@@ -2,19 +2,21 @@ import type { Awaitable } from '@julr/utils/types'
 
 import webpush from 'web-push'
 
-import type { WebpushConfig, WebpushTargets } from './types.ts'
+import type { WebpushConfig, WebpushTargets, WebpushSubscription } from './types.ts'
 import type { WebpushMessage } from './message.ts'
 
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.ts'
 import { errors } from '../../errors/index.ts'
 
+type Targets = WebpushTargets<WebpushSubscription | WebpushSubscription[]>
+
 export function webpushChannel(config: WebpushConfig) {
   return new WebpushChannel(config)
 }
 
-export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, any, WebpushTargets> {
+export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, any, Targets> {
   name = 'webpush' as const;
-  [kTargetSymbol] = null as any as WebpushTargets
+  [kTargetSymbol] = null as any as Targets
 
   constructor(private config: WebpushConfig) {
     webpush.setVapidDetails(config.vapidSubject, config.vapidPublicKey, config.vapidPrivateKey)
@@ -22,7 +24,7 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
     if (config.gcmApiKey) webpush.setGCMAPIKey(config.gcmApiKey)
   }
 
-  #resolveTargets(options: ChannelSendParams<WebpushMessage, WebpushTargets>): WebpushTargets {
+  #resolveTargets(options: ChannelSendParams<WebpushMessage, Targets>): Targets {
     if (options.targets) return options.targets
 
     throw new errors.E_UNAVAILABLE_TARGETS(['Webpush'])
@@ -41,35 +43,58 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
 
   #handleError(error: any): never {
     if (error.statusCode === 410) {
-      throw new Error(`Webpush subscription is no longer valid: ${error.body}`)
+      throw new Error(`Webpush subscription is no longer valid: ${error.body}`, { cause: error })
     }
 
     if (error.statusCode === 413) {
-      throw new Error(`Webpush payload too large: ${error.body}`)
+      throw new Error(`Webpush payload too large: ${error.body}`, { cause: error })
     }
 
     if (error.statusCode === 400) {
-      throw new Error(`Invalid webpush request: ${error.body}`)
+      throw new Error(`Invalid webpush request: ${error.body}`, { cause: error })
     }
 
     if (error.statusCode === 429) {
-      throw new Error(`Webpush rate limit exceeded: ${error.body}`)
+      throw new Error(`Webpush rate limit exceeded: ${error.body}`, { cause: error })
     }
 
     throw error
   }
 
-  async send(options: ChannelSendParams<WebpushMessage, WebpushTargets>) {
+  send(options: ChannelSendParams<WebpushMessage, WebpushTargets>): Promise<webpush.SendResult>
+  send(
+    options: ChannelSendParams<WebpushMessage, WebpushTargets<WebpushSubscription[]>>,
+  ): Promise<webpush.SendResult[]>
+  send(
+    options: ChannelSendParams<WebpushMessage, Targets>,
+  ): Promise<webpush.SendResult | webpush.SendResult[]>
+  async send(options: ChannelSendParams<WebpushMessage, Targets>) {
     const payload = options.message.serialize()
     const targets = this.#resolveTargets(options)
     const webpushOptions = this.#buildOptions()
 
-    try {
-      const result = await webpush.sendNotification(targets.subscription, payload, webpushOptions)
-      return { statusCode: result.statusCode, headers: result.headers, body: result.body }
-    } catch (error) {
-      return this.#handleError(error)
+    const send = async (subscription: WebpushSubscription) => {
+      try {
+        const result = await webpush.sendNotification(subscription, payload, webpushOptions)
+        return { statusCode: result.statusCode, headers: result.headers, body: result.body }
+      } catch (error) {
+        return this.#handleError(error)
+      }
     }
+
+    if (!Array.isArray(targets.subscription)) return send(targets.subscription)
+
+    const results = await Promise.allSettled(targets.subscription.map(send))
+    const failures = results.filter((result) => result.status === 'rejected')
+
+    if (failures.length) {
+      throw new AggregateError(
+        failures.map((result) => result.reason),
+        `Failed to send Webpush notification to ${failures.length} subscription(s)`,
+      )
+    }
+
+    return results.filter((result) => result.status === 'fulfilled').map((result) => result.value)
   }
 }
 

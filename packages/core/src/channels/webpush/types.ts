@@ -40,13 +40,17 @@ export interface WebpushConfig {
   timeout?: number
 }
 
-export interface WebpushTargets {
+export interface WebpushSubscription {
+  endpoint: string
+  keys: { p256dh: string; auth: string }
+  expirationTime?: number | null
+}
+
+export interface WebpushTargets<
+  Subscription extends WebpushSubscription | WebpushSubscription[] = WebpushSubscription,
+> {
   /**
-   * Push subscription object from the browser
+   * One browser push subscription by default; specify an array type for multiple devices
    */
-  subscription: {
-    endpoint: string
-    keys: { p256dh: string; auth: string }
-    expirationTime?: number | null
-  }
+  subscription: Subscription
 }

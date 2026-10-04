@@ -83,7 +83,7 @@ await facteur
 
 ### Target Properties
 
-- **`subscription`** (required): The push subscription object from the browser's Push API
+- **`subscription`** (required): A push subscription object from the browser's Push API, or an array of subscription objects
   - **`endpoint`**: The push service URL
   - **`keys.p256dh`**: The user's public key
   - **`keys.auth`**: The authentication secret
@@ -91,7 +91,18 @@ await facteur
 
 ### Multiple devices
 
-`subscription` is **one object, not an array**. Each channel send calls `web-push.sendNotification()` once. `.to([...])` sends to multiple notifiables; it does not fan out to multiple subscriptions belonging to one user. For a user with several devices, iterate over subscriptions in application code with explicit targets, or implement a custom channel. Automatic per-user multi-subscription delivery is not implemented.
+Pass an array to notify all of a user's devices in one call:
+
+```ts
+await facteur
+  .notification(MyNotification)
+  .via({ webpush: { subscription: userSubscriptions } })
+  .send()
+```
+
+Alternatively, return `{ webpush: { subscription: userSubscriptions } }` from `notificationTargets()` and use `.to(user)`.
+
+All subscriptions are attempted concurrently. Failures are grouped in an `AggregateError` and mark the channel as failed without preventing delivery to other devices. Retries resend to all devices and may cause duplicates.
 
 ## Client-Side Setup
 
