@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/hono",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Hono integration for Facteur - Send notifications via multiple channels in your Hono application",
   "keywords": [
     "cloudflare-workers",
