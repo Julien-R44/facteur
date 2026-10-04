@@ -28,16 +28,6 @@ export class ExpoChannel implements Channel<ExpoConfig, ExpoMessage, any, ExpoTa
 
   constructor(config: ExpoConfig) {
     this.#expo = new Expo(config)
-
-    if (config.accessToken) {
-      this.#validateExpoToken(config.accessToken)
-    }
-  }
-
-  #validateExpoToken(token: string): void {
-    if (!Expo.isExpoPushToken(token)) {
-      throw new Error(`Invalid Expo push token: ${token}`)
-    }
   }
 
   #resolveTargets(options: ChannelSendParams<ExpoMessage, ExpoTargets>): ExpoTargets {
