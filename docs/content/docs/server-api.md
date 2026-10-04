@@ -6,7 +6,7 @@ Facteur registers five HTTP routes for database notifications and preferences. C
 
 Every route calls `authorize` with `notifiableId`, `tenantId` and the request. Returning `false` responds with `403 { "error": "Unauthorized" }`. Authenticate the caller and check that they can access the requested user and tenant; IDs provided by the client are not proof of access. Do not use an always-true callback outside a disposable local demo.
 
-**Current security limitation:** `mark-as` authorizes the notifiable ID in the URL, then updates the row by `notificationId` alone. The built-in database adapters do not constrain this update by owner or tenant. Checking only the URL user in `authorize` does **not** prevent updating another user's notification. Before exposing this route, add an ownership/tenant check for the body’s `notificationId` in your authorization logic or replace the route with a scoped update. The frontend SDK and React mutation hooks use this same route.
+The built-in `mark-as` route updates a notification only when its ID, owner and exact tenant match the authorized request scope. Omitting `tenantId` matches only notifications without a tenant. Unknown or out-of-scope IDs are no-ops and still return `204`. Custom database adapters must enforce the same ownership and tenant predicates atomically. The frontend SDK and React mutation hooks use this same route.
 
 Also, omitting `tenantId` from notification list/mark-all requests does not filter to rows with a null tenant; the built-in adapters operate across that user's tenants. Require and validate a tenant where your application needs tenant isolation.
 

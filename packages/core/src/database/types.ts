@@ -42,6 +42,10 @@ export interface SaveToDatabaseParams extends Omit<Notification, 'id'> {}
 
 export interface UpdateNotificationParams {
   id: Identifier
+  /** The notification must belong to this notifiable. */
+  notifiableId: Identifier
+  /** Exact tenant scope. undefined matches only notifications without a tenant. */
+  tenantId: Identifier | undefined
   status: NotificationStatus
 }
 

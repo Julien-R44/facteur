@@ -36,6 +36,8 @@ export type NotificationsList<DatabaseContent> = Notification<DatabaseContent>[]
 export interface MarkAsOptions {
   notificationId: string
   status: 'read' | 'seen'
+  /** Exact tenant scope. Omit for notifications without a tenant. */
+  tenantId?: string
 }
 
 export interface MarkAllAsOptions {

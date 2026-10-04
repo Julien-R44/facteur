@@ -62,6 +62,21 @@ Both Knex and Kysely adapters support:
 - **`connection`** (required): Your database connection instance
 - **`tableNames`** (optional): Custom table names for notifications and preferences
 
+### Updating a Notification
+
+`facteur.db.updateNotification()` and `DatabaseAdapter.updateNotification()` require an explicit ownership scope: `id`, `notifiableId`, `tenantId`, and `status`. The update must match the notification ID, recipient, and exact tenant in the same database query. An ID outside that scope is a no-op.
+
+```ts
+await facteur.db.updateNotification({
+  id: 'notification-id',
+  notifiableId: 'user-123',
+  tenantId: 'tenant-456',
+  status: 'read'
+})
+```
+
+For notifications without a tenant, pass `tenantId: undefined` explicitly. This matches only rows with `tenant_id IS NULL`, not notifications in every tenant. Calls that previously supplied only `{ id, status }` must now provide the recipient and tenant scope. Custom database adapters must enforce the same scope.
+
 ## Database Schema
 
 Create the notifications table and optionally the preferences table. This SQL example uses PostgreSQL syntax; adapt identifier, JSON and timestamp types to your database.

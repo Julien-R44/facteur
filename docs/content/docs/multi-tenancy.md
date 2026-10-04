@@ -99,7 +99,7 @@ When using the `database` channel, notifications are stored with the `tenant_id`
 SELECT * FROM notifications WHERE notifiable_id = 'user-123' AND tenant_id = 'org-123';
 ```
 
-Supplying a tenant to list/mark-all operations filters by that tenant. Omitting it does **not** filter to null-tenant notifications: the built-in adapters list or update notifications across the user's tenants. Validate tenant membership in your API authorization. The `mark-as` update is scoped only by notification ID and needs an additional ownership/tenant check; see [Server API](./server-api.md#authorization-is-required).
+Supplying a tenant to list/mark-all operations filters by that tenant. Omitting it does **not** filter to null-tenant notifications: the built-in adapters list or update notifications across the user's tenants. Validate tenant membership in your API authorization. Single-notification `mark-as` updates match the notification ID, owner and exact tenant; omitting `tenantId` matches only notifications without a tenant. See [Server API](./server-api.md#authorization-is-required).
 
 ## API and SDK
 

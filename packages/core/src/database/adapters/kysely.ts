@@ -97,6 +97,9 @@ class KyselyAdapter implements DatabaseAdapter {
       .updateTable(this.#tableName)
       .set(updateData)
       .where('id', '=', options.id)
+      .where('notifiable_id', '=', options.notifiableId)
+      .$if(options.tenantId === undefined, (qb) => qb.where('tenant_id', 'is', null))
+      .$if(options.tenantId !== undefined, (qb) => qb.where('tenant_id', '=', options.tenantId))
       .execute()
   }
 
@@ -160,7 +163,9 @@ class KyselyAdapter implements DatabaseAdapter {
         .selectFrom(this.#preferencesTableName)
         .selectAll()
         .where('user_id', '=', options.notifiableId)
-        .$if(!!options.notificationName, (qb) => qb.where('notification_name', '=', options.notificationName))
+        .$if(!!options.notificationName, (qb) =>
+          qb.where('notification_name', '=', options.notificationName),
+        )
         .$if(!options.notificationName, (qb) => qb.where('notification_name', 'is', null))
         .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
         .$if(!options.tenantId, (qb) => qb.where('tenant_id', 'is', null))

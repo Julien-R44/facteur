@@ -45,15 +45,15 @@ export class NotificationsApi<DatabaseContent> {
   /**
    * Mark a notification as read
    */
-  async markAsRead(options: { notificationId: string }): Promise<void> {
-    return this.markAs({ notificationId: options.notificationId, status: 'read' })
+  async markAsRead(options: Omit<MarkAsOptions, 'status'>): Promise<void> {
+    return this.markAs({ ...options, status: 'read' })
   }
 
   /**
    * Mark a notification as seen
    */
-  async markAsSeen(options: { notificationId: string }): Promise<void> {
-    return this.markAs({ notificationId: options.notificationId, status: 'seen' })
+  async markAsSeen(options: Omit<MarkAsOptions, 'status'>): Promise<void> {
+    return this.markAs({ ...options, status: 'seen' })
   }
 
   /**

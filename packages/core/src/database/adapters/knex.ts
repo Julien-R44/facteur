@@ -44,16 +44,18 @@ class KnexAdapter implements DatabaseAdapter {
   }
 
   async save(options: SaveToDatabaseParams) {
-    await this.#getConnection().table(this.#tableName).insert({
-      notifiable_id: options.notifiableId,
-      tenant_id: options.tenantId || null,
-      type: options.type,
-      content: JSON.stringify(options.content),
-      status: options.status,
-      created_at: options.createdAt || new Date(),
-      updated_at: options.updatedAt || new Date(),
-      tags: options.tags ? JSON.stringify(options.tags) : null,
-    })
+    await this.#getConnection()
+      .table(this.#tableName)
+      .insert({
+        notifiable_id: options.notifiableId,
+        tenant_id: options.tenantId || null,
+        type: options.type,
+        content: JSON.stringify(options.content),
+        status: options.status,
+        created_at: options.createdAt || new Date(),
+        updated_at: options.updatedAt || new Date(),
+        tags: options.tags ? JSON.stringify(options.tags) : null,
+      })
   }
 
   async getNotifications(options: AdapterGetNotificationsParams): Promise<Notification[]> {
@@ -61,7 +63,9 @@ class KnexAdapter implements DatabaseAdapter {
     const limit = Math.min(options.limit || 10, 100)
     const offset = (page - 1) * limit
 
-    let query = this.#getConnection().table(this.#tableName).where('notifiable_id', options.notifiableId)
+    let query = this.#getConnection()
+      .table(this.#tableName)
+      .where('notifiable_id', options.notifiableId)
 
     if (options.tenantId) query.where('tenant_id', options.tenantId)
     if (options.status) query.where('status', options.status)
@@ -100,10 +104,15 @@ class KnexAdapter implements DatabaseAdapter {
       updateData.seen_at = new Date()
     }
 
-    await this.#getConnection()
+    const query = this.#getConnection()
       .table(this.#tableName)
       .where('id', options.id)
-      .update(updateData)
+      .where('notifiable_id', options.notifiableId)
+
+    if (options.tenantId === undefined) query.whereNull('tenant_id')
+    else query.where('tenant_id', options.tenantId)
+
+    await query.update(updateData)
   }
 
   async updateAllNotifications(options: UpdateAllNotificationsParams): Promise<void> {
@@ -118,7 +127,9 @@ class KnexAdapter implements DatabaseAdapter {
       updateData.seen_at = new Date()
     }
 
-    let query = this.#getConnection().table(this.#tableName).where('notifiable_id', options.notifiableId)
+    let query = this.#getConnection()
+      .table(this.#tableName)
+      .where('notifiable_id', options.notifiableId)
     if (options.tenantId) query = query.where('tenant_id', options.tenantId)
 
     await query.update(updateData)

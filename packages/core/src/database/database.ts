@@ -35,6 +35,8 @@ export class FacteurDatabase {
   updateNotification(option: UpdateNotificationParams) {
     return this.options.databaseAdapter?.updateNotification({
       id: option.id,
+      notifiableId: option.notifiableId,
+      tenantId: option.tenantId,
       status: option.status,
     })
   }

@@ -48,9 +48,9 @@ const facteur = createFacteurClient<MyNotificationData>({
 
 All good! Your client is ready to be used. Here are the available methods
 
-`notifiableId` identifies the user for requests; it does not authenticate them. Configure cookies (`credentials: 'include'`) or headers and enforce authorization on your server. The current `mark-as` route needs an ownership check beyond the URL user; see [Server API](../server-api.md#authorization-is-required).
+`notifiableId` identifies the user for requests; it does not authenticate them. Configure cookies (`credentials: 'include'`) or headers and enforce authorization on your server. The built-in adapters scope single-notification updates to the requested recipient and exact tenant, but the server must still authorize that scope; see [Server API](../server-api.md#authorization-is-required).
 
-The client has no default tenant setting. Pass `tenantId` in each list, preferences or mark-all call. Single-notification marking methods currently do not expose `tenantId`; ownership and tenant access must be verified by the server using the notification ID.
+The client has no default tenant setting. Pass `tenantId` in each list, preferences, mark-all or single-notification marking call. For single-notification updates, omitting `tenantId` only matches notifications without a tenant.
 
 ### notifications.list()
 
@@ -82,10 +82,12 @@ Marks a specific notification as read.
 **Parameters:**
 
 - `notificationId` (string, required): ID of the notification to mark
+- `tenantId` (string, optional): Exact tenant of the notification; omit only for notifications without a tenant
 
 ```ts
 await facteur.notifications.markAsRead({
   notificationId: 'notification-id',
+  tenantId: 'tenant-123',
 })
 ```
 
@@ -96,10 +98,12 @@ Marks a specific notification as seen.
 **Parameters:**
 
 - `notificationId` (string, required): ID of the notification to mark
+- `tenantId` (string, optional): Exact tenant of the notification; omit only for notifications without a tenant
 
 ```ts
 await facteur.notifications.markAsSeen({
   notificationId: 'notification-id',
+  tenantId: 'tenant-123',
 })
 ```
 
@@ -139,13 +143,17 @@ Marks a notification with a specific status (generic method).
 
 - `notificationId` (string, required): ID of the notification to mark
 - `status` (string, required): Status to apply (`'read'` | `'seen'`)
+- `tenantId` (string, optional): Exact tenant of the notification; omit only for notifications without a tenant
 
 ```ts
 await facteur.notifications.markAs({
   notificationId: 'notification-id',
   status: 'read',
+  tenantId: 'tenant-123',
 })
 ```
+
+These single-notification methods only modify notifications belonging to the client's notifiable ID and the exact tenant scope. Without `tenantId`, they only match notifications without a tenant. Unknown or out-of-scope notification IDs leave the database unchanged and still return success (`204`).
 
 ### notifications.markAllAs()
 

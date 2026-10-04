@@ -118,7 +118,7 @@ createHonoFacteurServer({
 export default app
 ```
 
-Implement `authorizeNotificationRequest` in your application to authenticate the caller and verify access. **The built-in `mark-as` route does not scope its update by owner/tenant**, so also verify the body’s notification ID or use a scoped custom route. Read [Server API](./server-api.md#authorization-is-required) before exposing the API. Serve Hono and attach `ioServer` to your HTTP server separately.
+Implement `authorizeNotificationRequest` in your application to authenticate the caller and verify access to the requested user and tenant. The built-in `mark-as` route then scopes its update by notification ID, owner and exact tenant. Read [Server API](./server-api.md#authorization-is-required) before exposing the API. Serve Hono and attach `ioServer` to your HTTP server separately.
 
 ## React frontend
 

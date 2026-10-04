@@ -45,7 +45,7 @@ export const markNotificationAsRoute = defineRoute(({ facteur, authorize }) => (
     if (!status) return { status: 400, body: { error: 'Status is required' } }
     if (!notificationId) return { status: 400, body: { error: 'Notification ID is required' } }
 
-    await facteur.db.updateNotification({ id: notificationId, status })
+    await facteur.db.updateNotification({ id: notificationId, notifiableId, tenantId, status })
 
     return { status: 204, body: {} }
   },

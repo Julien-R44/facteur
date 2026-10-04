@@ -62,7 +62,14 @@ test.group('Hono Responses | public mutation routes', () => {
       }),
     })
 
-    assert.deepEqual(calls, [{ id: 'notification-456', status: 'read' }])
+    assert.deepEqual(calls, [
+      {
+        id: 'notification-456',
+        notifiableId: 'user-123',
+        tenantId: 'tenant-789',
+        status: 'read',
+      },
+    ])
     assert.equal(response.status, 204)
     assert.isNull(response.body)
     assert.equal(await response.text(), '')
