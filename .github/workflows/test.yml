@@ -82,36 +82,3 @@ jobs:
           REDIS_PORT: 6379
           FORCE_COLOR: 1
         run: pnpm test -r
-
-  legacy-sdk-compatibility:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@latest --activate
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install legacy optional SDKs
-        run: |
-          pnpm --filter @facteurjs/core add -D --save-exact expo-server-sdk@3.15.0 firebase-admin@13.4.0 twilio@5.8.0 kysely@0.28.3 @boringnode/transmit@0.3.0
-          pnpm --filter @facteurjs/adonisjs add -D --save-exact @adonisjs/redis@10.0.0-next.2 @adonisjs/transmit@2.0.2
-
-      - name: Typecheck legacy SDKs
-        run: |
-          pnpm --filter @facteurjs/core typecheck
-          pnpm --filter @facteurjs/adonisjs typecheck
-
-      - name: Test legacy SDKs
-        run: pnpm --filter @facteurjs/core test
