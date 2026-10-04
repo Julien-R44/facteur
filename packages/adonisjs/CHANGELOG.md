@@ -1,5 +1,13 @@
 # @facteurjs/adonisjs
 
+## 2.0.1
+
+### Patch Changes
+
+- 142f450: Fix published packages: declare the Core runtime dependency on `@poppinss/utils`, include AdonisJS setup stubs at the expected path, and preserve channel types in generated AdonisJS declarations.
+- Updated dependencies [142f450]
+  - @facteurjs/core@2.0.1
+
 ## 2.0.0
 
 ### Minor Changes
