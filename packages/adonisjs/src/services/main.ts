@@ -1,10 +1,14 @@
+import type { NotificationChannels } from '@facteurjs/core/types'
+
 import app from '@adonisjs/core/services/app'
 
-import type { NotificationChannels } from '../types.ts'
 import type { NotificationManager } from '../manager.ts'
 
-// @ts-ignore
-let facteur: NotificationManager<NotificationChannels, null>
+type RegisteredChannels = {
+  [Name in keyof NotificationChannels]: NotificationChannels[Name]
+}
+
+let facteur: NotificationManager<RegisteredChannels, null>
 
 await app?.booted(async () => {
   facteur = await app.container.make('notifications.manager')

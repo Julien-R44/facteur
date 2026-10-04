@@ -21,7 +21,7 @@ export default defineConfig({
     'services/main': './src/services/main.ts',
   },
   unbundle: true,
-  copy: [{ from: './stubs', to: './dist/adonisjs' }],
+  copy: [{ from: './stubs', to: './dist' }],
   clean: true,
   dts: true,
   skipNodeModulesBundle: true,

@@ -1,8 +1,7 @@
 import type { Channel, DefaultPreferences, FacteurConfiguration } from '@facteurjs/core/types'
+import type { DatabaseAdapter } from '@facteurjs/core/database/types'
 import type { ConfigProvider } from '@adonisjs/core/types'
 import type { HttpContext } from '@adonisjs/core/http'
-
-import type { DatabaseAdapter } from './channels/database.ts'
 
 export interface AdonisFacteurConfiguration<
   Channels extends Record<string, ConfigProvider<Channel>>,
