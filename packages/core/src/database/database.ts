@@ -47,8 +47,11 @@ export class FacteurDatabase {
     })
   }
 
-  async #createEmptyPreferences(tenantId?: string | number): Promise<Preferences> {
-    const globalChannels = this.options.defaultPreferences.global.channels
+  async #createEmptyPreferences(
+    tenantId?: string | number,
+    includeDefaults = true,
+  ): Promise<Preferences> {
+    const globalChannels = includeDefaults ? this.options.defaultPreferences.global.channels : {}
 
     const notificationIdentities = await this.discoverer.getNotificationIdentities()
     const notificationPreferences = notificationIdentities.map((identity) => ({
@@ -67,7 +70,10 @@ export class FacteurDatabase {
       preferences.tenants = {
         [tenantId]: {
           global: { channels: { ...globalChannels } },
-          notifications: [...notificationPreferences],
+          notifications: notificationPreferences.map(({ notification, channels }) => ({
+            notification: { ...notification },
+            channels: { ...channels },
+          })),
         },
       }
     }
@@ -87,14 +93,21 @@ export class FacteurDatabase {
     }
   }
 
-  async getPreferences(options: GetPreferencesParams): Promise<Preferences> {
+  /**
+   * Return the full preference structure for reading. Channel resolution disables
+   * defaults so that only explicitly stored channels participate in user priority.
+   */
+  async getPreferences(
+    options: GetPreferencesParams,
+    includeDefaults = true,
+  ): Promise<Preferences> {
     const rawPreferences = await this.options.databaseAdapter?.getPreferences(options)
 
     if (!rawPreferences) {
-      return await this.#createEmptyPreferences(options.tenantId)
+      return await this.#createEmptyPreferences(options.tenantId, includeDefaults)
     }
 
-    const preferences = await this.#createEmptyPreferences(options.tenantId)
+    const preferences = await this.#createEmptyPreferences(options.tenantId, includeDefaults)
 
     for (const row of rawPreferences) {
       this.#processPreferenceRow(row, preferences)
@@ -133,7 +146,8 @@ export class FacteurDatabase {
     channels: Record<string, boolean>,
   ) {
     let notificationPref = notifications.find(
-      (n) => n.notification.name === notificationName || n.notification.identifier === notificationName,
+      (n) =>
+        n.notification.name === notificationName || n.notification.identifier === notificationName,
     )
 
     if (!notificationPref) {

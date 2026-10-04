@@ -91,15 +91,18 @@ export class ChannelResolver {
     if (notificationOptions.critical) return fromDeliverBy
 
     /**
-     * Get preferences for the notifiable and tenant.
+     * Get stored preferences without read-time defaults for the notifiable and tenant.
      * Skip if no notifiable (anonymous notification) or no database.
      */
     const notifiableId = (to as any)?.id as Identifier | undefined
     const preferences = notifiableId
-      ? await this.#database?.getPreferences({
-          notifiableId,
-          tenantId: tenantId as Identifier,
-        })
+      ? await this.#database?.getPreferences(
+          {
+            notifiableId,
+            tenantId: tenantId as Identifier,
+          },
+          false,
+        )
       : undefined
 
     /**
@@ -134,6 +137,7 @@ export class ChannelResolver {
        * 3. Notification-specific global preference
        * 4. Global user preference
        * 5. Category preference (from default config)
+       * 6. Global default config, then deliverBy
        */
       const preferencesSources = [
         notificationTenantPreference?.channels[channelName],
@@ -141,6 +145,7 @@ export class ChannelResolver {
         notificationGlobalPreference?.channels[channelName],
         globalPreferences?.channels[channelName],
         categoryPreferences?.[channelName],
+        this.#defaultPreferences?.global.channels[channelName],
       ]
 
       shouldSend = preferencesSources.find((preference) => !is.undefined(preference)) ?? shouldSend
