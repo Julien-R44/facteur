@@ -1,15 +1,17 @@
-import type { NotificationFilter } from '@facteurjs/client/types'
+import type { NotificationFilter, NotificationsList } from '@facteurjs/client/types'
 
 import { queryOptions, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
-import { useFacteur, type TypedFacteurClient } from './index.tsx'
+import type { QueryOptions } from './types.ts'
+
+import { useFacteur, type TypedFacteurClient, type DatabaseContent } from './index.tsx'
 
 interface UseNotificationsOptions extends NotificationFilter {}
 
 export const listNotificationsQueryOptions = (
   options: UseNotificationsOptions,
   client: TypedFacteurClient,
-) =>
+): QueryOptions<NotificationsList<DatabaseContent>, (string | UseNotificationsOptions)[]> =>
   queryOptions({
     queryKey: ['facteur', 'notifications', 'list', client.notifiableId, options],
     queryFn: () => client.notifications.list(options),
