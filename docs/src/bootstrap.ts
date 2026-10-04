@@ -114,6 +114,10 @@ export const renderer = new Renderer(edge, pipeline)
   .codeBlocksTheme('material-theme-palenight')
   .useTemplate('docs')
 
+export const homeRenderer = new Renderer(edge, pipeline)
+  .codeBlocksTheme('material-theme-palenight')
+  .useTemplate('home')
+
 /**
  * Adding grammars
  */

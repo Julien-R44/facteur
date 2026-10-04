@@ -23,6 +23,7 @@
  * Dimer doc theme styles
  */
 @import '@dimerapp/docs-theme/styles';
+@import './landing.css';
 
 :root {
   --progress-bar-color: var(--mauve-a11);

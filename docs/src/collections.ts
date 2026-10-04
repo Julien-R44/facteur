@@ -11,13 +11,18 @@
 
 import { Collection } from '@dimerapp/content'
 
-import { renderer } from './bootstrap.js'
+import { homeRenderer, renderer } from './bootstrap.js'
+
+const pages = new Collection()
+  .db(new URL('../content/pages/db.json', import.meta.url))
+  .useRenderer(homeRenderer)
 
 const docs = new Collection()
   .db(new URL('../content/docs/db.json', import.meta.url))
   .useRenderer(renderer)
   .urlPrefix('/docs')
 
+await pages.boot()
 await docs.boot()
 
-export const collections = [docs]
+export const collections = [pages, docs]
