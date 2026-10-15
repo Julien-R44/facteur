@@ -10,6 +10,16 @@ export type InferChannels<T> = T extends { channels: infer Channels }
     }
   : never
 
+export type InferDatabase<T> = T extends { databaseAdapter: ConfigProvider<infer Adapter> }
+  ? { adapter: Adapter }
+  : { adapter: null }
+
+/**
+ * Augment this interface with `InferDatabase<typeof config>` so the
+ * `facteur` service knows whether `facteur.db` is available.
+ */
+export interface NotificationsDatabase {}
+
 /**
  * Context passed to the AdonisJS authorization callback.
  * Includes the full HttpContext for accessing auth, session, etc.

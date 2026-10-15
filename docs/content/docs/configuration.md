@@ -43,7 +43,7 @@ After discovery, `getNotifications()` returns the classes and `getNotificationId
 
 The top-level `databaseAdapter` powers `facteur.db` and the [Server API](./server-api.md). Configuring a `database` channel alone only enables storing messages; it does not configure `facteur.db`. Use the same adapter for both, as shown in the [Database channel](./channels/database.md).
 
-The current `createFacteur()` helper fixes the database adapter generic to `null`, so TypeScript can reject a top-level adapter or type `facteur.db` as `never`. Instantiate `new Facteur<typeof channels, typeof adapter>({ channels, databaseAdapter: adapter, discoverer })` instead, as shown in the database guide. `InferChannelsFromConfig<typeof facteur>` has the same limitation for database-backed instances; extend `NotificationChannels` from an alias of `typeof channels` in that case, as shown in that guide.
+`createFacteur()` infers the adapter type: `facteur.db` is available when `databaseAdapter` is set and typed as `never` otherwise.
 
 ## Retry configuration
 

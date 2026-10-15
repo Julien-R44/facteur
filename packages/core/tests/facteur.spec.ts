@@ -1,9 +1,11 @@
 import { test } from '@japa/runner'
 
-import { FakeNotification, testProvider } from './helpers/index.ts'
+import type { InferChannelsFromConfig } from '../src/types/extend.ts'
+
+import { createFakeDatabaseAdapter, FakeNotification, testProvider } from './helpers/index.ts'
 import { Notification, type Notifiable } from '../src/types/notifications.ts'
 import { errors } from '../src/index.ts'
-import { Facteur } from '../src/facteur.ts'
+import { createFacteur, Facteur } from '../src/facteur.ts'
 
 type TestUser = { id: string; email: string } & Notifiable
 
@@ -447,5 +449,24 @@ test.group('Facteur | send typings', (group) => {
       .via({ email: { to: 'foo@ok.com' } })
       .tenant('tenant-id')
       .send()
+  })
+})
+
+test.group('Facteur | types', () => {
+  test('createFacteur types db from the database adapter', ({ expectTypeOf }) => {
+    const discoverer = { searchDirectory: new URL('./notifications', import.meta.url) }
+    const channels = { email: testProvider() }
+
+    const withAdapter = createFacteur({
+      channels,
+      discoverer,
+      databaseAdapter: createFakeDatabaseAdapter(),
+    })
+    const withoutAdapter = createFacteur({ channels, discoverer })
+
+    expectTypeOf<typeof withAdapter.db>().not.toBeNever()
+    expectTypeOf<typeof withAdapter.db>().toHaveProperty('getNotifications')
+    expectTypeOf<typeof withoutAdapter.db>().toBeNever()
+    expectTypeOf<InferChannelsFromConfig<typeof withAdapter>>().toEqualTypeOf<typeof channels>()
   })
 })

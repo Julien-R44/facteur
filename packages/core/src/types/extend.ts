@@ -22,4 +22,4 @@ export interface DatabaseContent {}
  * Infer the channels from the Facteur instance
  */
 export type InferChannelsFromConfig<T> =
-  T extends Facteur<infer U> ? U : T extends FacteurConfiguration<infer X> ? X : never
+  T extends Facteur<infer U, any> ? U : T extends FacteurConfiguration<infer X, any> ? X : never
