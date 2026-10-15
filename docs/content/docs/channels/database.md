@@ -9,7 +9,8 @@ This channel does **not support batching**. Each notification is inserted indivi
 ## Configuration
 
 ```ts
-import { Facteur } from '@facteurjs/core'
+import { createFacteur } from '@facteurjs/core'
+import type { InferChannelsFromConfig } from '@facteurjs/core/types'
 import { databaseChannel } from '@facteurjs/core/database'
 import { knexAdapter } from '@facteurjs/core/database/adapters/knex'
 import { connection } from './database.js'
@@ -17,16 +18,14 @@ import { connection } from './database.js'
 const adapter = knexAdapter({ connection })
 const channels = { database: databaseChannel({ adapter }) }
 
-export const facteur = new Facteur<typeof channels, typeof adapter>({
+export const facteur = createFacteur({
   discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
   databaseAdapter: adapter,
   channels,
 })
 
-type AppChannels = typeof channels
-
 declare module '@facteurjs/core/types' {
-  interface NotificationChannels extends AppChannels {}
+  interface NotificationChannels extends InferChannelsFromConfig<typeof facteur> {}
 }
 
 await facteur.discoverer.discoverNotifications()

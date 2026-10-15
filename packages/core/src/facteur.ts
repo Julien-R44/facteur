@@ -19,7 +19,10 @@ import { BatchingSender } from './notifications/batching_sender.ts'
 import { FacteurFake } from './fake.ts'
 import { FacteurDatabase } from './database/database.ts'
 
-export function createFacteur<T extends Record<string, Channel>>(config: FacteurConfiguration<T>) {
+export function createFacteur<
+  T extends Record<string, Channel>,
+  DBAdapter extends DatabaseAdapter | null = null,
+>(config: FacteurConfiguration<T, DBAdapter>) {
   return new Facteur(config)
 }
 

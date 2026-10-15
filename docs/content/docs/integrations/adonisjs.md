@@ -23,7 +23,7 @@ Adonis configuration requires config providers from `channels`, not raw channel 
 ```ts
 import { defineConfig, channels } from '@facteurjs/adonisjs'
 import { databases } from '@facteurjs/adonisjs/database'
-import type { InferChannels } from '@facteurjs/adonisjs/types'
+import type { InferChannels, InferDatabase } from '@facteurjs/adonisjs/types'
 
 const config = defineConfig({
   databaseAdapter: databases.lucid({}),
@@ -37,8 +37,11 @@ export default config
 
 declare module '@facteurjs/adonisjs/types' {
   interface NotificationChannels extends InferChannels<typeof config> {}
+  interface NotificationsDatabase extends InferDatabase<typeof config> {}
 }
 ```
+
+`NotificationsDatabase` types `facteur.db` from the config: available when `databaseAdapter` is set, `never` otherwise. Without this augmentation, `facteur.db` is typed as available and throws at runtime when no adapter is configured.
 
 `databases.lucid()` configures the database API/preferences layer; `channels.database()` configures message storage. Configure both for in-app notifications. They accept `connectionName` and custom `tableNames`. Kysely is available through `databases.kysely({ connection })` and `channels.kysely({ connection })`; the current Adonis Kysely wrappers do not forward custom table names.
 

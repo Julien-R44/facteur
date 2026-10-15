@@ -13,7 +13,8 @@ pnpm add @facteurjs/core @facteurjs/hono hono knex pg socket.io
 Create a Knex connection and Socket.IO server using your application's normal setup, then configure Facteur:
 
 ```ts
-import { Facteur } from '@facteurjs/core'
+import { createFacteur } from '@facteurjs/core'
+import type { InferChannelsFromConfig } from '@facteurjs/core/types'
 import { databaseChannel } from '@facteurjs/core/database'
 import { knexAdapter } from '@facteurjs/core/database/adapters/knex'
 import { socketIoChannel } from '@facteurjs/core/channels/socketio'
@@ -26,16 +27,14 @@ const channels = {
   socketIo: socketIoChannel({ server: ioServer }),
 }
 
-export const facteur = new Facteur<typeof channels, typeof adapter>({
+export const facteur = createFacteur({
   channels,
   databaseAdapter: adapter,
   discoverer: { searchDirectory: new URL('./notifications/', import.meta.url) },
 })
 
-type AppChannels = typeof channels
-
 declare module '@facteurjs/core/types' {
-  interface NotificationChannels extends AppChannels {}
+  interface NotificationChannels extends InferChannelsFromConfig<typeof facteur> {}
   interface DatabaseContent {
     message: string
     description?: string

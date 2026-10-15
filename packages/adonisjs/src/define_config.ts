@@ -15,8 +15,13 @@ export interface AdonisFacteurConfiguration<
   >
 }
 
-export function defineConfig<Channels extends Record<string, ConfigProvider<Channel>>>(
-  options: AdonisFacteurConfiguration<Channels>,
-) {
-  return options
+export function defineConfig<
+  Channels extends Record<string, ConfigProvider<Channel>>,
+  DatabaseProvider extends ConfigProvider<DatabaseAdapter> | undefined = undefined,
+>(options: AdonisFacteurConfiguration<Channels> & { databaseAdapter?: DatabaseProvider }) {
+  /**
+   * Keep the database adapter type so `InferDatabase` can tell
+   * whether the config defines one.
+   */
+  return options as AdonisFacteurConfiguration<Channels> & { databaseAdapter: DatabaseProvider }
 }

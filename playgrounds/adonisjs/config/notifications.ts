@@ -1,4 +1,4 @@
-import type { InferChannels } from '@facteurjs/adonisjs/types'
+import type { InferChannels, InferDatabase } from '@facteurjs/adonisjs/types'
 
 import { databases } from '@facteurjs/adonisjs/database'
 import { defineConfig, channels } from '@facteurjs/adonisjs'
@@ -72,4 +72,5 @@ export default config
 
 declare module '@facteurjs/adonisjs/types' {
   interface NotificationChannels extends InferChannels<typeof config> {}
+  interface NotificationsDatabase extends InferDatabase<typeof config> {}
 }
