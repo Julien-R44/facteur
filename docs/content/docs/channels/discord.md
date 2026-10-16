@@ -38,6 +38,8 @@ Since the Discord channel uses the webhook channel internally, it supports the s
 
 Provide either `webhooks` or `webhookUrl`, not both. If both exist at runtime, `webhookUrl` takes precedence.
 
+The Discord channel also accepts the [webhook security options](./webhook.md#security): `signingSecret`, `httpsOnly`, `followRedirects`, `timeout`, and `fetch`. Discord does not check Standard Webhooks signatures, so `signingSecret` helps only when a proxy you run checks them. If your users provide Discord webhook URLs, use `httpsOnly`, `timeout`, and a `fetch` that blocks SSRF.
+
 ## Targets
 
 The Discord channel targets work exactly like [webhook targets](./webhook.md#targets):
