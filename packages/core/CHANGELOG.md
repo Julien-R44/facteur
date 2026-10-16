@@ -1,5 +1,23 @@
 # @facteurjs/core
 
+## 2.1.0
+
+### Minor Changes
+
+- 5da6472: One recipient, several recipients and anonymous `via()` sends now go through the same send path, so every builder option behaves the same whatever the number of recipients.
+
+  Behavior changes for sends to two or more recipients:
+
+  - `.retries()` and `.timeout()` now apply to each channel send, like they already did for a single recipient. Only the failing channel is retried, so an already successful channel is no longer sent twice. Lifecycle hooks such as `beforeSend()` and channel/preference resolution are no longer retried or covered by the timeout.
+  - `.continueOnError()` combined with an explicit `.throwOnError(true)` now stops on the first failing recipient, like it already did for a single recipient. This also applies with `.useDriverBatching()`.
+  - `.onProgress()` now also counts recipients that fail before channel sending, so it always reaches the total.
+  - `.onProgress()` and `.useDriverBatching()` now also apply to one-recipient and anonymous sends.
+
+### Patch Changes
+
+- ec492ce: `continueOnError(true)` now makes `send()` resolve with the result instead of rejecting for one recipient and for anonymous `via()` sends, like it already did for several recipients. Bulk sends with `continueOnError(true)` now keep each failed recipient's channel results and errors instead of returning an empty `results` entry. An explicit `throwOnError(true)` still rejects single and anonymous sends.
+- d97a7c1: `createFacteur()` now accepts a top-level `databaseAdapter` and types `facteur.db` from it instead of `never`. `InferChannelsFromConfig` also works with database-backed instances.
+
 ## 2.0.1
 
 ### Patch Changes
