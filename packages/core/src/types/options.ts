@@ -261,21 +261,22 @@ export interface BulkSendOptions extends RetryOptions {
    * and `send()` resolves with the result instead of rejecting, whatever the number of
    * recipients. Channel failures are returned in `results`; a recipient failing before
    * channel sending (e.g. in `beforeSend()`) counts as one failure without channel details.
-   * An explicit `throwOnError(true)` still rejects single and anonymous sends.
+   * An explicit `throwOnError(true)` still stops on the first failing recipient.
    * If false, stops on first error (Promise.all behavior).
    * @default false
    */
   continueOnError?: boolean
 
   /**
-   * Number of retry attempts per recipient.
+   * Number of retry attempts for each failing channel send. Only the failing
+   * channel is retried, whatever the number of recipients.
    * Uses exponential backoff with jitter.
    * @default 0 (no retries)
    */
   retries?: number
 
   /**
-   * Timeout per recipient send operation.
+   * Timeout for each channel send attempt, whatever the number of recipients.
    * Accepts milliseconds or duration strings like '30s', '1m'.
    */
   timeout?: Duration

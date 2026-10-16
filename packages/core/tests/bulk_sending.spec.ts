@@ -282,13 +282,28 @@ test.group('Bulk Sending | continueOnError results', () => {
     })
 
   test('explicit throwOnError(true) still rejects for {title}')
-    .with(cases.filter((c) => c.title !== 'two recipients'))
+    .with(cases)
     .run(async ({ assert }, { send }) => {
       await assert.rejects(
         () => send(createFacteur(), true),
         'Failed to send notification due to errors in one or more channels.',
       )
     })
+
+  test('explicit throwOnError(true) still rejects with driver batching', async ({ assert }) => {
+    await assert.rejects(
+      () =>
+        createFacteur()
+          .notification(UserNotification)
+          .params({ message: 'Hello' })
+          .to([alice, bob])
+          .useDriverBatching()
+          .continueOnError(true)
+          .throwOnError(true)
+          .send(),
+      'Failed to send notification due to errors in one or more channels.',
+    )
+  })
 
   test('counts a single recipient failing before channel sending', async ({ assert }) => {
     class FailingNotification extends UserNotification {
@@ -338,6 +353,56 @@ test.group('Bulk Sending | retries', () => {
     assert.equal(result.success, 5)
     assert.equal(result.failed, 0)
     assert.equal(attempts['3'], 3)
+  })
+
+  test('retries only the failing channel, whatever the number of recipients', async ({
+    assert,
+  }) => {
+    class TwoChannelsNotification extends Notification<TestUser, { message: string }> {
+      static override options = {
+        name: 'TwoChannelsNotification',
+        deliverBy: { email: true, sms: true },
+      }
+
+      asEmailMessage() {
+        return { subject: 'Test', body: this.params.message }
+      }
+
+      asSmsMessage() {
+        return { body: this.params.message }
+      }
+    }
+
+    const email = testProvider()
+    const sms = testProvider()
+    const smsAttempts: Record<string, number> = {}
+    const originalSmsSend = sms.send.bind(sms)
+    sms.send = (options: any) => {
+      smsAttempts[options.to.id] = (smsAttempts[options.to.id] ?? 0) + 1
+      if (smsAttempts[options.to.id] === 1) throw new Error('Temporary failure')
+      return originalSmsSend(options)
+    }
+
+    const facteur = new Facteur({
+      channels: { email, sms },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    const users = createUsers(2).map((user) => ({
+      ...user,
+      notificationTargets: () => ({ email: user.email, sms: `+33${user.id}` }),
+    }))
+
+    const result = await facteur
+      .notification(TwoChannelsNotification)
+      .params({ message: 'Hello' })
+      .to(users)
+      .retries(1)
+      .send()
+
+    assert.equal(result.success, 4)
+    assert.equal(email.getSentMessages().length, 2)
+    assert.deepEqual(smsAttempts, { '1': 2, '2': 2 })
   })
 
   test('fails after exhausting retries', async ({ assert }) => {
@@ -424,6 +489,32 @@ test.group('Bulk Sending | onProgress', () => {
       { completed: 4, total: 5 },
       { completed: 5, total: 5 },
     ])
+  })
+
+  test('counts recipients failing before channel sending', async ({ assert }) => {
+    class FailingNotification extends UserNotification {
+      override beforeSend() {
+        if (this.notifiable.id === '2') throw new Error('beforeSend failed')
+      }
+    }
+
+    const progressCalls: number[] = []
+    const facteur = new Facteur({
+      channels: { email: testProvider() },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+
+    const result = await facteur
+      .notification(FailingNotification)
+      .params({ message: 'Hello' })
+      .to(createUsers(3))
+      .concurrency(1)
+      .continueOnError()
+      .onProgress((completed) => progressCalls.push(completed))
+      .send()
+
+    assert.equal(result.failed, 1)
+    assert.deepEqual(progressCalls, [1, 2, 3])
   })
 
   test('onProgress works with chunking', async ({ assert }) => {

@@ -46,13 +46,9 @@ export class BatchingSender {
    */
   async send(options: SenderInput): Promise<NotificationSendResult> {
     const { builderOptions, recipients, prepareNotification } = options
-    const {
-      chunkSize = Infinity,
-      concurrency = 10,
-      continueOnError = false,
-      timeout,
-      onProgress,
-    } = builderOptions
+    const { chunkSize = Infinity, concurrency = 10, timeout, onProgress } = builderOptions
+    // An explicit `throwOnError(true)` stops on the first failing recipient
+    const continueOnError = builderOptions.continueOnError === true && !builderOptions.throwOnError
 
     const result: NotificationSendResult = { success: 0, failed: 0, results: [] }
     let completedCount = 0
@@ -122,7 +118,7 @@ export class BatchingSender {
           ...prepared.results,
           ...prepared.messages.map((msg) => resultsByMessage.get(msg)!),
         ],
-        throwOnError: !options.continueOnError && options.builderOptions.throwOnError !== false,
+        throwOnError: options.builderOptions.throwOnError !== false,
       }),
     )
       .withConcurrency(options.concurrency)
