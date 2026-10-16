@@ -1,5 +1,12 @@
 # @facteurjs/hono
 
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [86c75c7]
+  - @facteurjs/core@2.2.0
+
 ## 2.0.2
 
 ### Patch Changes
