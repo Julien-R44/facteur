@@ -45,7 +45,7 @@ declare module '@facteurjs/adonisjs/types' {
 
 `databases.lucid()` configures the database API/preferences layer; `channels.database()` configures message storage. Configure both for in-app notifications. They accept `connectionName` and custom `tableNames`. Kysely is available through `databases.kysely({ connection })` and `channels.kysely({ connection })`; the current Adonis Kysely wrappers do not forward custom table names.
 
-Other factories include `channels.twilio()`, `webpush()`, `fcm()`, `expo()`, `awsSns()`, `socketIo()`, `slackWebhook()` and `discordWebhook()`, with the corresponding channel options. `channels.transmit()` and `channels.mail()` resolve their services from the container without an options object.
+`channels.webhook()` creates the generic [Webhook channel](../channels/webhook.md). Its `name` option defaults to `webhook`. Other factories include `channels.twilio()`, `webpush()`, `fcm()`, `expo()`, `awsSns()`, `socketIo()`, `slackWebhook()` and `discordWebhook()`, with the corresponding channel options. `channels.transmit()` and `channels.mail()` resolve their services from the container without an options object.
 
 The current Adonis provider does not forward `preferences` or `queueAdapter` from `config/notifications.ts` to the core instance. `api.guard` does not register or secure routes; use the explicit authorization callback below. There is no automatic queue delivery API yet.
 

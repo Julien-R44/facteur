@@ -38,6 +38,8 @@ Since the Slack channel uses the webhook channel internally, it supports the sam
 
 Provide either `webhooks` or `webhookUrl`, not both. If both exist at runtime, `webhookUrl` takes precedence and the named webhooks are not registered.
 
+The Slack channel also accepts the [webhook security options](./webhook.md#security): `signingSecret`, `httpsOnly`, `followRedirects`, `timeout`, and `fetch`. Slack does not check Standard Webhooks signatures, so `signingSecret` helps only when a proxy you run checks them. If your users provide Slack webhook URLs, use `httpsOnly`, `timeout`, and a `fetch` that blocks SSRF.
+
 ## Targets
 
 The Slack channel targets work exactly like [webhook targets](./webhook.md#targets):

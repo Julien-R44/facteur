@@ -2,6 +2,8 @@ import type { KyselyConfig } from '@facteurjs/core/database/types'
 import type { DatabaseChannel } from '@facteurjs/core/database'
 import type { WebpushConfig } from '@facteurjs/core/channels/webpush/types'
 import type { WebpushChannel } from '@facteurjs/core/channels/webpush'
+import type { WebhookOptions } from '@facteurjs/core/channels/webhook/types'
+import type { WebhookChannel } from '@facteurjs/core/channels/webhook'
 import type { TwilioConfig } from '@facteurjs/core/channels/twilio/types'
 import type { TwilioChannel } from '@facteurjs/core/channels/twilio'
 import type { TransmitChannel } from '@facteurjs/core/channels/transmit'
@@ -38,6 +40,9 @@ export interface DatabaseConfig {
 }
 
 export const channels: {
+  webhook<Options extends WebhookOptions<any>>(
+    config: Options & { name?: string },
+  ): ConfigProvider<WebhookChannel<Options>>
   discordWebhook<Options extends DiscordOptions<any>>(
     config: Options,
   ): ConfigProvider<DiscordProvider<Options>>
@@ -55,6 +60,16 @@ export const channels: {
   awsSns(config: AwsSnsConfig): ConfigProvider<AwsSnsChannel>
   expo(config: ExpoConfig): ConfigProvider<ExpoChannel>
 } = {
+  /**
+   * Generic webhook channel
+   */
+  webhook<Options extends WebhookOptions<any>>(config: Options & { name?: string }) {
+    return configProvider.create(async () => {
+      const { webhookChannel } = await import('@facteurjs/core/channels/webhook')
+      return webhookChannel({ name: 'webhook', ...config })
+    })
+  },
+
   /**
    * Discord channel
    */
