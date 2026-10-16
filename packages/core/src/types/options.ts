@@ -257,7 +257,11 @@ export interface BulkSendOptions extends RetryOptions {
   concurrency?: number
 
   /**
-   * If true, continues sending even if some recipients fail (Promise.allSettled behavior).
+   * If true, continues sending even if some recipients fail (Promise.allSettled behavior)
+   * and `send()` resolves with the result instead of rejecting, whatever the number of
+   * recipients. Channel failures are returned in `results`; a recipient failing before
+   * channel sending (e.g. in `beforeSend()`) counts as one failure without channel details.
+   * An explicit `throwOnError(true)` still rejects single and anonymous sends.
    * If false, stops on first error (Promise.all behavior).
    * @default false
    */

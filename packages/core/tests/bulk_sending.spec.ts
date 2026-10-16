@@ -19,6 +19,14 @@ class UserNotification extends Notification<TestUser, { message: string }> {
   }
 }
 
+class AnonymousNotification extends Notification<undefined, { message: string }> {
+  static override options = { name: 'AnonymousNotification', deliverBy: { email: true } }
+
+  asEmailMessage() {
+    return { subject: 'Test', body: this.params.message }
+  }
+}
+
 function createUsers(count: number): TestUser[] {
   return Array.from({ length: count }, (_, i) => ({
     id: String(i + 1),
@@ -191,6 +199,112 @@ test.group('Bulk Sending | continueOnError', () => {
     assert.equal(callCount, 10)
     assert.equal(result.success, 8)
     assert.equal(result.failed, 2)
+  })
+})
+
+test.group('Bulk Sending | continueOnError results', () => {
+  const alice = {
+    id: '1',
+    email: 'alice@test.com',
+    notificationTargets: () => ({ email: 'alice@test.com' }),
+  }
+  const bob = {
+    id: '2',
+    email: 'bob@test.com',
+    notificationTargets: () => ({ email: 'bob@test.com' }),
+  }
+
+  function createFacteur() {
+    const provider = testProvider()
+    const originalSend = provider.send.bind(provider)
+    provider.send = (options: any) => {
+      if (JSON.stringify(options.targets).includes('alice@')) throw new Error('alice is down')
+      return originalSend(options)
+    }
+
+    return new Facteur({
+      channels: { email: provider },
+      discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
+    })
+  }
+
+  const cases = [
+    {
+      title: 'one recipient',
+      expectedSuccess: 0,
+      send: (facteur: Facteur<any>, throwOnError = false) => {
+        const builder = facteur
+          .notification(UserNotification)
+          .params({ message: 'Hello' })
+          .to([alice])
+          .continueOnError(true)
+        return (throwOnError ? builder.throwOnError(true) : builder).send()
+      },
+    },
+    {
+      title: 'two recipients',
+      expectedSuccess: 1,
+      send: (facteur: Facteur<any>, throwOnError = false) => {
+        const builder = facteur
+          .notification(UserNotification)
+          .params({ message: 'Hello' })
+          .to([alice, bob])
+          .continueOnError(true)
+        return (throwOnError ? builder.throwOnError(true) : builder).send()
+      },
+    },
+    {
+      title: 'an anonymous send',
+      expectedSuccess: 0,
+      send: (facteur: Facteur<any>, throwOnError = false) => {
+        const builder = facteur
+          .notification(AnonymousNotification)
+          .params({ message: 'Hello' })
+          .via({ email: { to: 'alice@test.com' } })
+          .continueOnError(true)
+        return (throwOnError ? builder.throwOnError(true) : builder).send()
+      },
+    },
+  ]
+
+  test('resolves with the failing channel result for {title}')
+    .with(cases)
+    .run(async ({ assert }, { send, expectedSuccess }) => {
+      const result = await send(createFacteur())
+
+      assert.equal(result.success, expectedSuccess)
+      assert.equal(result.failed, 1)
+
+      const failures = result.results.filter((r) => r.status === 'failed')
+      assert.lengthOf(failures, 1)
+      assert.equal(failures[0]!.channel, 'email')
+      assert.equal(failures[0]!.error.message, 'alice is down')
+    })
+
+  test('explicit throwOnError(true) still rejects for {title}')
+    .with(cases.filter((c) => c.title !== 'two recipients'))
+    .run(async ({ assert }, { send }) => {
+      await assert.rejects(
+        () => send(createFacteur(), true),
+        'Failed to send notification due to errors in one or more channels.',
+      )
+    })
+
+  test('counts a single recipient failing before channel sending', async ({ assert }) => {
+    class FailingNotification extends UserNotification {
+      override beforeSend() {
+        throw new Error('beforeSend failed')
+      }
+    }
+
+    const result = await createFacteur()
+      .notification(FailingNotification)
+      .params({ message: 'Hello' })
+      .to([bob])
+      .continueOnError(true)
+      .send()
+
+    assert.deepEqual(result, { success: 0, failed: 1, results: [] })
   })
 })
 

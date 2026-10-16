@@ -6,6 +6,7 @@ import type { BuilderOptions, NotificationSendResult } from '../types/index.ts'
 import type { SenderInput, PrepareNotificationFn } from '../types/senders.ts'
 import type { NotificationSender } from './notification_sender.ts'
 import { chunk } from '../utils/chunk.ts'
+import { errors } from '../errors/index.ts'
 
 /**
  * Handles bulk notification sending using orchestration mode.
@@ -76,6 +77,7 @@ export class OrchestrationSender {
     continueOnError: boolean
     onProgress: () => void
   }): Promise<NotificationSendResult[]> {
+    const failedResults = new WeakMap<object, NotificationSendResult>()
     const builder = Tenace.map(options.recipientChunk, async (recipient) => {
       const recipientOptions = { ...options.perRecipientOptions, to: recipient }
       const { notification, shouldSkip } = await options.prepareNotification(
@@ -88,7 +90,19 @@ export class OrchestrationSender {
         return { success: 0, failed: 0, results: [] }
       }
 
-      const result = await this.#sender.send(recipientOptions, notification)
+      // Keep channel results even when the recipient fails, so `continueOnError()` can report them
+      const result = await this.#sender.send(
+        { ...recipientOptions, throwOnError: false },
+        notification,
+      )
+      if (result.failed > 0 && options.perRecipientOptions.throwOnError !== false) {
+        const error = new errors.E_SEND_NOTIFICATION_FAILED(
+          result.results.filter((r) => r.status === 'failed').map((r) => r.error),
+        )
+        failedResults.set(error, result)
+        throw error
+      }
+
       options.onProgress()
 
       return result
@@ -105,9 +119,10 @@ export class OrchestrationSender {
 
     const settled = await builder.settle()
 
-    return settled.map((result) =>
-      result.status === 'fulfilled' ? result.value : { success: 0, failed: 1, results: [] },
-    )
+    return settled.map((result) => {
+      if (result.status === 'fulfilled') return result.value
+      return failedResults.get(result.reason) ?? { success: 0, failed: 1, results: [] }
+    })
   }
 
   /**
