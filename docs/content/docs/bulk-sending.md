@@ -27,7 +27,7 @@ await facteur
 
 ## Error handling
 
-By default, a recipient failure rejects the bulk send; already-started operations may still complete. Use `continueOnError()` to process the remaining recipients: `send()` then resolves with every channel result, including failures and their `error`, whether you pass zero, one or many recipients, or use `via()` without `to()`. Use `.throwOnError(false)` to return per-channel failures rather than rejecting each recipient. An explicit `.throwOnError(true)` still rejects single and anonymous sends.
+By default, a recipient failure rejects the bulk send; already-started operations may still complete. Use `continueOnError()` to process the remaining recipients: `send()` then resolves with every channel result, including failures and their `error`, whether you pass zero, one or many recipients, or use `via()` without `to()`. Use `.throwOnError(false)` to return per-channel failures rather than rejecting each recipient. An explicit `.throwOnError(true)` still stops on the first failing recipient, even with `continueOnError()`.
 
 ```typescript
 const result = await facteur.notification(WelcomeNotification).to(users).continueOnError().send()
@@ -37,7 +37,7 @@ console.log(`Success: ${result.success}, Failed: ${result.failed}`)
 
 ## Retries and timeout
 
-In normal bulk mode, builder retries/timeouts apply to the entire recipient operation, including hooks and every channel. Global/per-channel retry configuration still applies to individual channel sends. A retry may resend an already successful channel, so design for duplicates.
+Builder retries/timeouts apply to each channel send, exactly like for a single recipient: only the failing channel is retried, and an already successful channel is not sent again. They override the global/per-channel retry configuration. Lifecycle hooks such as `beforeSend()` and channel/preference resolution are not retried or timed out.
 
 ```typescript
 await facteur
@@ -79,9 +79,9 @@ In driver batch mode:
 - Progress is reported per completed chunk rather than per recipient.
 - `afterSend()` and notification-level events are not run; message-level events still fire.
 - Channels without a batch API fall back to individual sends. `.disableDriverBatch()` forces this fallback while retaining batch-mode orchestration.
-- `continueOnError()` handles recipient preparation failures; batch item failures are returned as channel results. `.throwOnError()` is not applied to returned batch item failures.
+- `continueOnError()` handles recipient preparation failures; batch item failures are returned as channel results. An explicit `.throwOnError(true)` stops on the first failing recipient, like in normal mode.
 
-For real delivery, `success`/`failed` count channel deliveries, not users. With `continueOnError()`, a recipient whose channels fail contributes its channel results; a recipient failing before channel sending (for example in `beforeSend()`, or on a timeout) contributes one failure without channel details. A one-recipient array uses the single-send path; bulk options such as progress and driver batching do not apply.
+For real delivery, `success`/`failed` count channel deliveries, not users. With `continueOnError()`, a recipient whose channels fail contributes its channel results; a recipient failing before channel sending (for example in `beforeSend()`) contributes one failure without channel details. One recipient, many recipients and anonymous `via()` sends all go through the same path, so every option applies the same way.
 
 | Method                 | Description                                                |
 | ---------------------- | ---------------------------------------------------------- |

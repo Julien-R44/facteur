@@ -96,87 +96,55 @@ export class Facteur<
   }
 
   /**
-   * Handles anonymous sends (via without to) - e.g., sending to a fixed webhook
-   */
-  async #sendAnonymous(options: BuilderOptions<any>): Promise<NotificationSendResult> {
-    return this.#settleUnlessThrowing(options, async () => {
-      const { notification, shouldSkip } = await this.#prepareNotification(undefined, options)
-      if (shouldSkip) return { success: 0, failed: 0, results: [] }
-      if (this.#fake) return this.#fake.recordSent(options)
-
-      return this.#sender.send(this.#withResolvedThrowOnError(options), notification)
-    })
-  }
-
-  /**
-   * Main send entry point - unified handling for all recipient types
+   * Single send path: anonymous sends, one recipient and many recipients all go
+   * through the same per-recipient pipeline
    */
   async #send(options: BuilderOptions<any>): Promise<NotificationSendResult> {
-    if (options.via && !options.to) return this.#sendAnonymous(options)
-
-    const recipients = await this.#resolveRecipients(options.to)
+    const isAnonymous = Boolean(options.via && !options.to)
+    const recipients = isAnonymous ? [undefined] : await this.#resolveRecipients(options.to)
     if (recipients.length === 0) return { success: 0, failed: 0, results: [] }
 
-    // Fake mode - early return for all recipients
-    if (this.#fake) {
-      for (const recipient of recipients) this.#fake.recordSent({ ...options, to: recipient })
-      return { success: recipients.length, failed: 0, results: [] }
+    // `continueOnError()` returns channel failures instead of throwing, unless
+    // `throwOnError()` is set explicitly
+    const builderOptions = {
+      ...options,
+      throwOnError: options.throwOnError ?? !options.continueOnError,
     }
 
-    // Single recipient: fast path that preserves per-send retry options
-    if (recipients.length === 1) return this.#sendSingle({ ...options, to: recipients[0] })
+    if (this.#fake) return this.#recordFake(builderOptions, recipients, isAnonymous)
 
-    const prepareNotification = this.#prepareNotification.bind(this)
-
-    if (options.useDriverBatching) {
-      return this.#batchingSender.send({
-        recipients,
-        builderOptions: options,
-        prepareNotification,
-      })
-    }
-
-    return this.#orchestrationSender.send({
+    const input = {
       recipients,
-      builderOptions: options,
-      prepareNotification,
-    })
-  }
-
-  /**
-   * Fast path for single recipient - passes options directly to sender
-   */
-  async #sendSingle(options: BuilderOptions<any>): Promise<NotificationSendResult> {
-    return this.#settleUnlessThrowing(options, async () => {
-      const { notification, shouldSkip } = await this.#prepareNotification(options.to, options)
-      if (shouldSkip) return { success: 0, failed: 0, results: [] }
-
-      return this.#sender.send(this.#withResolvedThrowOnError(options), notification)
-    })
-  }
-
-  /**
-   * `continueOnError()` returns channel failures instead of throwing, unless
-   * `throwOnError()` was set explicitly
-   */
-  #withResolvedThrowOnError(options: BuilderOptions<any>): BuilderOptions<any> {
-    return { ...options, throwOnError: options.throwOnError ?? !options.continueOnError }
-  }
-
-  /**
-   * With `continueOnError()`, a failing single or anonymous send counts as one failed
-   * recipient, like in bulk sends. An explicit `throwOnError(true)` still rejects.
-   */
-  async #settleUnlessThrowing(
-    options: BuilderOptions<any>,
-    send: () => Promise<NotificationSendResult>,
-  ): Promise<NotificationSendResult> {
-    try {
-      return await send()
-    } catch (error) {
-      if (!options.continueOnError || options.throwOnError === true) throw error
-      return { success: 0, failed: 1, results: [] }
+      builderOptions,
+      prepareNotification: this.#prepareNotification.bind(this),
     }
+
+    if (options.useDriverBatching) return this.#batchingSender.send(input)
+    return this.#orchestrationSender.send(input)
+  }
+
+  /**
+   * Fake mode: recipient sends are recorded directly, anonymous sends still run
+   * preparation and `shouldSend()` first
+   */
+  async #recordFake(
+    options: BuilderOptions<any>,
+    recipients: unknown[],
+    isAnonymous: boolean,
+  ): Promise<NotificationSendResult> {
+    if (isAnonymous) {
+      try {
+        const { shouldSkip } = await this.#prepareNotification(undefined, options)
+        if (shouldSkip) return { success: 0, failed: 0, results: [] }
+        return this.#fake!.recordSent(options)
+      } catch (error) {
+        if (!options.continueOnError || options.throwOnError) throw error
+        return { success: 0, failed: 1, results: [] }
+      }
+    }
+
+    for (const recipient of recipients) this.#fake!.recordSent({ ...options, to: recipient })
+    return { success: recipients.length, failed: 0, results: [] }
   }
 
   /**
