@@ -27,7 +27,7 @@ await facteur
 
 ## Error handling
 
-By default, a recipient failure rejects the bulk send; already-started operations may still complete. Use `continueOnError()` to process the remaining recipients. Use `.throwOnError(false)` to return per-channel failures rather than rejecting each recipient.
+By default, a recipient failure rejects the bulk send; already-started operations may still complete. Use `continueOnError()` to process the remaining recipients: `send()` then resolves with every channel result, including failures and their `error`, whether you pass zero, one or many recipients, or use `via()` without `to()`. Use `.throwOnError(false)` to return per-channel failures rather than rejecting each recipient. An explicit `.throwOnError(true)` still rejects single and anonymous sends.
 
 ```typescript
 const result = await facteur.notification(WelcomeNotification).to(users).continueOnError().send()
@@ -81,7 +81,7 @@ In driver batch mode:
 - Channels without a batch API fall back to individual sends. `.disableDriverBatch()` forces this fallback while retaining batch-mode orchestration.
 - `continueOnError()` handles recipient preparation failures; batch item failures are returned as channel results. `.throwOnError()` is not applied to returned batch item failures.
 
-For real delivery, `success`/`failed` count channel deliveries, not users. A failed recipient caught by `continueOnError()` contributes one failure without channel details. A one-recipient array uses the single-send path; bulk options such as progress and driver batching do not apply.
+For real delivery, `success`/`failed` count channel deliveries, not users. With `continueOnError()`, a recipient whose channels fail contributes its channel results; a recipient failing before channel sending (for example in `beforeSend()`, or on a timeout) contributes one failure without channel details. A one-recipient array uses the single-send path; bulk options such as progress and driver batching do not apply.
 
 | Method                 | Description                                                |
 | ---------------------- | ---------------------------------------------------------- |

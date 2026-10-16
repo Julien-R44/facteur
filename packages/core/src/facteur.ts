@@ -99,11 +99,13 @@ export class Facteur<
    * Handles anonymous sends (via without to) - e.g., sending to a fixed webhook
    */
   async #sendAnonymous(options: BuilderOptions<any>): Promise<NotificationSendResult> {
-    const { notification, shouldSkip } = await this.#prepareNotification(undefined, options)
-    if (shouldSkip) return { success: 0, failed: 0, results: [] }
-    if (this.#fake) return this.#fake.recordSent(options)
+    return this.#settleUnlessThrowing(options, async () => {
+      const { notification, shouldSkip } = await this.#prepareNotification(undefined, options)
+      if (shouldSkip) return { success: 0, failed: 0, results: [] }
+      if (this.#fake) return this.#fake.recordSent(options)
 
-    return this.#sender.send(options, notification)
+      return this.#sender.send(this.#withResolvedThrowOnError(options), notification)
+    })
   }
 
   /**
@@ -145,10 +147,36 @@ export class Facteur<
    * Fast path for single recipient - passes options directly to sender
    */
   async #sendSingle(options: BuilderOptions<any>): Promise<NotificationSendResult> {
-    const { notification, shouldSkip } = await this.#prepareNotification(options.to, options)
-    if (shouldSkip) return { success: 0, failed: 0, results: [] }
+    return this.#settleUnlessThrowing(options, async () => {
+      const { notification, shouldSkip } = await this.#prepareNotification(options.to, options)
+      if (shouldSkip) return { success: 0, failed: 0, results: [] }
 
-    return this.#sender.send(options, notification)
+      return this.#sender.send(this.#withResolvedThrowOnError(options), notification)
+    })
+  }
+
+  /**
+   * `continueOnError()` returns channel failures instead of throwing, unless
+   * `throwOnError()` was set explicitly
+   */
+  #withResolvedThrowOnError(options: BuilderOptions<any>): BuilderOptions<any> {
+    return { ...options, throwOnError: options.throwOnError ?? !options.continueOnError }
+  }
+
+  /**
+   * With `continueOnError()`, a failing single or anonymous send counts as one failed
+   * recipient, like in bulk sends. An explicit `throwOnError(true)` still rejects.
+   */
+  async #settleUnlessThrowing(
+    options: BuilderOptions<any>,
+    send: () => Promise<NotificationSendResult>,
+  ): Promise<NotificationSendResult> {
+    try {
+      return await send()
+    } catch (error) {
+      if (!options.continueOnError || options.throwOnError === true) throw error
+      return { success: 0, failed: 1, results: [] }
+    }
   }
 
   /**
