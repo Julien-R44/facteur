@@ -88,21 +88,14 @@ export class NotificationSender {
     const hasRetry = options.retries !== undefined || options.timeout !== undefined
     if (!hasRetry) return fn()
 
-    let builder = Tenace.call(fn)
-
     // Order matters: timeout INNER (first), retry OUTER (second) = timeout per attempt
-    if (options.timeout !== undefined) {
-      builder = builder.withTimeout(options.timeout, 'aggressive')
-    }
-
-    if (options.retries !== undefined && options.retries > 0) {
-      builder = builder.withRetry({
-        times: options.retries,
-        delay: backoff.exponentialWithJitter({ initial: 100, max: 5000 }),
+    await Tenace.call(fn)
+      .withTimeout(options.timeout ?? Infinity)
+      .withRetry({
+        retries: options.retries ?? 0,
+        delay: backoff.exponential({ base: 100, max: 5000, jitter: 'full' }),
       })
-    }
-
-    await builder.execute()
+      .execute()
   }
 
   /**

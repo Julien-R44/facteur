@@ -1002,6 +1002,45 @@ test.group('Driver Batching | failures, retries and lifecycle', () => {
     assert.deepEqual(batches, [['3', '4'], ['5']])
   })
 
+  for (const continueOnError of [false, true]) {
+    test(`times out recipient preparation (continueOnError=${continueOnError})`, async ({
+      assert,
+    }) => {
+      const provider = new BatchableProvider()
+      class SlowPreparationNotification extends UserNotification {
+        override async beforeSend() {
+          if (this.notifiable.id === '1') await setTimeout(100)
+        }
+      }
+      const facteur = new Facteur({ discoverer, channels: { email: provider } })
+      const send = () =>
+        facteur
+          .notification(SlowPreparationNotification)
+          .params({ message: 'Hello' })
+          .to(createUsers(3))
+          .useDriverBatching()
+          .concurrency(1)
+          .timeout('25 milliseconds')
+          .continueOnError(continueOnError)
+          .send()
+
+      if (!continueOnError) {
+        await assert.rejects(send, /Operation timed out/)
+        assert.lengthOf(provider.getBatches(), 0)
+        return
+      }
+
+      const result = await send()
+      assert.equal(result.success, 2)
+      assert.equal(result.failed, 1)
+      assert.lengthOf(result.results, 2)
+      assert.deepEqual(
+        provider.getBatches().map((batch) => batch.map((message) => message.to.id)),
+        [['2', '3']],
+      )
+    })
+  }
+
   test('rejects exhausted partial failures and supplies a missing driver error', async ({
     assert,
   }) => {
@@ -1102,14 +1141,16 @@ test.group('Driver Batching | failures, retries and lifecycle', () => {
   }) => {
     const after: string[] = []
     const provider = new BatchableProvider()
+    const failure = new Error('Hook exception')
     class ThrowingHookNotification extends UserNotification {
       override afterSend() {
         after.push(this.notifiable.id)
-        if (this.notifiable.id === '2') throw new Error('Hook exception')
+        if (this.notifiable.id === '2') throw failure
       }
     }
     const facteur = new Facteur({ discoverer, channels: { email: provider } })
 
+    let caught: unknown
     await assert.rejects(
       () =>
         facteur
@@ -1120,10 +1161,15 @@ test.group('Driver Batching | failures, retries and lifecycle', () => {
           .chunkSize(2)
           .retries(2)
           .throwOnError(false)
-          .send(),
+          .send()
+          .catch((error) => {
+            caught = error
+            throw error
+          }),
       /Hook exception/,
     )
 
+    assert.strictEqual(caught, failure)
     assert.sameMembers(after, ['1', '2'])
     assert.equal(provider.getBatches().length, 1)
     assert.equal(provider.getTotalBatchedMessages(), 2)

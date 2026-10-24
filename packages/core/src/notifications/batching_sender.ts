@@ -1,6 +1,6 @@
-import type { Duration } from '@julr/tenace/types'
+import type { Duration } from '@julr/tenace'
 
-import { Tenace } from '@julr/tenace'
+import { Result, Tenace } from '@julr/tenace'
 
 import type { NotificationSender, PreparedMessage } from './notification_sender.ts'
 import type { ChannelResolver } from './channel_resolver.ts'
@@ -111,23 +111,24 @@ export class BatchingSender {
     )
 
     // Finalize every prepared notification, even if another notification fails.
-    const settled = await Tenace.map(preparedRecipients, (prepared) =>
-      this.#sender.processResults({
-        notification: prepared.notification,
-        results: [
-          ...prepared.results,
-          ...prepared.messages.map((msg) => resultsByMessage.get(msg)!),
-        ],
-        throwOnError: options.builderOptions.throwOnError !== false,
-      }),
-    )
-      .withConcurrency(options.concurrency)
-      .settle()
+    const settled = await Tenace.map(
+      preparedRecipients,
+      (prepared) =>
+        this.#sender.processResults({
+          notification: prepared.notification,
+          results: [
+            ...prepared.results,
+            ...prepared.messages.map((msg) => resultsByMessage.get(msg)!),
+          ],
+          throwOnError: options.builderOptions.throwOnError !== false,
+        }),
+      { concurrency: options.concurrency },
+    ).settle()
 
     const result: NotificationSendResult = { success: 0, failed, results: [] }
     for (const entry of settled) {
-      if (entry.status === 'rejected') {
-        if (!options.continueOnError) throw entry.reason
+      if (!entry.ok) {
+        if (!options.continueOnError) Result.unwrap(entry)
         result.failed++
         continue
       }
@@ -154,11 +155,11 @@ export class BatchingSender {
       timeout,
     } = options
 
-    const builder = Tenace.map(recipients, (recipient) =>
-      this.#prepareRecipient(recipient, builderOptions, prepareNotification),
-    ).withConcurrency(concurrency)
-
-    if (timeout) builder.withTimeoutPerTask(timeout)
+    const builder = Tenace.map(
+      recipients,
+      (recipient) => this.#prepareRecipient(recipient, builderOptions, prepareNotification),
+      { concurrency, policy: Tenace.policy().withTimeout(timeout ?? Infinity) },
+    )
 
     if (!continueOnError) {
       return {
@@ -172,9 +173,9 @@ export class BatchingSender {
     const settled = await builder.settle()
     return {
       preparedRecipients: settled
-        .map((r) => (r.status === 'fulfilled' ? r.value : null))
+        .map((r) => (r.ok ? r.value : null))
         .filter((p): p is BatchRecipient => p !== null),
-      failed: settled.filter((r) => r.status === 'rejected').length,
+      failed: settled.filter((r) => !r.ok).length,
     }
   }
 

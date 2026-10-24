@@ -1,6 +1,5 @@
-import type { Duration } from '@julr/tenace/types'
+import type { Duration } from '@julr/tenace'
 
-import type { NotificationClass, NotificationSendResult } from './notifications.ts'
 import type {
   BulkSendOptions,
   ChannelSpecificConfig,
@@ -8,8 +7,9 @@ import type {
   ExtractNotifiable,
   RetryOptions,
 } from './options.ts'
-import type { Identifier } from '../database/types.ts'
+import type { NotificationClass, NotificationSendResult } from './notifications.ts'
 import type { ChannelName } from './extend.ts'
+import type { Identifier } from '../database/types.ts'
 
 /**
  * Helper type to check if params are required for a notification
@@ -39,7 +39,9 @@ export interface BuilderState {
 /**
  * Internal options accumulated by the builder. Extends BulkSendOptions for bulk operations.
  */
-export interface BuilderOptions<TNotification extends NotificationClass<any, any>> extends BulkSendOptions {
+export interface BuilderOptions<
+  TNotification extends NotificationClass<any, any>,
+> extends BulkSendOptions {
   notification: TNotification
   params?: ExtractParams<TNotification>
   to?: ExtractNotifiable<TNotification> | ExtractNotifiable<TNotification>[] | unknown
@@ -73,7 +75,10 @@ type MergeState<TState extends BuilderState, TUpdate extends Partial<BuilderStat
 /**
  * Methods available on all builders: bulk options, retry, and tenant selection.
  */
-interface CommonBuilderMethods<TNotification extends NotificationClass<any, any>, TState extends BuilderState> {
+interface CommonBuilderMethods<
+  TNotification extends NotificationClass<any, any>,
+  TState extends BuilderState,
+> {
   tenant(id: Identifier): NotificationBuilder<TNotification, TState>
   chunkSize(size: number): NotificationBuilder<TNotification, TState>
   concurrency(limit: number): NotificationBuilder<TNotification, TState>
@@ -83,21 +88,34 @@ interface CommonBuilderMethods<TNotification extends NotificationClass<any, any>
   throwOnError(value?: boolean): NotificationBuilder<TNotification, TState>
   useDriverBatching(value?: boolean): NotificationBuilder<TNotification, TState>
   disableDriverBatch(value?: boolean): NotificationBuilder<TNotification, TState>
-  onProgress(callback: (completed: number, total: number) => void): NotificationBuilder<TNotification, TState>
+  onProgress(
+    callback: (completed: number, total: number) => void,
+  ): NotificationBuilder<TNotification, TState>
 }
 
 /**
  * Override channel targets directly (e.g., send to a specific email address).
  */
-interface ViaMethod<TNotification extends NotificationClass<any, any>, TState extends BuilderState> {
-  via(config: { [K in ChannelName]?: boolean | any }): NotificationBuilder<TNotification, MergeState<TState, { hasVia: true }>>
+interface ViaMethod<
+  TNotification extends NotificationClass<any, any>,
+  TState extends BuilderState,
+> {
+  via(config: { [K in ChannelName]?: boolean | any }): NotificationBuilder<
+    TNotification,
+    MergeState<TState, { hasVia: true }>
+  >
 }
 
 /**
  * params() method type - always available but changes state
  */
-interface ParamsMethod<TNotification extends NotificationClass<any, any>, TState extends BuilderState> {
-  params(params: ExtractParams<TNotification>): NotificationBuilder<TNotification, MergeState<TState, { hasParams: true }>>
+interface ParamsMethod<
+  TNotification extends NotificationClass<any, any>,
+  TState extends BuilderState,
+> {
+  params(
+    params: ExtractParams<TNotification>,
+  ): NotificationBuilder<TNotification, MergeState<TState, { hasParams: true }>>
 }
 
 /**
@@ -152,15 +170,15 @@ export type NotificationBuilder<
 > =
   // Common methods always available
   CommonBuilderMethods<TNotification, TState> &
-  // via() always available
-  ViaMethod<TNotification, TState> &
-  // params() available if not yet set
-  (TState['hasParams'] extends true ? {} : ParamsMethod<TNotification, TState>) &
-  // to() available only for non-anonymous and if not yet set
-  (IsAnonymous<TNotification> extends true
-    ? {}
-    : TState['hasTo'] extends true
+    // via() always available
+    ViaMethod<TNotification, TState> &
+    // params() available if not yet set
+    (TState['hasParams'] extends true ? {} : ParamsMethod<TNotification, TState>) &
+    // to() available only for non-anonymous and if not yet set
+    (IsAnonymous<TNotification> extends true
       ? {}
-      : ToMethod<TNotification, TState>) &
-  // send() available when all requirements are met
-  (CanSend<TNotification, TState> extends true ? SendMethod : {})
+      : TState['hasTo'] extends true
+        ? {}
+        : ToMethod<TNotification, TState>) &
+    // send() available when all requirements are met
+    (CanSend<TNotification, TState> extends true ? SendMethod : {})

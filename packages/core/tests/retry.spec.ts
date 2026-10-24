@@ -1,5 +1,5 @@
-import { test } from '@japa/runner'
 import { setTimeout } from 'node:timers/promises'
+import { test } from '@japa/runner'
 
 import { testProvider } from './helpers/index.ts'
 import { Notification, type Notifiable } from '../src/types/notifications.ts'
@@ -71,6 +71,7 @@ test.group('Retry | Global config', () => {
 
   test('applies global timeout config', async ({ assert }) => {
     const provider = testProvider()
+    const timeout: string = '50 milliseconds'
 
     provider.send = async () => {
       await setTimeout(500)
@@ -80,7 +81,7 @@ test.group('Retry | Global config', () => {
       channels: { email: provider },
       discoverer: { searchDirectory: new URL('./notifications', import.meta.url) },
       retry: {
-        timeout: 50,
+        timeout,
       },
     })
 
@@ -93,6 +94,7 @@ test.group('Retry | Global config', () => {
 
     assert.equal(result.failed, 1)
     assert.equal(result.success, 0)
+    assert.equal(result.results[0]!.error.name, 'TimeoutError')
   })
 })
 
@@ -152,7 +154,7 @@ test.group('Retry | Per-channel config', () => {
       retry: {
         timeout: 50, // Global: 50ms (would timeout)
         channels: {
-          email: { timeout: '1s' }, // Email: 1s (won't timeout)
+          email: { timeout: '1 second' }, // Email: 1s (won't timeout)
         },
       },
     })
@@ -198,6 +200,7 @@ test.group('Retry | Per-send config', () => {
 
   test('send options override channel config', async ({ assert }) => {
     const provider = testProvider()
+    const timeout: string = '1 second'
 
     provider.send = async () => {
       await setTimeout(200)
@@ -217,7 +220,7 @@ test.group('Retry | Per-send config', () => {
       .notification(UserNotification)
       .params({ message: 'Hello' })
       .to(testUser)
-      .timeout('1s')
+      .timeout(timeout)
       .send()
 
     assert.equal(result.success, 1)
