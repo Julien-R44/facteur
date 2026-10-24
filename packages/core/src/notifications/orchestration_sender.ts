@@ -1,8 +1,9 @@
 import { Tenace } from '@julr/tenace'
 
-import type { BuilderOptions, NotificationSendResult } from '../types/index.ts'
-import type { SenderInput, PrepareNotificationFn } from '../types/senders.ts'
 import type { NotificationSender } from './notification_sender.ts'
+import type { SenderInput, PrepareNotificationFn } from '../types/senders.ts'
+import type { BuilderOptions, NotificationSendResult } from '../types/index.ts'
+
 import { chunk } from '../utils/chunk.ts'
 
 /**
@@ -56,28 +57,32 @@ export class OrchestrationSender {
     onProgress: () => void
   }): Promise<NotificationSendResult[]> {
     const { concurrency = 10, continueOnError, throwOnError } = options.builderOptions
-    const builder = Tenace.map(options.recipientChunk, async (recipient) => {
-      const recipientOptions = { ...options.builderOptions, to: recipient }
+    const builder = Tenace.map(
+      options.recipientChunk,
+      async (recipient) => {
+        const recipientOptions = { ...options.builderOptions, to: recipient }
 
-      try {
-        const { notification, shouldSkip } = await options.prepareNotification(
-          recipient,
-          recipientOptions,
-        )
-        if (shouldSkip) return { success: 0, failed: 0, results: [] }
+        try {
+          const { notification, shouldSkip } = await options.prepareNotification(
+            recipient,
+            recipientOptions,
+          )
+          if (shouldSkip) return { success: 0, failed: 0, results: [] }
 
-        return await this.#sender.send(recipientOptions, notification)
-      } finally {
-        options.onProgress()
-      }
-    }).withConcurrency(concurrency)
+          return await this.#sender.send(recipientOptions, notification)
+        } finally {
+          options.onProgress()
+        }
+      },
+      { concurrency },
+    )
 
     // An explicit `throwOnError(true)` stops on the first failing recipient
     if (!continueOnError || throwOnError) return builder.execute()
 
     const settled = await builder.settle()
     return settled.map((result) =>
-      result.status === 'fulfilled' ? result.value : { success: 0, failed: 1, results: [] },
+      result.ok ? result.value : { success: 0, failed: 1, results: [] },
     )
   }
 

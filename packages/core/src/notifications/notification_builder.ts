@@ -1,17 +1,13 @@
-import type { Duration } from '@julr/tenace/types'
+import type { Duration } from '@julr/tenace'
 
+import type { ExtractParams, ExtractNotifiable, ChannelSpecificConfig } from '../types/options.ts'
 import type { NotificationClass, NotificationSendResult } from '../types/notifications.ts'
-import type {
-  ExtractParams,
-  ExtractNotifiable,
-  ChannelSpecificConfig,
-} from '../types/options.ts'
-import type { Identifier } from '../database/types.ts'
 import type {
   BuilderOptions,
   BuilderState,
   NotificationBuilder as NotificationBuilderType,
 } from '../types/builder.ts'
+import type { Identifier } from '../database/types.ts'
 
 type SendFn = (options: BuilderOptions<any>) => Promise<NotificationSendResult>
 
@@ -31,7 +27,9 @@ export class NotificationBuilderImpl<
     this.#options = { notification }
   }
 
-  params(params: ExtractParams<TNotification>): NotificationBuilderImpl<TNotification, TState & { hasParams: true }> {
+  params(
+    params: ExtractParams<TNotification>,
+  ): NotificationBuilderImpl<TNotification, TState & { hasParams: true }> {
     this.#options.params = params
     return this as any
   }
@@ -46,7 +44,9 @@ export class NotificationBuilderImpl<
     return this as any
   }
 
-  via(config: ChannelSpecificConfig<any>): NotificationBuilderImpl<TNotification, TState & { hasVia: true }> {
+  via(
+    config: ChannelSpecificConfig<any>,
+  ): NotificationBuilderImpl<TNotification, TState & { hasVia: true }> {
     this.#options.via = config
     return this as any
   }
@@ -96,7 +96,9 @@ export class NotificationBuilderImpl<
     return this
   }
 
-  onProgress(callback: (completed: number, total: number) => void): NotificationBuilderImpl<TNotification, TState> {
+  onProgress(
+    callback: (completed: number, total: number) => void,
+  ): NotificationBuilderImpl<TNotification, TState> {
     this.#options.onProgress = callback
     return this
   }

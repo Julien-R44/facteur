@@ -1,8 +1,8 @@
-import type { Duration } from '@julr/tenace/types'
+import type { Duration } from '@julr/tenace'
 
 import type { BuilderOptions, Notification } from './index.ts'
-import type { ResolvedChannels } from '../notifications/channel_resolver.ts'
 import type { PreparedMessage } from '../notifications/notification_sender.ts'
+import type { ResolvedChannels } from '../notifications/channel_resolver.ts'
 
 /**
  * Function that prepares a notification for a recipient, resolving the notification

@@ -1,6 +1,6 @@
 import type { Awaitable } from '@julr/utils/types'
 import type { Logger } from '@julr/utils/logger'
-import type { Duration } from '@julr/tenace/types'
+import type { Duration } from '@julr/tenace'
 
 import type { QueueAdapter } from './queue.ts'
 import type { DefaultPreferences } from './preferences.ts'
@@ -230,7 +230,9 @@ export interface RetryOptions {
 /**
  * Global retry configuration with per-channel overrides
  */
-export interface RetryConfig<KnownChannels extends Record<string, Channel> = Record<string, Channel>> extends RetryOptions {
+export interface RetryConfig<
+  KnownChannels extends Record<string, Channel> = Record<string, Channel>,
+> extends RetryOptions {
   /**
    * Per-channel retry overrides
    */
