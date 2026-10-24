@@ -1,6 +1,6 @@
 {
   "name": "@facteurjs/core",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Framework-agnostic notification system for Node.js with support for multiple channels (email, SMS, push, webhooks, etc.)",
   "keywords": [
     "discord",
