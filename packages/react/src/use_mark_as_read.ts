@@ -4,6 +4,8 @@ import { useFacteur, type TypedFacteurClient } from './index.tsx'
 
 interface UseMarkAsReadOptions {
   notificationId: string
+  /** Exact tenant scope. Omit for notifications without a tenant. */
+  tenantId?: string
 }
 
 export const markAsReadMutationOptions = (client: TypedFacteurClient) =>
