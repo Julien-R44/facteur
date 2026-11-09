@@ -1,5 +1,11 @@
 # @facteurjs/react
 
+## 2.0.1
+
+### Patch Changes
+
+- bd1de40: Add optional `tenantId` to `useMarkAsRead` and `useMarkAsSeen` options so tenant-scoped notifications can be marked from React, like the client `markAsRead` and `markAsSeen` shortcuts.
+
 ## 2.0.0
 
 ### Minor Changes
