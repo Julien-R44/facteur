@@ -95,15 +95,16 @@ export class ChannelResolver {
      * Skip if no notifiable (anonymous notification) or no database.
      */
     const notifiableId = (to as any)?.id as Identifier | undefined
-    const preferences = notifiableId
-      ? await this.#database?.getPreferences(
-          {
-            notifiableId,
-            tenantId: tenantId as Identifier,
-          },
-          false,
-        )
-      : undefined
+    const preferences =
+      notifiableId !== undefined
+        ? await this.#database?.getPreferences(
+            {
+              notifiableId,
+              tenantId: tenantId as Identifier,
+            },
+            false,
+          )
+        : undefined
 
     /**
      * Get category preferences from default config
@@ -116,7 +117,7 @@ export class ChannelResolver {
     /**
      * Apply user preferences with priority order
      */
-    const currentTenant = preferences?.tenants?.[tenantId || -1]
+    const currentTenant = tenantId === undefined ? undefined : preferences?.tenants?.[tenantId]
     const tenantPreferences = currentTenant?.global
     const globalPreferences = preferences?.global.global
 

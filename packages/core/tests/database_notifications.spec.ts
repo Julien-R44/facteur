@@ -9,7 +9,10 @@ import { createFakeDatabaseAdapter, createMockRequest } from './helpers/index.ts
 import { Facteur } from '../src/facteur.ts'
 import { kyselyAdapter } from '../src/database/adapters/kysely.ts'
 import { knexAdapter } from '../src/database/adapters/knex.ts'
-import { markNotificationAsRoute } from '../src/api/handlers/notifications.ts'
+import {
+  markAllNotificationsAsRoute,
+  markNotificationAsRoute,
+} from '../src/api/handlers/notifications.ts'
 
 const schema = `CREATE TABLE notifications (
   id INTEGER PRIMARY KEY,
@@ -18,6 +21,10 @@ const schema = `CREATE TABLE notifications (
   status TEXT NOT NULL,
   read_at INTEGER,
   seen_at INTEGER,
+  type TEXT DEFAULT 'test',
+  content TEXT DEFAULT '{}',
+  tags TEXT,
+  created_at INTEGER DEFAULT 123,
   updated_at INTEGER NOT NULL
 )`
 
@@ -238,6 +245,155 @@ for (const [name, createFixture] of Object.entries(fixtures)) {
       }
     })
   }
+
+  test.group(`Database identifier scopes | ${name}`, (group) => {
+    let fixture: ReturnType<typeof createFixture>
+
+    group.each.setup(async () => {
+      fixture = createFixture()
+      await fixture.execute(schema)
+      await fixture.execute(seed)
+      await fixture.execute(`INSERT INTO notifications
+        (id, notifiable_id, tenant_id, status, updated_at) VALUES
+        (8, 'user-1', 0, 'unseen', 123),
+        (9, '', 'tenant-a', 'unseen', 123)`)
+      await fixture.execute(`CREATE TABLE notification_preferences (
+        id INTEGER PRIMARY KEY, user_id NUMERIC NOT NULL, tenant_id NUMERIC,
+        notification_name TEXT, channels TEXT, created_at INTEGER, updated_at INTEGER
+      )`)
+    })
+
+    group.each.teardown(async () => {
+      await fixture.close()
+    })
+
+    const tenantScopes = [
+      { tenantId: 0, ids: [8], pruneIds: [6, 8] },
+      { tenantId: '', ids: [7], pruneIds: [7] },
+      { tenantId: 'tenant-a', ids: [1], pruneIds: [1, 2, 9] },
+      { tenantId: undefined, ids: [1, 3, 4, 7, 8], pruneIds: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+    ]
+
+    test('lists only notifications within the supplied tenant scope')
+      .with(tenantScopes)
+      .run(async ({ assert }, { tenantId, ids }) => {
+        const notifications = await fixture.adapter.getNotifications({
+          notifiableId: 'user-1',
+          tenantId,
+        })
+        assert.sameMembers(
+          notifications.map((row) => row.id),
+          ids,
+        )
+      })
+
+    test('mark-all respects the authorized tenant scope')
+      .with(tenantScopes)
+      .run(async ({ assert }, { tenantId, ids }) => {
+        const before = await fixture.rows()
+        const facteur = new Facteur({
+          channels: {},
+          discoverer: { searchDirectory: new URL('./helpers/notifications', import.meta.url) },
+          databaseAdapter: fixture.adapter,
+        })
+        const route = markAllNotificationsAsRoute({
+          facteur,
+          authorize: (context) =>
+            context.notifiableId === 'user-1' && context.tenantId === tenantId,
+        })
+        const response = await route.handler(
+          createMockRequest({
+            params: { notifiableId: 'user-1' },
+            body: { tenantId, status: 'read' },
+          }),
+        )
+        assert.equal(response.status, 204)
+        const after = await fixture.rows()
+        assert.deepEqual(
+          after.filter((row: any) => !ids.includes(row.id)),
+          before.filter((row: any) => !ids.includes(row.id)),
+        )
+        assert.sameMembers(
+          after.filter((row: any) => row.status === 'read').map((row: any) => row.id),
+          ids,
+        )
+      })
+
+    test('prunes only notifications within the supplied user scope')
+      .with([
+        { notifiableId: 0, ids: [6] },
+        { notifiableId: '', ids: [9] },
+        { notifiableId: 'user-1', ids: [1, 3, 4, 7, 8] },
+        { notifiableId: undefined, ids: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+      ])
+      .run(async ({ assert }, { notifiableId, ids }) => {
+        const before = await fixture.rows()
+        await fixture.adapter.pruneNotifications(notifiableId === undefined ? {} : { notifiableId })
+        assert.deepEqual(
+          await fixture.rows(),
+          before.filter((row: any) => !ids.includes(row.id)),
+        )
+      })
+
+    test('prunes only notifications within the supplied tenant scope')
+      .with(tenantScopes)
+      .run(async ({ assert }, { tenantId, pruneIds }) => {
+        const before = await fixture.rows()
+        await fixture.adapter.pruneNotifications(tenantId === undefined ? {} : { tenantId })
+        assert.deepEqual(
+          await fixture.rows(),
+          before.filter((row: any) => !pruneIds.includes(row.id)),
+        )
+      })
+
+    test('preserves tenant identifiers when saving notifications')
+      .with([0, '', 'tenant-a', undefined])
+      .run(async ({ assert }, tenantId) => {
+        await fixture.adapter.save({
+          notifiableId: 'new-user',
+          tenantId,
+          type: 'test',
+          content: { invoice: 42 },
+          status: 'unseen',
+        })
+        const saved = (await fixture.rows()).find(
+          (row: any) => row.notifiable_id === 'new-user',
+        ) as any
+        assert.strictEqual(saved.tenant_id, tenantId ?? null)
+      })
+
+    test('keeps tenant preferences separate from global preferences')
+      .with([0, '', 'tenant-a'])
+      .run(async ({ assert }, tenantId) => {
+        await fixture.adapter.updatePreferences({
+          notifiableId: 'user-1',
+          channelPreferences: { email: true },
+        })
+        await fixture.adapter.updatePreferences({
+          notifiableId: 'user-1',
+          tenantId,
+          channelPreferences: { email: true },
+        })
+        await fixture.adapter.updatePreferences({
+          notifiableId: 'user-1',
+          tenantId,
+          channelPreferences: { email: false },
+        })
+        const rows = await fixture.adapter.getPreferences({ notifiableId: 'user-1', tenantId })
+        assert.lengthOf(rows, 2)
+        assert.deepEqual(rows.find((row) => row.tenant_id === null)?.channels, { email: true })
+        assert.deepEqual(rows.find((row) => row.tenant_id === tenantId)?.channels, { email: false })
+        const facteur = new Facteur({
+          channels: {},
+          discoverer: { searchDirectory: new URL('./helpers/notifications', import.meta.url) },
+          databaseAdapter: fixture.adapter,
+        })
+        await facteur.discoverer.discoverNotifications()
+        const preferences = await facteur.db.getPreferences({ notifiableId: 'user-1', tenantId })
+        assert.deepEqual(preferences.global.global.channels, { email: true })
+        assert.deepEqual(preferences.tenants?.[tenantId].global.channels, { email: false })
+      })
+  })
 }
 
 test('updateNotification requires both user and explicit tenant scope', ({ expectTypeOf }) => {

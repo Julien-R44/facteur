@@ -205,6 +205,40 @@ test.group('FacteurDatabase | getPreferences', () => {
 })
 
 test.group('FacteurDatabase | ChannelResolver preferences', () => {
+  test('honors opt-outs for zero and empty user and tenant identifiers')
+    .with([0, ''])
+    .run(async ({ assert }, identifier) => {
+      const db = createDatabase({
+        identities: [{ name: 'Invoice Paid', identifier: 'invoice.paid' }],
+        rawRows: [
+          {
+            id: 1,
+            user_id: identifier,
+            tenant_id: null,
+            channels: { email: true, sms: false },
+            created_at: new Date(),
+          },
+          {
+            id: 2,
+            user_id: identifier,
+            tenant_id: identifier,
+            channels: { email: false },
+            created_at: new Date(),
+          },
+        ],
+      })
+      const resolver = new ChannelResolver(db)
+      const to = { id: identifier, notificationTargets: () => ({}) }
+      const result = await resolver.resolveChannels({
+        notification: BillingNotification,
+        to,
+        params: {},
+        tenantId: identifier,
+      })
+      assert.isFalse(result.email.shouldSend)
+      assert.isFalse(result.sms.shouldSend)
+    })
+
   const cases: Array<{
     name: string
     rows: Array<Pick<RawPreferenceRow, 'tenant_id' | 'notification_name' | 'channels'>>

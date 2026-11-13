@@ -68,7 +68,7 @@ export class FacteurDatabase {
       },
     }
 
-    if (tenantId) {
+    if (tenantId !== undefined) {
       preferences.tenants = {
         [tenantId]: {
           global: { channels: { ...globalChannels } },
@@ -88,9 +88,9 @@ export class FacteurDatabase {
     const notificationName = row.notification_name
     const rowTenantId = row.tenant_id
 
-    if (rowTenantId && preferences.tenants?.[rowTenantId]) {
+    if (rowTenantId != null && preferences.tenants?.[rowTenantId]) {
       this.#updateTenantPreferences(preferences.tenants[rowTenantId], notificationName, channels)
-    } else if (!rowTenantId) {
+    } else if (rowTenantId == null) {
       this.#updateGlobalPreferences(preferences.global, notificationName, channels)
     }
   }

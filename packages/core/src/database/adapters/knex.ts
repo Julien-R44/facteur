@@ -48,7 +48,7 @@ class KnexAdapter implements DatabaseAdapter {
       .table(this.#tableName)
       .insert({
         notifiable_id: options.notifiableId,
-        tenant_id: options.tenantId || null,
+        tenant_id: options.tenantId ?? null,
         type: options.type,
         content: JSON.stringify(options.content),
         status: options.status,
@@ -67,7 +67,7 @@ class KnexAdapter implements DatabaseAdapter {
       .table(this.#tableName)
       .where('notifiable_id', options.notifiableId)
 
-    if (options.tenantId) query.where('tenant_id', options.tenantId)
+    if (options.tenantId !== undefined) query.where('tenant_id', options.tenantId)
     if (options.status) query.where('status', options.status)
     if (options.tags) query.whereJsonSupersetOf('tags' as never, JSON.stringify(options.tags))
 
@@ -130,7 +130,7 @@ class KnexAdapter implements DatabaseAdapter {
     let query = this.#getConnection()
       .table(this.#tableName)
       .where('notifiable_id', options.notifiableId)
-    if (options.tenantId) query = query.where('tenant_id', options.tenantId)
+    if (options.tenantId !== undefined) query = query.where('tenant_id', options.tenantId)
 
     await query.update(updateData)
   }
@@ -138,8 +138,9 @@ class KnexAdapter implements DatabaseAdapter {
   async pruneNotifications(options: PruneNotificationsParams): Promise<void> {
     let query = this.#getConnection().table(this.#tableName)
 
-    if (options.notifiableId) query = query.where('notifiable_id', options.notifiableId)
-    if (options.tenantId) query = query.where('tenant_id', options.tenantId)
+    if (options.notifiableId !== undefined)
+      query = query.where('notifiable_id', options.notifiableId)
+    if (options.tenantId !== undefined) query = query.where('tenant_id', options.tenantId)
     if (options.olderThan) query = query.where('created_at', '<', options.olderThan)
 
     await query.del()
@@ -151,7 +152,7 @@ class KnexAdapter implements DatabaseAdapter {
       .where('user_id', options.notifiableId)
       .andWhere((builder) => {
         builder.whereNull('tenant_id')
-        if (options.tenantId) builder.orWhere('tenant_id', options.tenantId)
+        if (options.tenantId !== undefined) builder.orWhere('tenant_id', options.tenantId)
       })
       .select('*')
 
@@ -177,7 +178,7 @@ class KnexAdapter implements DatabaseAdapter {
           else builder.whereNull('notification_name')
         })
         .andWhere((builder) => {
-          if (options.tenantId) {
+          if (options.tenantId !== undefined) {
             builder.where('tenant_id', options.tenantId)
           } else {
             builder.whereNull('tenant_id')
@@ -198,7 +199,7 @@ class KnexAdapter implements DatabaseAdapter {
         // Insert new preference
         await trx.table(this.#preferencesTableName).insert({
           user_id: options.notifiableId,
-          tenant_id: options.tenantId || null,
+          tenant_id: options.tenantId ?? null,
           notification_name: options.notificationName || null,
           channels: JSON.stringify(options.channelPreferences),
           created_at: new Date(),

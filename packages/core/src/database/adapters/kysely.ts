@@ -38,7 +38,7 @@ class KyselyAdapter implements DatabaseAdapter {
       .insertInto(this.#tableName)
       .values({
         notifiable_id: options.notifiableId,
-        tenant_id: options.tenantId || null,
+        tenant_id: options.tenantId ?? null,
         type: options.type,
         content: JSON.stringify(options.content),
         status: options.status,
@@ -58,7 +58,7 @@ class KyselyAdapter implements DatabaseAdapter {
       .selectFrom(this.#tableName)
       .selectAll()
       .where('notifiable_id', '=', options.notifiableId)
-      .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
+      .$if(options.tenantId !== undefined, (qb) => qb.where('tenant_id', '=', options.tenantId))
       .$if(!!options.status, (qb) => qb.where('status', '=', options.status))
       .$if(!!options.tags, (qb) => qb.where('tags', '@>', JSON.stringify(options.tags)))
       .orderBy('created_at', 'desc')
@@ -119,15 +119,17 @@ class KyselyAdapter implements DatabaseAdapter {
       .updateTable(this.#tableName)
       .set(updateData)
       .where('notifiable_id', '=', options.notifiableId)
-      .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
+      .$if(options.tenantId !== undefined, (qb) => qb.where('tenant_id', '=', options.tenantId))
       .execute()
   }
 
   async pruneNotifications(options: PruneNotificationsParams): Promise<void> {
     await this.#connection
       .deleteFrom(this.#tableName)
-      .$if(!!options.notifiableId, (qb) => qb.where('notifiable_id', '=', options.notifiableId))
-      .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
+      .$if(options.notifiableId !== undefined, (qb) =>
+        qb.where('notifiable_id', '=', options.notifiableId),
+      )
+      .$if(options.tenantId !== undefined, (qb) => qb.where('tenant_id', '=', options.tenantId))
       .$if(!!options.olderThan, (qb) => qb.where('created_at', '<', options.olderThan))
       .execute()
   }
@@ -140,7 +142,7 @@ class KyselyAdapter implements DatabaseAdapter {
       .where((eb) =>
         eb.or([
           eb('tenant_id', 'is', null),
-          ...(options.tenantId ? [eb('tenant_id', '=', options.tenantId)] : []),
+          ...(options.tenantId !== undefined ? [eb('tenant_id', '=', options.tenantId)] : []),
         ]),
       )
       .execute()
@@ -167,8 +169,8 @@ class KyselyAdapter implements DatabaseAdapter {
           qb.where('notification_name', '=', options.notificationName),
         )
         .$if(!options.notificationName, (qb) => qb.where('notification_name', 'is', null))
-        .$if(!!options.tenantId, (qb) => qb.where('tenant_id', '=', options.tenantId))
-        .$if(!options.tenantId, (qb) => qb.where('tenant_id', 'is', null))
+        .$if(options.tenantId !== undefined, (qb) => qb.where('tenant_id', '=', options.tenantId))
+        .$if(options.tenantId === undefined, (qb) => qb.where('tenant_id', 'is', null))
         .executeTakeFirst()
 
       if (existing) {
@@ -187,7 +189,7 @@ class KyselyAdapter implements DatabaseAdapter {
           .insertInto(this.#preferencesTableName)
           .values({
             user_id: options.notifiableId,
-            tenant_id: options.tenantId || null,
+            tenant_id: options.tenantId ?? null,
             notification_name: options.notificationName || null,
             channels: JSON.stringify(options.channelPreferences),
             created_at: new Date(),
