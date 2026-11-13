@@ -56,10 +56,64 @@ class AnonymousDeviceNotification extends Notification<undefined> {
   }
 }
 
-test.group('Webpush channel', (group) => {
-  group.each.setup(() => {
-    mock.method(webpush, 'setVapidDetails', () => {})
+test('isolates VAPID and GCM credentials between Webpush channels', async ({ assert, cleanup }) => {
+  cleanup(() => mock.restoreAll())
+  mock.method(
+    webpush,
+    'sendNotification',
+    async (...args: Parameters<typeof webpush.sendNotification>) => {
+      const request = webpush.generateRequestDetails(args[0], args[1] ?? undefined, args[2])
+      return { statusCode: 201, headers: {}, body: request.headers.Authorization! }
+    },
+  )
+
+  const keysA = webpush.generateVAPIDKeys()
+  const keysB = webpush.generateVAPIDKeys()
+  const subscription = {
+    endpoint: 'https://push.example.com/device',
+    keys: { p256dh: keysA.publicKey, auth: Buffer.alloc(16, 1).toString('base64url') },
+  }
+  const a = webpushChannel({
+    vapidSubject: 'mailto:a@example.com',
+    vapidPublicKey: keysA.publicKey,
+    vapidPrivateKey: keysA.privateKey,
+    gcmApiKey: 'gcm-a',
   })
+
+  const before = await a.send({ message, targets: { subscription } })
+  assert.include(before.body, `k=${keysA.publicKey}`)
+
+  const b = webpushChannel({
+    vapidSubject: 'mailto:b@example.com',
+    vapidPublicKey: keysB.publicKey,
+    vapidPrivateKey: keysB.privateKey,
+    gcmApiKey: 'gcm-b',
+  })
+
+  for (const [channel, keys, subject, gcmApiKey] of [
+    [a, keysA, 'mailto:a@example.com', 'gcm-a'],
+    [b, keysB, 'mailto:b@example.com', 'gcm-b'],
+  ] as const) {
+    const result = await channel.send({ message, targets: { subscription } })
+    assert.include(result.body, `k=${keys.publicKey}`)
+    const jwt = result.body.split('t=')[1]!.split(',')[0]!
+    const claims = JSON.parse(Buffer.from(jwt.split('.')[1]!, 'base64url').toString())
+    assert.equal(claims.sub, subject)
+
+    const legacyResult = await channel.send({
+      message,
+      targets: {
+        subscription: {
+          ...subscription,
+          endpoint: 'https://android.googleapis.com/gcm/send/device',
+        },
+      },
+    })
+    assert.equal(legacyResult.body, `key=${gcmApiKey}`)
+  }
+})
+
+test.group('Webpush channel', (group) => {
   group.each.teardown(() => mock.restoreAll())
 
   test('preserves single-subscription responses, payload and request options', async ({
@@ -80,7 +134,17 @@ test.group('Webpush channel', (group) => {
     assert.deepEqual(send.mock.calls[0]!.arguments, [
       subscriptions[0],
       '{"title":"Hello","body":"All your devices"}',
-      { TTL: 0, urgency: 'high', proxy: config.proxy, timeout: 1500 },
+      {
+        vapidDetails: {
+          subject: config.vapidSubject,
+          publicKey: config.vapidPublicKey,
+          privateKey: config.vapidPrivateKey,
+        },
+        TTL: 0,
+        urgency: 'high',
+        proxy: config.proxy,
+        timeout: 1500,
+      },
     ])
   })
 
@@ -108,7 +172,17 @@ test.group('Webpush channel', (group) => {
         subscriptions.map((subscription) => [
           subscription,
           '{"title":"Hello","body":"All your devices"}',
-          { TTL: 0, urgency: 'high', proxy: config.proxy, timeout: 1500 },
+          {
+            vapidDetails: {
+              subject: config.vapidSubject,
+              publicKey: config.vapidPublicKey,
+              privateKey: config.vapidPrivateKey,
+            },
+            TTL: 0,
+            urgency: 'high',
+            proxy: config.proxy,
+            timeout: 1500,
+          },
         ]),
       )
     } finally {

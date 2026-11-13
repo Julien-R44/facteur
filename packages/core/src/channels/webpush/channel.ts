@@ -18,11 +18,7 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
   name = 'webpush' as const;
   [kTargetSymbol] = null as any as Targets
 
-  constructor(private config: WebpushConfig) {
-    webpush.setVapidDetails(config.vapidSubject, config.vapidPublicKey, config.vapidPrivateKey)
-
-    if (config.gcmApiKey) webpush.setGCMAPIKey(config.gcmApiKey)
-  }
+  constructor(private config: WebpushConfig) {}
 
   #resolveTargets(options: ChannelSendParams<WebpushMessage, Targets>): Targets {
     if (options.targets) return options.targets
@@ -31,8 +27,15 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
   }
 
   #buildOptions(): webpush.RequestOptions {
-    const options: webpush.RequestOptions = {}
+    const options: webpush.RequestOptions = {
+      vapidDetails: {
+        subject: this.config.vapidSubject,
+        publicKey: this.config.vapidPublicKey,
+        privateKey: this.config.vapidPrivateKey,
+      },
+    }
 
+    if (this.config.gcmApiKey) options.gcmAPIKey = this.config.gcmApiKey
     if (this.config.ttl !== undefined) options.TTL = this.config.ttl
     if (this.config.urgency) options.urgency = this.config.urgency
     if (this.config.proxy) options.proxy = this.config.proxy
