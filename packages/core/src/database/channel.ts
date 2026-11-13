@@ -41,10 +41,10 @@ export class DatabaseChannel implements Channel<
     const message = options.message.serialize()
     const targets = this.#resolveTargets(options)
 
-    const notifiableId = message.notifiableId || targets.notifiableId
-    const tenantId = message.tenantId || targets.tenantId || options.tenantId
+    const notifiableId = message.notifiableId ?? targets.notifiableId
+    const tenantId = message.tenantId ?? targets.tenantId ?? options.tenantId
 
-    if (!notifiableId) throw new Error('No notifiableId provided')
+    if (notifiableId === undefined) throw new Error('No notifiableId provided')
 
     const result = await this.#adapter.save({
       notifiableId,

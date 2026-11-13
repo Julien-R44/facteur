@@ -7,6 +7,7 @@ import type { DatabaseAdapter, UpdateNotificationParams } from '../src/database/
 
 import { createFakeDatabaseAdapter, createMockRequest } from './helpers/index.ts'
 import { Facteur } from '../src/facteur.ts'
+import { databaseChannel, DatabaseMessage } from '../src/database/channel.ts'
 import { kyselyAdapter } from '../src/database/adapters/kysely.ts'
 import { knexAdapter } from '../src/database/adapters/knex.ts'
 import {
@@ -392,6 +393,33 @@ for (const [name, createFixture] of Object.entries(fixtures)) {
         const preferences = await facteur.db.getPreferences({ notifiableId: 'user-1', tenantId })
         assert.deepEqual(preferences.global.global.channels, { email: true })
         assert.deepEqual(preferences.tenants?.[tenantId].global.channels, { email: false })
+      })
+
+    test('preserves explicit message and target identifiers through the database channel')
+      .with([0, ''])
+      .run(async ({ assert }, identifier) => {
+        const channel = databaseChannel({ adapter: fixture.adapter })
+        await channel.send({
+          message: DatabaseMessage.create()
+            .setType('message-scope')
+            .setNotifiableId(identifier)
+            .setTenantId(identifier),
+          targets: { notifiableId: 'wrong-user', tenantId: 'wrong-tenant' },
+          tenantId: 'fallback-tenant',
+        })
+        await channel.send({
+          message: DatabaseMessage.create().setType('target-scope'),
+          targets: { notifiableId: identifier, tenantId: identifier },
+          tenantId: 'fallback-tenant',
+        })
+        const saved = (await fixture.rows()).filter(
+          (row: any) => row.type === 'message-scope' || row.type === 'target-scope',
+        )
+        assert.lengthOf(saved, 2)
+        for (const row of saved) {
+          assert.strictEqual((row as any).notifiable_id, identifier)
+          assert.strictEqual((row as any).tenant_id, identifier)
+        }
       })
   })
 }
