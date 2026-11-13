@@ -6,5 +6,5 @@ export default defineConfig({
   exports: {
     devExports: true,
   },
-  skipNodeModulesBundle: true,
+  deps: { neverBundle: true },
 })

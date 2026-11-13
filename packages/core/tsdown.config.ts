@@ -33,5 +33,5 @@ export default defineConfig({
   },
   unbundle: true,
   dts: true,
-  skipNodeModulesBundle: true,
+  deps: { neverBundle: true },
 })

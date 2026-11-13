@@ -24,5 +24,5 @@ export default defineConfig({
   copy: [{ from: './stubs', to: './dist' }],
   clean: true,
   dts: true,
-  skipNodeModulesBundle: true,
+  deps: { neverBundle: true },
 })

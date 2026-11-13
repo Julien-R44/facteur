@@ -83,8 +83,8 @@
     "@poppinss/exception": "catalog:"
   },
   "devDependencies": {
-    "@adonisjs/assembler": "^8.5.2",
-    "@adonisjs/core": "^7.5.2",
+    "@adonisjs/assembler": "^8.6.0",
+    "@adonisjs/core": "^7.6.0",
     "@adonisjs/lucid": "^22.4.2",
     "@adonisjs/mail": "catalog:",
     "@adonisjs/redis": "^11.0.0",

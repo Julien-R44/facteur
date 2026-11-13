@@ -16,21 +16,20 @@
     "checks": "pnpm lint && pnpm typecheck"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.1",
+    "@changesets/cli": "^3.0.3",
     "@japa/assert": "^4.2.0",
     "@japa/expect-type": "^2.0.4",
     "@japa/file-system": "^3.0.0",
-    "@japa/runner": "^5.3.0",
-    "@julr/tooling-configs": "^5.0.0",
-    "@poppinss/utils": "^7.1.1",
-    "@types/node": "^25.9.9",
-    "oxfmt": "^0.31.0",
-    "oxlint": "^1.86.0",
-    "p-event": "^6.0.1",
-    "tsdown": "^0.20.3",
+    "@japa/runner": "^5.4.0",
+    "@julr/tooling-configs": "^6.4.0",
+    "@poppinss/utils": "^7.1.2",
+    "@types/node": "^26.6.6",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "tsdown": "^0.23.7",
     "tsx": "^4.23.15",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.147.0"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.162.0"
   },
   "engines": {
     "node": ">=24.0.0"

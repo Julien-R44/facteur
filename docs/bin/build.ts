@@ -45,7 +45,7 @@ async function exportHTML() {
         const output = await entry.writeToDisk(app.makePath('dist'), { collection, entry })
         ace.ui.logger.action(`create ${output.filePath}`).succeeded()
       } catch (error) {
-        ace.ui.logger.action(`create ${entry.permalink}`).failed(error)
+        ace.ui.logger.action(`create ${entry.permalink}`).failed(String(error))
       }
     }
   }

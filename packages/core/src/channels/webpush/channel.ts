@@ -1,12 +1,13 @@
+import * as webpush from 'web-push'
 import type { Awaitable } from '@julr/utils/types'
-
-import webpush from 'web-push'
 
 import type { WebpushConfig, WebpushTargets, WebpushSubscription } from './types.ts'
 import type { WebpushMessage } from './message.ts'
-
 import { kTargetSymbol, type Channel, type ChannelSendParams } from '../../types/index.ts'
 import { errors } from '../../errors/index.ts'
+
+// eslint-disable-next-line import/namespace -- Web Push 3 has a CommonJS default; v4 has named ESM exports.
+const webpushClient = 'default' in webpush ? webpush.default : webpush
 
 type Targets = WebpushTargets<WebpushSubscription | WebpushSubscription[]>
 
@@ -78,7 +79,7 @@ export class WebpushChannel implements Channel<WebpushConfig, WebpushMessage, an
 
     const send = async (subscription: WebpushSubscription) => {
       try {
-        const result = await webpush.sendNotification(subscription, payload, webpushOptions)
+        const result = await webpushClient.sendNotification(subscription, payload, webpushOptions)
         return { statusCode: result.statusCode, headers: result.headers, body: result.body }
       } catch (error) {
         return this.#handleError(error)

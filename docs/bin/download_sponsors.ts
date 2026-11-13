@@ -8,8 +8,9 @@
 |
 */
 
-import { request } from 'undici'
 import { readFile, writeFile } from 'node:fs/promises'
+
+import { request } from 'undici'
 
 /**
  * The file path to the config.json file
@@ -50,7 +51,7 @@ export async function downloadSponsors() {
 
     await writeFile(SPONSORS_FILE_PATH, JSON.stringify(sponsorsList))
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       console.warn('Cannot download sponsors list. Unable to find "content/config.json" file')
       return
     }

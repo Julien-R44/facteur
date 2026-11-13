@@ -1,5 +1,5 @@
-import { pEvent } from 'p-event'
-import EventEmitter from 'node:events'
+import EventEmitter, { once } from 'node:events'
+
 import { test } from '@japa/runner'
 
 import { FakeNotification, testProvider } from './helpers/index.ts'
@@ -16,9 +16,12 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.notification(FakeNotification).via({ email: { to: 'foo@ok.com' } }).send()
+    facteur
+      .notification(FakeNotification)
+      .via({ email: { to: 'foo@ok.com' } })
+      .send()
 
-    const event = await pEvent(emitter, 'facteur:message:sending')
+    const [event] = await once(emitter, 'facteur:message:sending')
 
     assert.equal(event.channelName, 'email')
     assert.instanceOf(event.notification, FakeNotification)
@@ -37,9 +40,12 @@ test.group('Facteur | Events', () => {
       emitter,
     })
 
-    facteur.notification(FakeNotification).via({ email: { to: 'foo@ok.com' } }).send()
+    facteur
+      .notification(FakeNotification)
+      .via({ email: { to: 'foo@ok.com' } })
+      .send()
 
-    const event = await pEvent(emitter, 'facteur:message:sent')
+    const [event] = await once(emitter, 'facteur:message:sent')
 
     assert.equal(event.channelName, 'email')
     assert.instanceOf(event.notification, FakeNotification)
@@ -66,7 +72,7 @@ test.group('Facteur | Events', () => {
       .throwOnError(false)
       .send()
 
-    const event = await pEvent(emitter, 'facteur:message:failed')
+    const [event] = await once(emitter, 'facteur:message:failed')
 
     assert.equal(event.channelName, 'email')
     assert.instanceOf(event.notification, FakeNotification)
@@ -93,7 +99,7 @@ test.group('Facteur | Events', () => {
       .via({ email: { to: 'foo@ok.com' } })
       .send()
 
-    const event = await pEvent(emitter, 'facteur:notification:sending')
+    const [event] = await once(emitter, 'facteur:notification:sending')
 
     assert.instanceOf(event.notification, FakeNotification)
     assert.isDefined(event.resolvedChannels)
@@ -119,7 +125,7 @@ test.group('Facteur | Events', () => {
       .via({ email: { to: 'foo@ok.com' } })
       .send()
 
-    const event = await pEvent(emitter, 'facteur:notification:sent')
+    const [event] = await once(emitter, 'facteur:notification:sent')
 
     assert.instanceOf(event.notification, FakeNotification)
     assert.isArray(event.results)
@@ -147,7 +153,7 @@ test.group('Facteur | Events', () => {
       .throwOnError(false)
       .send()
 
-    const event = await pEvent(emitter, 'facteur:notification:failed')
+    const [event] = await once(emitter, 'facteur:notification:failed')
 
     assert.instanceOf(event.notification, FakeNotification)
 
@@ -175,7 +181,10 @@ test.group('Facteur | Events', () => {
     emitter.on('facteur:message:sent', () => events.push('message:sent'))
     emitter.on('facteur:notification:sent', () => events.push('notification:sent'))
 
-    await facteur.notification(FakeNotification).via({ email: { to: 'foo@ok.com' } }).send()
+    await facteur
+      .notification(FakeNotification)
+      .via({ email: { to: 'foo@ok.com' } })
+      .send()
 
     assert.deepEqual(events, [
       'notification:sending',
