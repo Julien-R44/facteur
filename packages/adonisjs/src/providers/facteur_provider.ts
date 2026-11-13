@@ -34,6 +34,7 @@ export default class NotificationsProvider {
           channels: await Object.fromEntries(await Promise.all(resolvedChannels)),
           // queueAdapter: config.queueAdapter,
           databaseAdapter: dbAdapter ?? null,
+          preferences: config.preferences,
           emitter: emitter as any,
           discoverer: { searchDirectory: new URL('./app', this.app.appRoot) },
           notificationResolver: (notification, ctx) => this.app.container.make(notification, [ctx]),
