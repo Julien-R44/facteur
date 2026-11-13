@@ -1,5 +1,6 @@
 import type { Awaitable } from '@julr/utils/types'
 
+import { randomUUID } from 'node:crypto'
 import { getMessaging, Messaging } from 'firebase-admin/messaging'
 import { initializeApp, cert } from 'firebase-admin/app'
 
@@ -34,10 +35,14 @@ export class FcmChannel implements Channel<FcmConfig, FcmMessage, any, FcmTarget
     if (messaging) {
       this.#messaging = messaging
     } else {
-      const app = initializeApp({
-        ...config,
-        ...(config.serviceAccountKeyPath ? { credential: cert(config.serviceAccountKeyPath) } : {}),
-      })
+      const { debugToken: _debugToken, serviceAccountKeyPath, ...appOptions } = config
+      const app = initializeApp(
+        {
+          ...appOptions,
+          ...(serviceAccountKeyPath ? { credential: cert(serviceAccountKeyPath) } : {}),
+        },
+        `facteur-fcm-${randomUUID()}`,
+      )
       this.#messaging = getMessaging(app)
     }
   }
