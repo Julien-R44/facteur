@@ -57,12 +57,17 @@ export class DiscordMessage extends WebhookMessage {
   }
 
   /**
-   * Adds a button that opens the URL. Discord shows up to 5 buttons per row and 5 rows.
+   * Adds a button that opens the URL. Discord shows up to 5 buttons per row and 5 rows,
+   * so a 26th button throws.
    *
    * A webhook created in the Discord settings can only send link buttons, so Facteur sends
    * them with the `with_components` query parameter that Discord requires.
    */
   addLinkButton(options: { label: string; url: string }) {
+    if (this.#linkButtons.length === 25) {
+      throw new RangeError('A Discord message holds at most 25 link buttons')
+    }
+
     this.#linkButtons.push(options)
     return this
   }

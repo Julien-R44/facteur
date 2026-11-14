@@ -100,7 +100,7 @@ export default class DiscordNotification extends Notification<undefined> {
 
 ### Link buttons
 
-`addLinkButton()` adds a button that opens a URL. Discord shows up to 5 buttons per row and 5 rows:
+`addLinkButton()` adds a button that opens a URL. Discord shows up to 5 buttons per row and 5 rows, so a 26th button throws a `RangeError`:
 
 ```ts
 DiscordMessage.create()

@@ -113,4 +113,19 @@ test.group('Chat messages', (group) => {
     assert.isFalse(requests[0].url.searchParams.has('with_components'))
     assert.notProperty(requests[0].body, 'components')
   })
+
+  test('accepts 25 Discord link buttons and refuses a 26th, as Discord allows 5 rows of 5', ({
+    assert,
+  }) => {
+    const message = DiscordMessage.create()
+    for (let index = 1; index <= 25; index++) {
+      message.addLinkButton({ label: `Link ${index}`, url: `https://example.com/${index}` })
+    }
+
+    assert.throws(
+      () => message.addLinkButton({ label: 'Link 26', url: 'https://example.com/26' }),
+      'A Discord message holds at most 25 link buttons',
+    )
+    assert.lengthOf(message.serialize().body.components!, 5)
+  })
 })
