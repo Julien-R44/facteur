@@ -13,6 +13,7 @@ export class DiscordMessage extends WebhookMessage {
   #avatarUrl = ''
   #tts = false
   #embeds: DiscordEmbed[] = []
+  #linkButtons: { label: string; url: string }[] = []
 
   /**
    * Creates a new instance of DiscordMessage.
@@ -56,6 +57,22 @@ export class DiscordMessage extends WebhookMessage {
   }
 
   /**
+   * Adds a button that opens the URL. Discord shows up to 5 buttons per row and 5 rows,
+   * so a 26th button throws.
+   *
+   * A webhook created in the Discord settings can only send link buttons, so Facteur sends
+   * them with the `with_components` query parameter that Discord requires.
+   */
+  addLinkButton(options: { label: string; url: string }) {
+    if (this.#linkButtons.length === 25) {
+      throw new RangeError('A Discord message holds at most 25 link buttons')
+    }
+
+    this.#linkButtons.push(options)
+    return this
+  }
+
+  /**
    * Whether or not this notification should be read as text to speech.
    */
   setTTS(flag: boolean) {
@@ -64,14 +81,29 @@ export class DiscordMessage extends WebhookMessage {
   }
 
   override serialize() {
+    const serialized = super.serialize()
+    const rows = []
+    for (let index = 0; index < this.#linkButtons.length; index += 5) {
+      rows.push({
+        type: 1,
+        components: this.#linkButtons
+          .slice(index, index + 5)
+          .map((button) => ({ type: 2, style: 5, label: button.label, url: button.url })),
+      })
+    }
+
     return {
-      ...super.serialize(),
+      ...serialized,
+      ...(rows.length > 0
+        ? { queryParameters: { ...serialized.queryParameters, with_components: 'true' } }
+        : {}),
       body: {
         tts: this.#tts,
         content: this.#body,
         ...(this.#username ? { username: this.#username } : {}),
         ...(this.#avatarUrl ? { avatar_url: this.#avatarUrl } : {}),
         embeds: this.#embeds.map((embed) => embed.serialize()),
+        ...(rows.length > 0 ? { components: rows } : {}),
       },
     }
   }
