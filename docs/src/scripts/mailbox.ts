@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { toonOutlinePass } from 'three/tsl'
+import { color, mix, positionLocal, smoothstep, toonOutlinePass } from 'three/tsl'
 
 interface MailboxOptions {
   /** Holds the mailbox still: no idle motion, deliveries only raise the flag. */
@@ -13,6 +13,8 @@ const POST = 0x9b6a45
 const PAPER = 0xf6f1e4
 const PAPER_SHADE = 0xe2d9c4
 const OUTLINE = 0x0b0b12
+const INSIDE_TOP = 0x070a18
+const INSIDE_FLOOR = 0x1d2756
 
 /* Body profile: a box with a half-round roof, like a rural mailbox. */
 const WIDTH = 1
@@ -20,15 +22,11 @@ const WALL = 0.62
 const DEPTH = 1.9
 
 const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1)
+const random = (min: number, max: number) => min + Math.random() * (max - min)
 const easeOutCubic = (value: number) => 1 - (1 - clamp01(value)) ** 3
 const easeInOutCubic = (value: number) => {
   const t = clamp01(value)
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
-}
-/** Rises to 1 with a springy overshoot, settled by t = 1. */
-const springIn = (value: number) => {
-  const t = clamp01(value)
-  return 1 - Math.exp(-6 * t) * Math.cos(9 * t)
 }
 /** A decaying wobble that starts and ends at 0. */
 const wobble = (value: number, frequency = 18) => {
@@ -104,6 +102,20 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
   body.position.z = -DEPTH / 2
   box.add(body)
 
+  /* The slot behind the door: a dark opening, so an open door shows the inside of the box. */
+  const slotMaterial = new THREE.MeshBasicNodeMaterial()
+  slotMaterial.colorNode = mix(
+    color(INSIDE_FLOOR),
+    color(INSIDE_TOP),
+    smoothstep(0, 0.7, positionLocal.y),
+  )
+  const slot = new THREE.Mesh(
+    new THREE.ShapeGeometry(profile(WIDTH - 0.14, WALL - 0.06), 24),
+    slotMaterial,
+  )
+  slot.position.set(0, 0.04, DEPTH / 2 + 0.04)
+  box.add(slot)
+
   /* Door: hinged along its bottom edge on the front face. */
   const door = new THREE.Group()
   door.position.set(0, 0, DEPTH / 2 + 0.035)
@@ -140,24 +152,83 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
   pin.position.x = -0.02
   flag.add(pin)
 
-  /* Letter: a paper envelope with its flap, flying in from the left. */
-  const letter = new THREE.Group()
-  scene.add(letter)
-  const paper = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.48, 0.03), toon(PAPER))
-  letter.add(paper)
+  const inside = new THREE.Vector3()
+  const anchor = new THREE.Vector3()
+  const front = new THREE.Vector3()
+  const boxQuaternion = new THREE.Quaternion()
+  const entry = new THREE.Quaternion()
+  const tumble = new THREE.Quaternion()
+
+  /* Letters share geometries and materials, so a burst of clicks compiles nothing new. */
   const flapShape = new THREE.Shape()
   flapShape.moveTo(-0.36, 0.24)
   flapShape.lineTo(0.36, 0.24)
   flapShape.lineTo(0, -0.04)
   flapShape.lineTo(-0.36, 0.24)
-  const flap = new THREE.Mesh(new THREE.ShapeGeometry(flapShape), toon(PAPER_SHADE))
-  flap.position.z = 0.017
-  letter.add(flap)
-  const seal = new THREE.Mesh(new THREE.CircleGeometry(0.055, 20), toon(FLAG))
-  seal.position.set(0, -0.02, 0.019)
-  letter.add(seal)
-  letter.rotation.order = 'YXZ'
-  letter.visible = false
+  const letterParts = [
+    { geometry: new THREE.BoxGeometry(0.72, 0.48, 0.03), material: toon(PAPER), z: 0, y: 0 },
+    { geometry: new THREE.ShapeGeometry(flapShape), material: toon(PAPER_SHADE), z: 0.017, y: 0 },
+    { geometry: new THREE.CircleGeometry(0.055, 20), material: toon(FLAG), z: 0.019, y: -0.02 },
+  ]
+
+  /* Every letter rolls its own throw: where it appears, its arc, pace, spin and landing. */
+  interface Letter {
+    group: THREE.Group
+    age: number
+    flight: number
+    slide: number
+    /** 0 eases in and out like a lob, 1 leaves fast like a throw. */
+    punch: number
+    size: number
+    turns: number
+    axis: THREE.Vector3
+    /** Landing point in the slot and approach distance, in box space. */
+    slot: THREE.Vector3
+    reach: number
+    rise: number
+    tilt: THREE.Quaternion
+    start: THREE.Vector3
+    swing: THREE.Vector3
+    approach: THREE.Vector3
+    target: THREE.Vector3
+    path: THREE.CubicBezierCurve3
+  }
+
+  const letters: Letter[] = []
+
+  const createLetter = (): Letter => {
+    const group = new THREE.Group()
+    for (const part of letterParts) {
+      const mesh = new THREE.Mesh(part.geometry, part.material)
+      mesh.position.set(0, part.y, part.z)
+      group.add(mesh)
+    }
+    group.visible = false
+    scene.add(group)
+    const start = new THREE.Vector3()
+    const swing = new THREE.Vector3()
+    const approach = new THREE.Vector3()
+    const target = new THREE.Vector3()
+    return {
+      group,
+      age: 0,
+      flight: 0,
+      slide: 0,
+      punch: 0,
+      size: 1,
+      turns: 0,
+      axis: new THREE.Vector3(),
+      slot: new THREE.Vector3(),
+      reach: 0,
+      rise: 0,
+      tilt: new THREE.Quaternion(),
+      start,
+      swing,
+      approach,
+      target,
+      path: new THREE.CubicBezierCurve3(start, swing, approach, target),
+    }
+  }
 
   /* Soft contact shadow under the post. */
   const shadow = new THREE.Mesh(
@@ -185,8 +256,8 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
 
   const DOOR_OPEN = 1.75
   const FLAG_DOWN = Math.PI / 2
-  const FLAG_RAISE_AT = 1.25
-  const DURATION = 2.6
+  const CLOSE = 0.6
+  const MAX_LETTERS = 16
   const BASE_YAW = -0.55
   const TURN = Math.PI * 2
 
@@ -213,23 +284,16 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
     spring.value += spring.velocity * delta
   }
 
-  let deliveryAge = Number.POSITIVE_INFINITY
   let dragging = false
+  /* Door state: open while letters fly, then a slam measured by closeAge. */
+  let doorOpen = false
+  let closeFrom = 0
+  let closeAge = Number.POSITIVE_INFINITY
+  let gulpAge = Number.POSITIVE_INFINITY
   const lean = new THREE.Vector2()
   const leanTarget = new THREE.Vector2()
 
-  const mouth = new THREE.Vector3()
-  const inside = new THREE.Vector3()
-  const start = new THREE.Vector3()
-  const control = new THREE.Vector3()
-  const path = new THREE.QuadraticBezierCurve3(start, control, mouth)
-
   const pose = (delta: number) => {
-    const previousAge = deliveryAge
-    deliveryAge += delta
-    const t = deliveryAge
-    if (previousAge < FLAG_RAISE_AT && t >= FLAG_RAISE_AT) flagSpring.target = 0
-
     advance(flagSpring, 160, 9, delta)
     if (!dragging) advance(spinSpring, 18, 6.5, delta)
     advance(hoverSpring, 260, 18, delta)
@@ -241,41 +305,75 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
     rig.scale.setScalar(1 + hoverSpring.value * 0.045)
     flag.rotation.x = flagSpring.value
 
-    /* Door: opens as the letter approaches, slams shut after it. */
-    const opening = easeOutCubic((t - 0.05) / 0.35)
-    const closing = springIn((t - 1.05) / 0.6)
-    door.rotation.x = t < 1.05 ? DOOR_OPEN * opening : DOOR_OPEN * (1 - closing)
-
-    /* Jolt: the box squashes when the door slams and shakes with the flag. */
-    const jolt = wobble((t - 1.1) / 0.9)
-    box.scale.set(1 + jolt * 0.05, 1 - jolt * 0.07, 1 + jolt * 0.05)
-    box.rotation.z = wobble((t - 1.15) / 0.8, 26) * 0.06
-
-    /* Letter: arcs in from the left, slides through the door, disappears inside. */
+    /* Letters: each follows its own curve, tumbles, then lines up with the slot and slides in. */
     box.updateWorldMatrix(true, true)
-    mouth.copy(box.localToWorld(new THREE.Vector3(0, WALL * 0.75, DEPTH / 2 + 0.45)))
-    inside.copy(box.localToWorld(new THREE.Vector3(0, WALL * 0.75, -0.2)))
-    start.set(rig.position.x - 6.4, 1.6, 0.8)
-    control.set(rig.position.x - 2.6, 2.6, 2.2)
+    box.getWorldQuaternion(boxQuaternion)
+    front.set(0, 0, 1).applyQuaternion(boxQuaternion)
 
-    letter.visible = t > 0 && t < 1.08
-    if (letter.visible) {
-      const flight = easeInOutCubic(t / 0.72)
-      if (t < 0.72) {
-        letter.position.copy(path.getPoint(flight))
-        letter.rotation.set(
-          0.25 - flight * 1.27,
-          rig.rotation.y * flight,
-          Math.sin(flight * Math.PI) * 0.9,
+    let inFlight = false
+    for (const letter of letters) {
+      if (!letter.group.visible) continue
+      letter.age += delta
+      const t = letter.age
+      if (t >= letter.flight + letter.slide) {
+        letter.group.visible = false
+        gulpAge = 0
+        continue
+      }
+
+      inFlight = true
+      letter.target.copy(box.localToWorld(anchor.copy(letter.slot)))
+      letter.approach.copy(letter.target).addScaledVector(front, letter.reach)
+      letter.approach.y += letter.rise
+      entry.copy(boxQuaternion).multiply(letter.tilt)
+
+      if (t < letter.flight) {
+        const progress = t / letter.flight
+        const eased =
+          easeInOutCubic(progress) * (1 - letter.punch) + easeOutCubic(progress) * letter.punch
+        letter.group.position.copy(letter.path.getPoint(eased))
+        tumble.setFromAxisAngle(
+          letter.axis,
+          letter.turns * Math.PI * 2 * (1 - easeOutCubic(progress)),
         )
-        letter.scale.setScalar(0.9 + flight * 0.1)
+        letter.group.quaternion.copy(entry).multiply(tumble)
+        /* Pops in where it appears instead of crossing the canvas edge. */
+        letter.group.scale.setScalar(letter.size * easeOutCubic(t / 0.16))
       } else {
-        const slide = easeInOutCubic((t - 0.72) / 0.32)
-        letter.position.lerpVectors(mouth, inside, slide)
-        letter.rotation.set(-Math.PI / 2 + 0.55, rig.rotation.y, 0)
-        letter.scale.setScalar(1 - slide * 0.25)
+        const slide = easeInOutCubic((t - letter.flight) / letter.slide)
+        inside.copy(box.localToWorld(anchor.set(letter.slot.x, letter.slot.y, -0.2)))
+        letter.group.position.lerpVectors(letter.target, inside, slide)
+        letter.group.quaternion.copy(entry)
+        letter.group.scale.setScalar(letter.size * (1 - slide * 0.25))
       }
     }
+
+    /* Door: swings open while letters fly in. Once the last one is inside it slams and
+       bounces on the frame; |cos| keeps the angle at or above closed, so it never enters the box. */
+    if (inFlight) {
+      doorOpen = true
+      door.rotation.x += (DOOR_OPEN - door.rotation.x) * (1 - Math.exp(-delta * 10))
+    } else {
+      if (doorOpen) {
+        doorOpen = false
+        closeFrom = door.rotation.x
+        closeAge = 0
+      }
+      const previousClose = closeAge
+      closeAge += delta
+      const progress = clamp01(closeAge / CLOSE)
+      door.rotation.x =
+        progress >= 1
+          ? 0
+          : closeFrom * Math.exp(-6 * progress) * Math.abs(Math.cos(2 * Math.PI * progress))
+      if (previousClose < 0.2 && closeAge >= 0.2) flagSpring.target = 0
+    }
+    gulpAge += delta
+
+    /* Jolt: a small gulp per letter, a bigger squash when the door slams. */
+    const jolt = wobble((closeAge - 0.12) / 0.9) + wobble(gulpAge / 0.4, 22) * 0.35
+    box.scale.set(1 + jolt * 0.05, 1 - jolt * 0.07, 1 + jolt * 0.05)
+    box.rotation.z = wobble((closeAge - 0.15) / 0.8, 26) * 0.06
   }
 
   /* ---------------------------------------------------------------- */
@@ -296,7 +394,9 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
     /* Render on demand: the loop stops once nothing moves and restarts on input. */
     const settled =
       !dragging &&
-      deliveryAge > DURATION &&
+      !doorOpen &&
+      closeAge > CLOSE &&
+      gulpAge > 0.4 &&
       lean.distanceTo(leanTarget) < 0.0005 &&
       springs.every(
         (spring) =>
@@ -318,6 +418,9 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
   }
 
   /* Framing comes from CSS so each breakpoint can place the mailbox. */
+  /* Half extents of the visible area on the z = 0 plane, where letters may appear. */
+  const view = { x: 0, y: 0 }
+
   const resize = () => {
     const { width, height } = canvas.getBoundingClientRect()
     if (!width || !height) return
@@ -330,6 +433,8 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
     camera.position.set(0, 1.1, distance)
     camera.lookAt(0, 0.2, 0)
     camera.updateProjectionMatrix()
+    view.y = distance * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+    view.x = view.y * camera.aspect
     rig.position.x = offset
     shadow.position.x = offset
     play()
@@ -348,14 +453,64 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
   /* Interaction                                                       */
   /* ---------------------------------------------------------------- */
 
+  const inFrame = (point: THREE.Vector3, margin: number) => {
+    point.x = THREE.MathUtils.clamp(point.x, -view.x * margin, view.x * margin)
+    point.y = THREE.MathUtils.clamp(point.y, 0.2 - view.y * 0.7, 0.2 + view.y * margin)
+    return point
+  }
+
+  /** Rolls a new throw: a start inside the frame and away from the mailbox, a random swing, pace and spin. */
+  const throwLetter = (letter: Letter) => {
+    letter.age = 0
+    letter.flight = random(0.55, 1.05)
+    letter.slide = random(0.2, 0.34)
+    letter.punch = Math.random()
+    letter.size = random(0.68, 0.95)
+    letter.turns = random(0.3, 2.2) * (Math.random() < 0.5 ? -1 : 1)
+    letter.axis.randomDirection()
+    const room = (0.86 - 0.72 * letter.size) / 2 - 0.02
+    letter.slot.set(random(-room, room), WALL * 0.75 + random(-0.08, 0.1), DEPTH / 2 + 0.45)
+    letter.reach = random(0.6, 1.8)
+    letter.rise = random(-0.2, 0.9)
+    letter.tilt.setFromEuler(
+      new THREE.Euler(-Math.PI / 2 + random(0.4, 0.75), 0, random(-0.15, 0.15)),
+    )
+
+    for (let attempt = 0; attempt < 12; attempt++) {
+      letter.start.set(
+        random(-view.x, view.x) * 0.92,
+        0.2 + random(-0.4, 0.9) * view.y,
+        random(-2, 2),
+      )
+      const clear = Math.abs(letter.start.x - rig.position.x) > 1.6 || letter.start.y > 1.9
+      if (clear) break
+    }
+    inFrame(letter.start, 0.92)
+    letter.swing.set(
+      letter.start.x + random(-2.4, 2.4),
+      letter.start.y + random(-0.5, 2.6),
+      letter.start.z + random(-2, 2.5),
+    )
+    inFrame(letter.swing, 0.85)
+  }
+
+  /** Posts one letter. Calls stack: every click sends its own letter. */
   const deliver = () => {
-    if (deliveryAge < FLAG_RAISE_AT) return
     if (options.reducedMotion) {
       flagSpring.target = 0
-      deliveryAge = DURATION
-    } else {
+      play()
+      return
+    }
+
+    let letter = letters.find((candidate) => !candidate.group.visible)
+    if (!letter && letters.length < MAX_LETTERS) {
+      letter = createLetter()
+      letters.push(letter)
+    }
+    if (letter) {
+      throwLetter(letter)
+      letter.group.visible = true
       flagSpring.target = FLAG_DOWN
-      deliveryAge = 0
     }
     play()
   }
@@ -467,6 +622,5 @@ export async function mountMailbox(canvas: HTMLCanvasElement, options: MailboxOp
   canvas.dataset.ready = ''
   play()
 
-  /** Plays one delivery: the door opens, a letter goes in, the flag goes up. */
   return { deliver }
 }
