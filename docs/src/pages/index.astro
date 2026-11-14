@@ -1,0 +1,1780 @@
+---
+import { Code } from 'astro:components'
+
+import Base from '../layouts/Base.astro'
+import Icon from '../components/Icon.astro'
+import Logo from '../components/Logo.astro'
+import { codeTheme } from '../code-theme.ts'
+
+const install = 'npm install @facteurjs/core'
+
+const channelCards = [
+  {
+    label: 'Messaging',
+    headline: 'Email, SMS, chat',
+    text: 'Reach people where they already read: their inbox, their phone, your team channels.',
+    link: { label: 'Configure a channel', slug: 'configuration' },
+    channels: [
+      { name: 'AdonisJS Mail', slug: 'mail' },
+      { name: 'Twilio SMS', slug: 'twilio' },
+      { name: 'AWS SNS', slug: 'aws-sns' },
+      { name: 'Slack', slug: 'slack' },
+      { name: 'Discord', slug: 'discord' },
+    ],
+  },
+  {
+    label: 'In-app',
+    badge: 'Built-in inbox',
+    featured: true,
+    headline: 'Your own inbox',
+    text: 'Store notifications, push them live, and render them with a typed API and React hooks.',
+    link: { label: 'Build an inbox', slug: 'in-app-notifications' },
+    channels: [
+      { name: 'Database (Knex or Kysely)', slug: 'database' },
+      { name: 'Socket.IO', slug: 'socketio' },
+      { name: 'Transmit (SSE)', slug: 'transmit' },
+      { name: 'Server API', slug: 'server-api' },
+      { name: 'React hooks', slug: 'facteurjs-react' },
+    ],
+  },
+  {
+    label: 'Push and HTTP',
+    headline: 'Devices and services',
+    text: 'Native and web push for your apps, signed webhooks for everything else.',
+    link: { label: 'Write a custom channel', slug: 'custom-channels' },
+    channels: [
+      { name: 'Web Push', slug: 'webpush' },
+      { name: 'Firebase Cloud Messaging', slug: 'fcm' },
+      { name: 'Expo', slug: 'expo-notifications' },
+      { name: 'Webhook', slug: 'webhook' },
+      { name: 'Your own channel', slug: 'custom-channels' },
+    ],
+  },
+]
+
+const features = [
+  {
+    icon: 'lucide:sliders-horizontal',
+    title: 'User preferences',
+    text: 'Users switch channels on or off globally, per category or per notification.',
+    slug: 'preferences',
+  },
+  {
+    icon: 'lucide:building-2',
+    title: 'Multi-tenancy',
+    text: 'Scope a send with .tenant(id). Storage, preferences and the API follow it.',
+    slug: 'multi-tenancy',
+  },
+  {
+    icon: 'lucide:layers',
+    title: 'Bulk sending',
+    text: 'Arrays or async iterables, with chunk size, concurrency and per-recipient errors.',
+    slug: 'bulk-sending',
+  },
+  {
+    icon: 'lucide:rotate-ccw',
+    title: 'Retries and timeouts',
+    text: 'Exponential backoff with jitter, set globally, per channel or per send.',
+    slug: 'configuration',
+  },
+  {
+    icon: 'lucide:flask-conical',
+    title: 'Testing fake',
+    text: 'facteur.fake() records sends so tests assert what your code asked to deliver.',
+    slug: 'testing',
+  },
+  {
+    icon: 'lucide:activity',
+    title: 'Events and hooks',
+    text: 'beforeSend, shouldSend and afterSend on the class, delivery events on the emitter.',
+    slug: 'events',
+  },
+]
+
+const examples = [
+  {
+    title: 'One class per notification',
+    text: 'Declare where it goes and how it reads on each channel.',
+    file: 'invoice_paid_notification.ts',
+    lang: 'ts',
+    code: `import { Notification } from '@facteurjs/core/types'
+import { DatabaseMessage } from '@facteurjs/core/database'
+import { TwilioMessage } from '@facteurjs/core/channels/twilio'
+import type { User } from './user.js'
+
+export default class InvoicePaidNotification extends Notification<User, { amount: number }> {
+  static options = {
+    name: 'Invoice paid',
+    category: 'billing',
+    deliverBy: { database: true, twilio: true },
+  }
+
+  asDatabaseMessage() {
+    return DatabaseMessage.create().setType('invoice-paid').setContent({ amount: this.params.amount })
+  }
+
+  asTwilioMessage() {
+    return TwilioMessage.create().setBody(\`Invoice of $\${this.params.amount} paid.\`)
+  }
+}`,
+  },
+  {
+    title: 'One call, every channel',
+    text: 'Facteur resolves targets, applies preferences and retries failures.',
+    file: 'billing_service.ts',
+    lang: 'ts',
+    code: `import { facteur } from './facteur.js'
+import InvoicePaidNotification from './invoice_paid_notification.js'
+
+// One recipient
+await facteur.notification(InvoicePaidNotification).to(user).params({ amount: 100 }).send()
+
+// Thousands of recipients, in chunks, without stopping on failures
+await facteur
+  .notification(InvoicePaidNotification)
+  .to(customers)
+  .params({ amount: 100 })
+  .chunkSize(100)
+  .concurrency(5)
+  .continueOnError()
+  .send()`,
+  },
+  {
+    title: 'A fake for your tests',
+    text: 'Swap Facteur for a recorder, then assert what was sent.',
+    file: 'billing.spec.ts',
+    lang: 'ts',
+    code: `import assert from 'node:assert'
+import { test } from '@japa/runner'
+import { facteur } from '#services/facteur'
+
+test('notifies the customer when an invoice is paid', async () => {
+  using fake = facteur.fake()
+
+  await billing.markAsPaid(invoice)
+
+  fake.assertSent(InvoicePaidNotification, (sent) => {
+    assert.equal(sent.to.id, invoice.customerId)
+  })
+})`,
+  },
+  {
+    title: 'An inbox in your frontend',
+    text: 'React hooks read and update stored notifications through the Server API.',
+    file: 'inbox.tsx',
+    lang: 'tsx',
+    code: `import { useMarkAsRead, useNotifications } from '@facteurjs/react'
+
+export function Inbox() {
+  const { data: notifications = [] } = useNotifications({ limit: 10, status: 'unread' })
+  const markAsRead = useMarkAsRead()
+
+  return (
+    <ul>
+      {notifications.map((notification) => (
+        <li key={notification.id}>
+          Invoice of \${notification.content.amount} paid
+          <button onClick={() => markAsRead.mutate({ notificationId: String(notification.id) })}>
+            Mark as read
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}`,
+  },
+]
+
+const footerColumns = [
+  {
+    title: 'Docs',
+    links: [
+      { label: 'Introduction', href: '/docs/introduction' },
+      { label: 'Quick start', href: '/docs/quick-start' },
+      { label: 'Notifications', href: '/docs/notifications' },
+      { label: 'Testing', href: '/docs/testing' },
+    ],
+  },
+  {
+    title: 'Channels',
+    links: [
+      { label: 'Database', href: '/docs/database' },
+      { label: 'Twilio SMS', href: '/docs/twilio' },
+      { label: 'Slack', href: '/docs/slack' },
+      { label: 'Web Push', href: '/docs/webpush' },
+    ],
+  },
+  {
+    title: 'Project',
+    links: [
+      { label: 'GitHub', href: 'https://github.com/Julien-R44/facteur' },
+      { label: 'npm', href: 'https://www.npmjs.com/package/@facteurjs/core' },
+      { label: 'Issues', href: 'https://github.com/Julien-R44/facteur/issues' },
+      { label: 'Sponsor', href: 'https://github.com/sponsors/Julien-R44' },
+    ],
+  },
+]
+---
+
+<Base
+  title="Facteur | Notifications for Node.js, delivered"
+  description="A TypeScript-first notification library for Node.js. Write a notification once and deliver it by email, SMS, push, chat, realtime and in-app."
+>
+  <main id="content">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-copy">
+        <a class="badge" href="https://github.com/Julien-R44/facteur">
+          <Icon name="simple-icons:github" size={12} />
+          Open source, MIT licensed
+        </a>
+
+        <h1>Notifications,<br /><span>delivered everywhere.</span></h1>
+
+        <p class="lead">
+          A TypeScript notification library for Node.js. Write a notification once, then send it by email, SMS, push,
+          Slack, websockets and to an in-app inbox.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="/docs/quick-start">
+            Get started
+            <Icon name="lucide:arrow-right" size={15} />
+          </a>
+          <button class="button button-secondary install" type="button" data-copy={install} aria-label="Copy install command">
+            <code>{install}</code>
+            <span class="install-copy" data-copy-label>Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="dispatch glass" data-dispatch>
+          <div class="dispatch-command">
+            <div class="window-bar">
+              <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span>billing_service.ts</span>
+              <button class="window-button" type="button" data-dispatch-replay>
+                <Icon name="lucide:play" size={12} />
+                Send again
+              </button>
+            </div>
+            <pre><code><span class="t-k">await</span> facteur
+  .<span class="t-f">notification</span>(InvoicePaidNotification)
+  .<span class="t-f">to</span>(jane)
+  .<span class="t-f">params</span>(&#123; amount: <span class="t-n">100</span> &#125;)
+  .<span class="t-f">send</span>()</code></pre>
+          </div>
+
+          <div class="dispatch-routes" aria-hidden="true">
+            <span class="route route-stem"></span>
+            <span class="route route-bus"></span>
+            <span class="route route-branch" style="--d: 1"></span>
+            <span class="route route-branch" style="--d: 0"></span>
+            <span class="route route-branch" style="--d: 0"></span>
+            <span class="route route-branch" style="--d: 1"></span>
+          </div>
+
+          <div
+            class="deliveries"
+            role="img"
+            aria-label="The same invoice notification delivered as a push notification, an SMS, a Slack message and an in-app notification"
+          >
+            <article class="delivery" style="--d: 1">
+              <div class="push">
+                <div class="push-app"><Icon name="lucide:receipt" size={14} /></div>
+                <div class="push-body">
+                  <div class="push-meta"><strong>Acme</strong><span>now</span></div>
+                  <p><strong>Invoice paid</strong></p>
+                  <p>Your invoice of $100 has been paid.</p>
+                </div>
+              </div>
+              <footer><Icon name="lucide:bell-ring" size={12} /> webpush <span class="status"></span></footer>
+            </article>
+
+            <article class="delivery" style="--d: 0">
+              <div class="sms">
+                <span class="sms-from">ACME</span>
+                <p class="sms-bubble">Invoice of $100 paid. Thanks, Jane!</p>
+              </div>
+              <footer><Icon name="simple-icons:twilio" size={12} /> twilio <span class="status"></span></footer>
+            </article>
+
+            <article class="delivery" style="--d: 0">
+              <div class="slack">
+                <div class="slack-avatar">A</div>
+                <div>
+                  <div class="slack-meta"><strong>Acme Billing</strong><span>9:41</span></div>
+                  <p>Jane Cooper paid <strong>$100</strong></p>
+                </div>
+              </div>
+              <footer><Icon name="simple-icons:slack" size={12} /> slack <span class="status"></span></footer>
+            </article>
+
+            <article class="delivery" style="--d: 1">
+              <div class="inbox">
+                <div class="inbox-head">
+                  <span>Inbox</span>
+                  <span class="inbox-bell"><Icon name="lucide:bell" size={13} /><b>1</b></span>
+                </div>
+                <div class="inbox-item">
+                  <span class="inbox-dot"></span>
+                  <div><p>Invoice of $100 paid</p><span>Just now</span></div>
+                </div>
+              </div>
+              <footer><Icon name="lucide:database" size={12} /> database <span class="status"></span></footer>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Channels -->
+    <section id="channels" class="section" aria-labelledby="channels-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="badge"><Icon name="lucide:send" size={12} /> Channels</span>
+          <h2 id="channels-title">Every address your users have</h2>
+          <p>Install only the providers you use. Bring your own when you need more.</p>
+        </div>
+
+        <div class="channel-cards">
+          {
+            channelCards.map((card) => (
+              <article class:list={['channel-card', 'glass', { featured: card.featured }]}>
+                <div class="channel-card-top">
+                  <span class="channel-card-label">{card.label}</span>
+                  {card.badge && <span class="channel-card-badge">{card.badge}</span>}
+                </div>
+                <h3>{card.headline}</h3>
+                <p>{card.text}</p>
+                <a
+                  class="button button-secondary channel-card-button"
+                  href={`/docs/${card.link.slug}`}
+                >
+                  {card.link.label}
+                </a>
+                <p class="divider-label">Includes</p>
+                <ul>
+                  {card.channels.map((channel) => (
+                    <li>
+                      <a href={`/docs/${channel.slug}`}>
+                        <span class="check">
+                          <Icon name="lucide:check" size={11} />
+                        </span>
+                        {channel.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Code carousel -->
+    <section class="section" aria-labelledby="code-title" aria-roledescription="carousel">
+      <div class="container">
+        <div class="section-head">
+          <span class="badge"><Icon name="lucide:terminal" size={12} /> In code</span>
+          <h2 id="code-title">From class to inbox in four steps</h2>
+          <p>A notification is a class. Facteur carries it to every channel you configured.</p>
+        </div>
+
+        <div class="carousel" data-carousel>
+          <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous example" data-carousel-prev>
+            <Icon name="lucide:chevron-left" size={18} />
+          </button>
+
+          <div class="carousel-viewport" data-carousel-viewport>
+          <div class="carousel-track" data-carousel-track>
+            {
+              examples.map((example, index) => (
+                <div
+                  class="slide"
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label={`${index + 1} of ${examples.length}: ${example.title}`}
+                  inert={index !== 0}
+                  data-slide
+                >
+                  <div class="slide-head">
+                    <span class="slide-step">0{index + 1}</span>
+                    <h3>{example.title}</h3>
+                    <p>{example.text}</p>
+                  </div>
+                  <div class="code-window glass">
+                    <div class="window-bar">
+                      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                      <span>{example.file}</span>
+                      <button class="window-button" type="button" data-copy={example.code}>
+                        <span data-copy-label>Copy</span>
+                      </button>
+                    </div>
+                    <Code code={example.code} lang={example.lang as 'ts'} theme={codeTheme} />
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+
+          </div>
+
+          <button class="carousel-arrow carousel-next" type="button" aria-label="Next example" data-carousel-next>
+            <Icon name="lucide:chevron-right" size={18} />
+          </button>
+
+          <div class="carousel-dots">
+            {
+              examples.map((example, index) => (
+                <button
+                  type="button"
+                  aria-label={`Show ${example.title}`}
+                  aria-current={index === 0 ? 'true' : undefined}
+                  data-carousel-dot
+                />
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section" aria-labelledby="features-title">
+      <div class="container">
+        <div class="section-head">
+          <span class="badge"><Icon name="lucide:package" size={12} /> Built in</span>
+          <h2 id="features-title">What's included</h2>
+          <p>The parts every notification system needs, ready on day one.</p>
+        </div>
+
+        <div class="features">
+          {
+            features.map((feature) => (
+              <a class="feature" href={`/docs/${feature.slug}`}>
+                <span class="feature-icon">
+                  <Icon name={feature.icon} size={18} />
+                </span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section section-cta">
+      <div class="container">
+        <div class="cta glass">
+          <h2>Ready for your first delivery?</h2>
+          <p>Install the core, configure a channel, send a notification. About five minutes.</p>
+          <div class="cta-actions">
+            <button class="cta-install" type="button" data-copy={install} aria-label="Copy install command">
+              <span aria-hidden="true">$</span>
+              <code>{install}</code>
+              <span class="install-copy" data-copy-label>Copy</span>
+            </button>
+            <a class="button button-primary" href="/docs/quick-start">Read the quick start</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="footer-logo" href="/"><Logo size={26} /> Facteur</a>
+        <p>A TypeScript notification library for Node.js. One notification, every destination.</p>
+        <div class="footer-socials">
+          <a href="https://github.com/Julien-R44/facteur" aria-label="GitHub"><Icon name="simple-icons:github" size={14} /></a>
+          <a href="https://www.npmjs.com/package/@facteurjs/core" aria-label="npm"><Icon name="simple-icons:npm" size={14} /></a>
+        </div>
+      </div>
+
+      {
+        footerColumns.map((column) => (
+          <nav class="footer-column" aria-label={column.title}>
+            <p>{column.title}</p>
+            <ul>
+              {column.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+
+    <div class="container footer-bottom">
+      <span>MIT licensed. Made by <a href="https://github.com/Julien-R44">Julien Ripouteau</a>.</span>
+    </div>
+  </footer>
+</Base>
+
+<script>
+  /* Hero: replay the delivery animation */
+  const dispatch = document.querySelector<HTMLElement>('[data-dispatch]')
+
+  document.querySelector('[data-dispatch-replay]')?.addEventListener('click', () => {
+    if (!dispatch) return
+    dispatch.classList.remove('is-running')
+    void dispatch.offsetWidth
+    dispatch.classList.add('is-running')
+  })
+
+  dispatch?.classList.add('is-running')
+
+  /* Code carousel: slides sit side by side and the track slides between them */
+  const carousel = document.querySelector<HTMLElement>('[data-carousel]')
+
+  if (carousel) {
+    const viewport = carousel.querySelector<HTMLElement>('[data-carousel-viewport]')!
+    const track = carousel.querySelector<HTMLElement>('[data-carousel-track]')!
+    const slides = [...carousel.querySelectorAll<HTMLElement>('[data-slide]')]
+    const dots = [...carousel.querySelectorAll<HTMLButtonElement>('[data-carousel-dot]')]
+    let current = 0
+
+    const fitHeight = () => {
+      viewport.style.height = `${slides[current].offsetHeight}px`
+    }
+
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length
+      track.style.transform = `translateX(calc(${-current} * (100% + var(--slide-gap))))`
+      slides.forEach((slide, slideIndex) => {
+        slide.inert = slideIndex !== current
+        slide.toggleAttribute('data-active', slideIndex === current)
+      })
+      dots.forEach((dot, dotIndex) => {
+        if (dotIndex === current) dot.setAttribute('aria-current', 'true')
+        else dot.removeAttribute('aria-current')
+      })
+      fitHeight()
+    }
+
+    carousel.querySelector('[data-carousel-prev]')?.addEventListener('click', () => show(current - 1))
+    carousel.querySelector('[data-carousel-next]')?.addEventListener('click', () => show(current + 1))
+    dots.forEach((dot, index) => dot.addEventListener('click', () => show(index)))
+
+    carousel.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(current - 1)
+      if (event.key === 'ArrowRight') show(current + 1)
+    })
+
+    let startX: number | undefined
+    viewport.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'mouse') startX = event.clientX
+    })
+    viewport.addEventListener('pointerup', (event) => {
+      if (startX === undefined) return
+      const deltaX = event.clientX - startX
+      startX = undefined
+      if (Math.abs(deltaX) > 50) show(current + (deltaX < 0 ? 1 : -1))
+    })
+
+    new ResizeObserver(fitHeight).observe(slides[0])
+    show(0)
+  }
+</script>
+
+<style>
+  /* ---------------------------------------------------------------- */
+  /* Shared                                                            */
+  /* ---------------------------------------------------------------- */
+
+  .glass {
+    position: relative;
+    border: 1px solid var(--border);
+    background: var(--glass), var(--surface);
+    box-shadow: var(--glass-highlight);
+  }
+
+  /* A light streak along the top edge, as if lit from above. */
+  .glass::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: var(--glass-highlight);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  a.badge {
+    transition: border-color 160ms ease;
+  }
+
+  .section {
+    padding: 120px 0 0;
+  }
+
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 620px;
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+
+  .section-head h2,
+  .cta h2 {
+    margin: 18px 0 0;
+    font-size: clamp(30px, 4vw, 40px);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .section-head p {
+    margin: 12px 0 0;
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  .section-head p a {
+    color: var(--accent-text);
+  }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 42px;
+    padding: 0 10px 0 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.1);
+  }
+
+  .window-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    margin-left: auto;
+    padding: 0 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 7px;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      border-color 160ms ease,
+      color 160ms ease,
+      transform 160ms var(--ease-out);
+  }
+
+  .window-bar > span:not(.dots) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .window-button:active {
+    transform: scale(0.96);
+  }
+
+  .window-button[data-copied] {
+    color: var(--success);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    a.badge:hover {
+      border-color: rgb(255 255 255 / 0.25);
+    }
+
+    .window-button:hover {
+      border-color: rgb(255 255 255 / 0.25);
+      color: var(--text);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Hero                                                              */
+  /* ---------------------------------------------------------------- */
+
+  .hero {
+    position: relative;
+    padding: 88px 0 0;
+  }
+
+  /* Soft light from above plus a faint starfield, like the reference. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -90px 0 auto;
+    z-index: -1;
+    height: 760px;
+    background:
+      radial-gradient(ellipse 50% 45% at 50% 0%, rgb(255 255 255 / 0.08), transparent 70%),
+      radial-gradient(ellipse 30% 30% at 50% 55%, rgb(79 124 255 / 0.1), transparent 70%),
+      radial-gradient(circle at center, rgb(255 255 255 / 0.12) 0.6px, transparent 1px) 0 0 / 28px 28px;
+    mask-image: linear-gradient(to bottom, black 40%, transparent);
+    pointer-events: none;
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero h1 {
+    margin: 24px 0 0;
+    font-size: clamp(42px, 6.4vw, 68px);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(180deg, #f2f2f3 10%, #8b8b93);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .lead {
+    max-width: 560px;
+    margin: 22px 0 0;
+    color: var(--text-muted);
+    font-size: 17px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .install {
+    gap: 12px;
+    padding-right: 6px;
+  }
+
+  .install code {
+    font-size: 13px;
+  }
+
+  .install-copy {
+    min-width: 54px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.06);
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  [data-copied] .install-copy {
+    color: var(--success);
+  }
+
+  /* Dispatch visual */
+
+  .dispatch {
+    max-width: 920px;
+    margin: 64px auto 0;
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .dispatch-command {
+    max-width: 520px;
+    margin-inline: auto;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    background: var(--code-bg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .dispatch pre {
+    margin: 0;
+    padding: 16px 20px 18px;
+    overflow-x: auto;
+    color: var(--code-foreground);
+    font-size: 13.5px;
+    line-height: 1.75;
+  }
+
+  .t-k {
+    color: var(--code-token-keyword);
+  }
+
+  .t-f {
+    color: var(--code-token-function);
+  }
+
+  .t-n {
+    color: var(--code-token-constant);
+  }
+
+  /* A tree from the snippet to each card: a stem, a horizontal bus, then
+     one branch per card. The bus spans the centers of the first and last
+     cards, which sit (100% - 3 gaps) / 8 from each edge. */
+  .dispatch-routes {
+    --gap: 12px;
+    --columns: 4;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+    gap: var(--gap);
+    height: 44px;
+  }
+
+  .route {
+    position: relative;
+    background: var(--border-strong);
+  }
+
+  .route::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-text);
+    box-shadow: 0 0 10px var(--accent);
+    opacity: 0.45;
+  }
+
+  .route-stem {
+    position: absolute;
+    top: 0;
+    left: calc(50% - 0.5px);
+    width: 1px;
+    height: 50%;
+  }
+
+  .route-bus {
+    position: absolute;
+    top: 50%;
+    right: calc((100% - (var(--columns) - 1) * var(--gap)) / (var(--columns) * 2));
+    left: calc((100% - (var(--columns) - 1) * var(--gap)) / (var(--columns) * 2));
+    height: 1px;
+  }
+
+  .route-branch {
+    grid-row: 1;
+    justify-self: center;
+    align-self: end;
+    width: 1px;
+    height: 50%;
+  }
+
+  .route-stem::after,
+  .route-branch::after {
+    transform-origin: top;
+  }
+
+  .deliveries {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .delivery {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-raised);
+  }
+
+  .delivery > div {
+    flex: 1;
+    padding: 14px;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+
+  .delivery p {
+    margin: 0;
+  }
+
+  .delivery footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .status {
+    margin-left: auto;
+    color: var(--success);
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+
+  .status::before {
+    content: 'Delivered';
+  }
+
+  .push,
+  .slack {
+    display: flex;
+    gap: 10px;
+  }
+
+  .push-app,
+  .slack-avatar {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .push-app {
+    background: linear-gradient(180deg, #8aa8ff, #3358e0);
+    color: #fff;
+  }
+
+  .slack-avatar {
+    background: #4a154b;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .push-body {
+    min-width: 0;
+    color: var(--text-muted);
+  }
+
+  .push-body strong,
+  .slack strong {
+    color: var(--text);
+  }
+
+  .push-meta,
+  .slack-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: var(--text-faint);
+    font-size: 11px;
+  }
+
+  .push-meta strong,
+  .slack-meta strong {
+    font-size: 12px;
+  }
+
+  .push-meta span {
+    margin-left: auto;
+  }
+
+  .slack p {
+    margin-top: 2px;
+    color: var(--text-muted);
+  }
+
+  .sms {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sms-from {
+    color: var(--text-faint);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .sms-bubble {
+    align-self: flex-start;
+    padding: 7px 11px;
+    border-radius: 14px 14px 14px 4px;
+    background: rgb(255 255 255 / 0.07);
+  }
+
+  .inbox {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .inbox-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .inbox-bell {
+    position: relative;
+    color: var(--text-muted);
+  }
+
+  .inbox-bell b {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    display: grid;
+    place-items: center;
+    min-width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 9px;
+  }
+
+  .inbox-item {
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+  }
+
+  .inbox-item span:not(.inbox-dot) {
+    color: var(--text-faint);
+    font-size: 11px;
+  }
+
+  .inbox-dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* Delivery animation. Cards are visible by default, so no-JS and
+     reduced-motion users see the final state. */
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* stem 150ms, bus 380ms from the center out, branches by distance,
+       then each card lands once its branch has lit up. */
+    .is-running .route-stem::after {
+      animation: route-y 260ms var(--ease-out) 150ms both;
+    }
+
+    .is-running .route-bus::after {
+      animation: route-x 380ms var(--ease-out) 380ms both;
+    }
+
+    .is-running .route-branch::after {
+      animation: route-y 220ms var(--ease-out) both;
+      animation-delay: calc(var(--d) * 170ms + 520ms);
+    }
+
+    .is-running .delivery {
+      animation: deliver 520ms var(--ease-out) both;
+      animation-delay: calc(var(--d) * 170ms + 680ms);
+    }
+
+    .is-running .status::before {
+      animation: status 1ms linear both;
+      animation-delay: calc(var(--d) * 170ms + 1150ms);
+    }
+  }
+
+  @keyframes route-y {
+    from {
+      transform: scaleY(0);
+    }
+    70% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    to {
+      transform: scaleY(1);
+      opacity: 0.45;
+    }
+  }
+
+  @keyframes route-x {
+    from {
+      transform: scaleX(0);
+    }
+    70% {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+    to {
+      transform: scaleX(1);
+      opacity: 0.45;
+    }
+  }
+
+  @keyframes deliver {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+  }
+
+  @keyframes status {
+    from {
+      content: 'Sending';
+      color: var(--text-faint);
+    }
+    to {
+      content: 'Delivered';
+      color: var(--success);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Channel cards                                                     */
+  /* ---------------------------------------------------------------- */
+
+  .channel-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    max-width: 980px;
+    margin-inline: auto;
+  }
+
+  .channel-card {
+    display: flex;
+    flex-direction: column;
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  .channel-card.featured {
+    border-color: var(--border-strong);
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgb(255 255 255 / 0.07), transparent 70%),
+      var(--glass),
+      var(--surface-raised);
+  }
+
+  .channel-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 22px;
+  }
+
+  .channel-card-label {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .channel-card-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.1);
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .channel-card h3 {
+    margin: 14px 0 0;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+
+  .channel-card > p:not(.divider-label) {
+    min-height: 66px;
+    margin: 8px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .channel-card-button {
+    width: 100%;
+    height: 36px;
+    margin-top: 18px;
+  }
+
+  .divider-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 14px;
+    color: var(--text-faint);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .divider-label::before,
+  .divider-label::after {
+    content: '';
+    flex: 1;
+    border-top: 1px dashed var(--border-strong);
+  }
+
+  .channel-card ul {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .channel-card li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: color 160ms ease;
+  }
+
+  .check {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    color: var(--text);
+  }
+
+  .featured .check {
+    border-color: rgb(79 124 255 / 0.5);
+    color: var(--accent-text);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .channel-card li a:hover {
+      color: var(--text);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Code carousel                                                     */
+  /* ---------------------------------------------------------------- */
+
+  .carousel {
+    position: relative;
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  .slide-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .slide-step {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.02));
+    box-shadow:
+      var(--glass-highlight),
+      0 0 0 6px rgb(255 255 255 / 0.02);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .slide-head h3 {
+    margin: 18px 0 0;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .slide-head p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  .carousel-viewport {
+    overflow: hidden;
+    transition: height 480ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .carousel-track {
+    --slide-gap: 48px;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--slide-gap);
+    transition: transform 560ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    opacity: 0.2;
+    transition: opacity 480ms ease;
+  }
+
+  .slide[data-active] {
+    opacity: 1;
+  }
+
+  .code-window {
+    overflow: hidden;
+    border-radius: 14px;
+  }
+
+  .code-window :global(.astro-code) {
+    min-height: 380px;
+    padding: 20px 24px;
+    background: transparent !important;
+    font-size: 13px;
+  }
+
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text-muted);
+    transition:
+      color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms var(--ease-out);
+  }
+
+  .carousel-arrow:active {
+    transform: scale(0.94);
+  }
+
+  .carousel-prev {
+    left: -64px;
+  }
+
+  .carousel-next {
+    right: -64px;
+  }
+
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .carousel-dots button {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.18);
+    transition:
+      width 240ms var(--ease-out),
+      background-color 160ms ease;
+  }
+
+  .carousel-dots button[aria-current='true'] {
+    width: 22px;
+    background: var(--accent);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .carousel-arrow:hover {
+      border-color: rgb(255 255 255 / 0.3);
+      color: var(--text);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Features grid                                                     */
+  /* ---------------------------------------------------------------- */
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 980px;
+    margin-inline: auto;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--border);
+    gap: 1px;
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    padding: 30px 26px;
+    background: var(--bg);
+    transition: background-color 200ms ease;
+  }
+
+  .feature-icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    background: var(--glass);
+    box-shadow: var(--glass-highlight);
+    color: var(--text);
+  }
+
+  .feature h3 {
+    margin: 22px 0 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .feature p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .feature:hover {
+      background: var(--bg-subtle);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* CTA                                                               */
+  /* ---------------------------------------------------------------- */
+
+  .section-cta {
+    padding-bottom: 120px;
+  }
+
+  .cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 980px;
+    margin-inline: auto;
+    padding: 80px 32px;
+    overflow: hidden;
+    border-radius: 18px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse 50% 70% at 50% 0%, rgb(255 255 255 / 0.06), transparent 70%),
+      radial-gradient(circle at center, rgb(255 255 255 / 0.08) 0.6px, transparent 1px) 0 0 / 24px 24px,
+      var(--surface);
+  }
+
+  .cta h2 {
+    margin: 0;
+  }
+
+  .cta p {
+    margin: 12px 0 0;
+    color: var(--text-muted);
+  }
+
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .cta-install {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 40px;
+    padding: 0 6px 0 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 9px;
+    background: rgb(0 0 0 / 0.3);
+    color: var(--text-faint);
+    font-size: 13px;
+    transition: border-color 160ms ease;
+  }
+
+  .cta-install code {
+    color: var(--text);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cta-install:hover {
+      border-color: rgb(255 255 255 / 0.25);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Footer                                                            */
+  /* ---------------------------------------------------------------- */
+
+  .site-footer {
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+    gap: 40px;
+    padding-top: 56px;
+    padding-bottom: 48px;
+  }
+
+  .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+
+  .footer-brand p {
+    max-width: 320px;
+    margin: 16px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .footer-socials {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .footer-socials a {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    color: var(--text-muted);
+    transition: color 160ms ease;
+  }
+
+  .footer-column p {
+    margin: 0 0 14px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .footer-column ul {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-column a,
+  .footer-bottom a {
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: color 160ms ease;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 20px;
+    padding-bottom: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 13px;
+  }
+
+  .footer-bottom span a {
+    font-size: inherit;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .footer-column a:hover,
+    .footer-bottom a:hover,
+    .footer-socials a:hover {
+      color: var(--text);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Responsive                                                        */
+  /* ---------------------------------------------------------------- */
+
+  @media (max-width: 1060px) {
+    .carousel-arrow {
+      top: auto;
+      bottom: -6px;
+    }
+
+    .carousel-prev {
+      left: 0;
+    }
+
+    .carousel-next {
+      right: 0;
+    }
+
+    .carousel-dots {
+      height: 28px;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .deliveries {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dispatch-routes {
+      --columns: 2;
+    }
+
+    .route-branch:nth-child(n + 5) {
+      display: none;
+    }
+
+    .channel-cards {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 480px;
+    }
+
+    .channel-card > p:not(.divider-label) {
+      min-height: 0;
+    }
+
+    .features {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .footer-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      padding-top: 56px;
+    }
+
+    .install {
+      max-width: 100%;
+    }
+
+    .dispatch {
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .section {
+      padding-top: 88px;
+    }
+
+    .code-window :global(.astro-code) {
+      min-height: 0;
+      padding: 16px;
+      font-size: 12px;
+    }
+
+    .features {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cta {
+      padding: 56px 20px;
+    }
+
+    .cta-install {
+      max-width: 100%;
+    }
+
+    .cta-install code {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .footer-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 480px) {
+    .deliveries {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .dispatch-routes {
+      display: none;
+    }
+
+    .deliveries {
+      margin-top: 12px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-viewport,
+    .carousel-track,
+    .slide {
+      transition: none;
+    }
+  }
+</style>

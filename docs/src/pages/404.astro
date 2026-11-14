@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro'
+import Icon from '../components/Icon.astro'
+---
+
+<Base title="Page not found | Facteur" description="This page does not exist.">
+  <main id="content" class="not-found container">
+    <p class="not-found-code">404</p>
+    <h1>Return to sender.</h1>
+    <p>We could not deliver this page. It may have moved, or never existed.</p>
+    <div class="not-found-actions">
+      <a class="button button-primary" href="/docs/introduction">Browse the docs <Icon name="lucide:arrow-right" size={16} /></a>
+      <a class="button button-secondary" href="/">Home</a>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .not-found {
+    display: grid;
+    justify-items: center;
+    padding-top: 18vh;
+    padding-bottom: 18vh;
+    text-align: center;
+  }
+
+  .not-found-code {
+    margin: 0;
+    color: var(--accent-text);
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  h1 {
+    margin: 12px 0 0;
+    font-size: clamp(36px, 6vw, 56px);
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+
+  p {
+    max-width: 440px;
+    color: var(--text-muted);
+  }
+
+  .not-found-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+</style>

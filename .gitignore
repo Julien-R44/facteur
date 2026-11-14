@@ -17,3 +17,4 @@ yarn-error.log
 dist
 service-account.json
 .amp/portals/*
+**/.astro

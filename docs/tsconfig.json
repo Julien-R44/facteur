@@ -1,7 +1,5 @@
 {
-  "extends": "@adonisjs/tsconfig/tsconfig.app.json",
-  "compilerOptions": {
-    "rootDir": "./",
-    "outDir": "./build"
-  }
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
 }

@@ -1,0 +1,184 @@
+---
+import type { GetStaticPaths } from 'astro'
+import { getCollection, render } from 'astro:content'
+
+import '../../styles/docs.css'
+
+import Base from '../../layouts/Base.astro'
+import Icon from '../../components/Icon.astro'
+import { navigation, navigationItems } from '../../navigation.ts'
+
+export const getStaticPaths = (async () => {
+  const entries = await getCollection('docs')
+  const missing = entries.filter((entry) => !navigationItems.some((item) => item.slug === entry.id))
+  const unknown = navigationItems.filter((item) => !entries.some((entry) => entry.id === item.slug))
+
+  if (missing.length || unknown.length) {
+    throw new Error(
+      `Docs navigation is out of sync. Not in navigation: ${missing.map((entry) => entry.id).join(', ') || 'none'}. ` +
+        `Missing pages: ${unknown.map((item) => item.slug).join(', ') || 'none'}.`,
+    )
+  }
+
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }))
+}) satisfies GetStaticPaths
+
+const { entry } = Astro.props
+const { Content, headings, remarkPluginFrontmatter } = await render(entry)
+
+const index = navigationItems.findIndex((item) => item.slug === entry.id)
+const current = navigationItems[index]
+const previous = navigationItems[index - 1]
+const next = navigationItems[index + 1]
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3)
+const editUrl = `https://github.com/Julien-R44/facteur/edit/main/docs/${entry.filePath}`
+---
+
+<Base title={`${current.title} | Facteur`} description={entry.data.description ?? remarkPluginFrontmatter.description ?? ''} withMenu>
+  <div class="docs-layout">
+    <div class="sidebar-backdrop" data-menu-close></div>
+
+    <aside class="docs-sidebar" aria-label="Documentation" data-sidebar>
+      <nav>
+        {
+          navigation.map((section) => (
+            <div class="sidebar-section">
+              <p class="sidebar-section-title">{section.title}</p>
+              <ul>
+                {section.items.map((item) => (
+                  <li>
+                    <a href={`/docs/${item.slug}`} aria-current={item.slug === entry.id ? 'page' : undefined}>
+                      {item.icon && <Icon name={item.icon} size={15} class="sidebar-icon" />}
+                      <span>{item.title}</span>
+                      {item.badge && <span class="sidebar-badge">{item.badge}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </aside>
+
+    <main id="content" class="docs-main">
+      <article class="docs-article">
+        <p class="docs-eyebrow">{current.section}</p>
+        <div class="prose" data-pagefind-body data-pagefind-meta={`title:${current.title}`}>
+          <Content />
+        </div>
+
+        <footer class="docs-footer">
+          <a class="edit-link" href={editUrl}>
+            <Icon name="lucide:pencil" size={14} />
+            Edit this page on GitHub
+          </a>
+
+          <nav class="pager" aria-label="Pagination">
+            {
+              previous && (
+                <a class="pager-link" href={`/docs/${previous.slug}`} rel="prev">
+                  <span class="pager-label">
+                    <Icon name="lucide:arrow-left" size={14} /> Previous
+                  </span>
+                  <span class="pager-title">{previous.title}</span>
+                </a>
+              )
+            }
+            {
+              next && (
+                <a class="pager-link pager-next" href={`/docs/${next.slug}`} rel="next">
+                  <span class="pager-label">
+                    Next <Icon name="lucide:arrow-right" size={14} />
+                  </span>
+                  <span class="pager-title">{next.title}</span>
+                </a>
+              )
+            }
+          </nav>
+        </footer>
+      </article>
+
+      {
+        toc.length > 1 && (
+          <aside class="docs-toc" aria-label="On this page">
+            <p class="toc-title">On this page</p>
+            <ul>
+              {toc.map((heading) => (
+                <li class:list={{ 'toc-sub': heading.depth === 3 }}>
+                  <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )
+      }
+    </main>
+  </div>
+</Base>
+
+<script>
+  /* Mobile sidebar */
+  const root = document.documentElement
+
+  document.querySelector('[data-menu-open]')?.addEventListener('click', () => root.toggleAttribute('data-menu-open'))
+  document.querySelector('[data-menu-close]')?.addEventListener('click', () => root.removeAttribute('data-menu-open'))
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') root.removeAttribute('data-menu-open')
+  })
+
+  document.querySelector('[data-sidebar] [aria-current="page"]')?.scrollIntoView({ block: 'center' })
+
+  /* Table of contents scroll spy */
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')].map((link) => [link.dataset.tocLink!, link]),
+  )
+  const headings = [...links.keys()]
+    .map((id) => document.getElementById(id))
+    .filter((heading): heading is HTMLElement => heading !== null)
+
+  function updateActiveHeading() {
+    const offset = 120
+    const atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 4
+    const current = atBottom
+      ? headings.at(-1)
+      : headings.findLast((heading) => heading.getBoundingClientRect().top <= offset) ?? headings[0]
+
+    links.forEach((link, id) => link.toggleAttribute('data-active', id === current?.id))
+  }
+
+  if (headings.length) {
+    updateActiveHeading()
+    window.addEventListener('scroll', updateActiveHeading, { passive: true })
+  }
+
+  /* Code groups: tabs built from the titles of the blocks they contain */
+  document.querySelectorAll<HTMLElement>('.code-group').forEach((group, groupIndex) => {
+    const frames = [...group.querySelectorAll<HTMLElement>(':scope > .code-frame')]
+    const tabs = document.createElement('div')
+    tabs.className = 'code-group-tabs'
+    tabs.setAttribute('role', 'tablist')
+
+    const select = (index: number) => {
+      frames.forEach((frame, frameIndex) => (frame.hidden = frameIndex !== index))
+      tabs.querySelectorAll('button').forEach((tab, tabIndex) => tab.setAttribute('aria-selected', String(tabIndex === index)))
+    }
+
+    frames.forEach((frame, index) => {
+      const tab = document.createElement('button')
+      tab.type = 'button'
+      tab.setAttribute('role', 'tab')
+      tab.id = `code-group-${groupIndex}-${index}`
+      tab.textContent = frame.dataset.title ?? `Tab ${index + 1}`
+      tab.addEventListener('click', () => select(index))
+      tabs.append(tab)
+      frame.setAttribute('role', 'tabpanel')
+      frame.setAttribute('aria-labelledby', tab.id)
+    })
+
+    group.prepend(tabs)
+    select(0)
+  })
+</script>

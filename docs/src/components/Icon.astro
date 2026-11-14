@@ -1,0 +1,19 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import { iconSvg } from '../icons.ts'
+
+interface Props extends HTMLAttributes<'svg'> {
+  /** `lucide:<name>` or `simple-icons:<name>` */
+  name: string
+  size?: number
+}
+
+const { name, size = 16, ...attributes } = Astro.props
+const svg = iconSvg(
+  name,
+  size,
+  Object.fromEntries(Object.entries(attributes).map(([key, value]) => [key, String(value)])),
+)
+---
+
+<Fragment set:html={svg} />

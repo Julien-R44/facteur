@@ -1,0 +1,60 @@
+---
+import '../styles/global.css'
+
+import Header from '../components/Header.astro'
+import Search from '../components/Search.astro'
+
+interface Props {
+  title: string
+  description: string
+  withMenu?: boolean
+}
+
+const { title, description, withMenu } = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#0c0c0d" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Facteur" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body class:list={{ 'docs-shell': withMenu }}>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <Header withMenu={withMenu} />
+    <slot />
+    <Search />
+
+    <script>
+      document.addEventListener('click', async (event) => {
+        const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-copy], .copy-button')
+        if (!button) return
+
+        const text = button.dataset.copy ?? button.closest('.code-frame')?.querySelector('pre')?.innerText ?? ''
+
+        await navigator.clipboard.writeText(text.trimEnd())
+        const label = button.querySelector('[data-copy-label]') ?? button
+        const previous = label.textContent
+        button.setAttribute('data-copied', '')
+        label.textContent = 'Copied'
+        setTimeout(() => {
+          button.removeAttribute('data-copied')
+          label.textContent = previous
+        }, 1600)
+      })
+    </script>
+  </body>
+</html>

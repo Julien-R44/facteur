@@ -1,0 +1,284 @@
+---
+import Icon from './Icon.astro'
+---
+
+<dialog class="search-dialog" aria-label="Search documentation" data-search-dialog>
+  <div class="search-panel">
+    <label class="search-field">
+      <Icon name="lucide:search" size={18} />
+      <span class="sr-only">Search</span>
+      <input type="search" placeholder="Search the docs" autocomplete="off" spellcheck="false" data-search-input />
+      <kbd>Esc</kbd>
+    </label>
+    <ul class="search-results" role="listbox" data-search-results></ul>
+    <p class="search-empty" data-search-empty>Type to search guides, channels and APIs.</p>
+  </div>
+</dialog>
+
+<script>
+  type PagefindResult = {
+    url: string
+    meta: { title?: string }
+    excerpt: string
+    sub_results?: { url: string; title: string; excerpt: string }[]
+  }
+
+  type Pagefind = {
+    init(): Promise<void>
+    debouncedSearch(query: string): Promise<{ results: { data(): Promise<PagefindResult> }[] } | null>
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-search-dialog]')!
+  const input = dialog.querySelector<HTMLInputElement>('[data-search-input]')!
+  const list = dialog.querySelector<HTMLUListElement>('[data-search-results]')!
+  const empty = dialog.querySelector<HTMLElement>('[data-search-empty]')!
+
+  let pagefind: Promise<Pagefind | undefined> | undefined
+  let active = 0
+
+  function loadPagefind() {
+    const url = '/pagefind/pagefind.js'
+    pagefind ??= import(/* @vite-ignore */ url)
+      .then(async (module: Pagefind) => {
+        await module.init()
+        return module
+      })
+      .catch(() => undefined)
+
+    return pagefind
+  }
+
+  function open() {
+    dialog.showModal()
+    input.select()
+    loadPagefind()
+  }
+
+  function cleanUrl(url: string) {
+    return url.replace(/\.html(?=#|$)/, '')
+  }
+
+  function setActive(index: number) {
+    const items = [...list.querySelectorAll<HTMLAnchorElement>('a')]
+    if (!items.length) return
+
+    active = (index + items.length) % items.length
+    items.forEach((item, itemIndex) => item.setAttribute('aria-selected', String(itemIndex === active)))
+    items[active].scrollIntoView({ block: 'nearest' })
+  }
+
+  async function search(query: string) {
+    const module = await loadPagefind()
+
+    if (!module) {
+      empty.textContent = 'Search is available on the built site (pnpm build && pnpm preview).'
+      empty.hidden = false
+      return
+    }
+
+    const response = await module.debouncedSearch(query)
+    if (response === null || query !== input.value) return
+
+    const results = await Promise.all(response.results.slice(0, 8).map((result) => result.data()))
+
+    list.replaceChildren(
+      ...results.flatMap((result) => {
+        const entries = result.sub_results?.length ? result.sub_results.slice(0, 3) : [result]
+
+        return entries.map((entry) => {
+          const item = document.createElement('li')
+          const link = document.createElement('a')
+          const title = 'title' in entry ? entry.title : result.meta.title
+
+          link.href = cleanUrl(entry.url)
+          link.setAttribute('role', 'option')
+          link.innerHTML = `<span class="search-result-page"></span><span class="search-result-title"></span><span class="search-result-excerpt">${entry.excerpt}</span>`
+          link.querySelector('.search-result-page')!.textContent = result.meta.title ?? ''
+          link.querySelector('.search-result-title')!.textContent = title === result.meta.title ? '' : (title ?? '')
+          item.append(link)
+          return item
+        })
+      }),
+    )
+
+    empty.hidden = results.length > 0
+    empty.textContent = `No results for "${query}".`
+    setActive(0)
+  }
+
+  input.addEventListener('input', () => {
+    if (!input.value.trim()) {
+      list.replaceChildren()
+      empty.textContent = 'Type to search guides, channels and APIs.'
+      empty.hidden = false
+      return
+    }
+
+    search(input.value.trim())
+  })
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      setActive(active + (event.key === 'ArrowDown' ? 1 : -1))
+    }
+
+    if (event.key === 'Enter') {
+      list.querySelectorAll<HTMLAnchorElement>('a')[active]?.click()
+    }
+  })
+
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close()
+  })
+
+  document.querySelectorAll('[data-search-open]').forEach((button) => button.addEventListener('click', open))
+
+  document.addEventListener('keydown', (event) => {
+    const isShortcut = event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)
+    const target = event.target as HTMLElement
+    const isTyping = target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+
+    if (isShortcut || (event.key === '/' && !isTyping)) {
+      event.preventDefault()
+      if (dialog.open) dialog.close()
+      else open()
+    }
+  })
+</script>
+
+<style>
+  .search-dialog {
+    width: min(640px, calc(100vw - 32px));
+    max-height: min(560px, calc(100vh - 120px));
+    margin: 12vh auto auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--surface-raised);
+    color: var(--text);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .search-dialog[open] {
+    animation: search-in 180ms var(--ease-out);
+  }
+
+  .search-dialog::backdrop {
+    background: rgb(10 10 9 / 0.45);
+    backdrop-filter: blur(3px);
+  }
+
+  .search-panel {
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+  }
+
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-faint);
+  }
+
+  .search-field input {
+    flex: 1;
+    height: 56px;
+    border: 0;
+    outline: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+  }
+
+  .search-field input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .search-field kbd {
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+  }
+
+  .search-results {
+    margin: 0;
+    padding: 8px;
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  .search-results:empty {
+    display: none;
+  }
+
+  .search-results :global(a) {
+    display: grid;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+  }
+
+  .search-results :global(a[aria-selected='true']) {
+    background: var(--bg-subtle);
+  }
+
+  .search-results :global(.search-result-page) {
+    color: var(--text-faint);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .search-results :global(.search-result-title) {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .search-results :global(.search-result-title:empty) {
+    display: none;
+  }
+
+  .search-results :global(.search-result-excerpt) {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    line-height: 1.5;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .search-results :global(mark) {
+    background: var(--accent-soft);
+    color: var(--text);
+    font-weight: 550;
+  }
+
+  .search-empty {
+    margin: 0;
+    padding: 28px 16px;
+    color: var(--text-faint);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  @keyframes search-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .search-dialog[open] {
+      animation: none;
+    }
+  }
+</style>
