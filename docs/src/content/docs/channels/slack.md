@@ -91,4 +91,27 @@ export default class SlackNotification extends Notification<undefined> {
 }
 ```
 
+### Colored attachments
+
+Slack only colors attachments. An attachment holds the same blocks as a message, with a colored bar on its left:
+
+```ts
+SlackMessage.create()
+  .setText('Deployment of worker failed')
+  .addAttachment((attachment) =>
+    attachment
+      .setColor('#e01e5a')
+      .setFallback('Deployment of worker failed')
+      .addHeaderBlock('Deployment of worker failed')
+      .addSectionBlock((block) =>
+        block.addMarkdownField('*Project*\nShop').addMarkdownField('*Environment*\nstaging'),
+      )
+      .addActionsBlock((block) =>
+        block.addButton({ text: 'Open worker', actionId: 'open', url: 'https://example.com' }),
+      ),
+  )
+```
+
+`setFallback()` sets the text that notifications and clients without blocks show.
+
 For more details about webhook configuration and targeting, see the [Webhook channel documentation](./webhook.md).

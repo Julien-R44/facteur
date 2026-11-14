@@ -98,4 +98,16 @@ export default class DiscordNotification extends Notification<undefined> {
 }
 ```
 
+### Link buttons
+
+`addLinkButton()` adds a button that opens a URL. Discord shows up to 5 buttons per row and 5 rows:
+
+```ts
+DiscordMessage.create()
+  .addEmbed((embed) => embed.setTitle('api deployed').setColor('#2eb67d'))
+  .addLinkButton({ label: 'Open api', url: 'https://example.com/api' })
+```
+
+A webhook created in the Discord settings can only send link buttons. Facteur adds the `with_components` query parameter that Discord needs to accept them.
+
 For more details about webhook configuration and targeting, see the [Webhook channel documentation](./webhook.md).

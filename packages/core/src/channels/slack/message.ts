@@ -1,3 +1,5 @@
+import type { HexadecimalColor } from './types.ts'
+
 import { WebhookMessage } from '../webhook/message.ts'
 
 export class SlackMessage extends WebhookMessage {
@@ -9,7 +11,8 @@ export class SlackMessage extends WebhookMessage {
   #threadTs = ''
   #unfurlLinks = false
   #unfurlMedia = false
-  #blocks: SlackBlock[] = []
+  #blocks = new SlackBlocks()
+  #attachments: SlackAttachment[] = []
 
   /**
    * Creates a new instance of SlackMessage.
@@ -86,6 +89,93 @@ export class SlackMessage extends WebhookMessage {
    * Adds a section block with text content.
    */
   addSectionBlock(callback: (block: SlackSectionBlock) => void) {
+    this.#blocks.addSectionBlock(callback)
+    return this
+  }
+
+  /**
+   * Adds a header block with plain text.
+   */
+  addHeaderBlock(text: string) {
+    this.#blocks.addHeaderBlock(text)
+    return this
+  }
+
+  /**
+   * Adds a divider block to separate content.
+   */
+  addDividerBlock() {
+    this.#blocks.addDividerBlock()
+    return this
+  }
+
+  /**
+   * Adds a context block with contextual information.
+   */
+  addContextBlock(callback: (block: SlackContextBlock) => void) {
+    this.#blocks.addContextBlock(callback)
+    return this
+  }
+
+  /**
+   * Adds an image block to display an image.
+   */
+  addImageBlock(callback: (block: SlackImageBlock) => void) {
+    this.#blocks.addImageBlock(callback)
+    return this
+  }
+
+  /**
+   * Adds an actions block with interactive elements.
+   */
+  addActionsBlock(callback: (block: SlackActionsBlock) => void) {
+    this.#blocks.addActionsBlock(callback)
+    return this
+  }
+
+  /**
+   * Adds an attachment, shown under the message with a colored bar on its left.
+   * Slack only colors attachments: use one to give a message a status color.
+   */
+  addAttachment(callback: (attachment: SlackAttachment) => void) {
+    const attachment = new SlackAttachment()
+    callback(attachment)
+    this.#attachments.push(attachment)
+    return this
+  }
+
+  override serialize() {
+    const body: any = {
+      text: this.#text,
+      username: this.#username,
+      icon_emoji: this.#iconEmoji,
+      icon_url: this.#iconUrl,
+      channel: this.#channel,
+      unfurl_links: this.#unfurlLinks,
+      unfurl_media: this.#unfurlMedia,
+      blocks: this.#blocks.serializeBlocks(),
+    }
+
+    if (this.#attachments.length > 0) {
+      body.attachments = this.#attachments.map((attachment) => attachment.serialize())
+    }
+
+    if (this.#threadTs) body.thread_ts = this.#threadTs
+
+    return { ...super.serialize(), body }
+  }
+}
+
+/**
+ * An ordered list of blocks, shared by a message and its attachments.
+ */
+class SlackBlocks {
+  #blocks: SlackBlock[] = []
+
+  /**
+   * Adds a section block with text content.
+   */
+  addSectionBlock(callback: (block: SlackSectionBlock) => void) {
     const block = new SlackSectionBlock()
     callback(block)
     this.#blocks.push(block)
@@ -138,21 +228,36 @@ export class SlackMessage extends WebhookMessage {
     return this
   }
 
-  override serialize() {
-    const body: any = {
-      text: this.#text,
-      username: this.#username,
-      icon_emoji: this.#iconEmoji,
-      icon_url: this.#iconUrl,
-      channel: this.#channel,
-      unfurl_links: this.#unfurlLinks,
-      unfurl_media: this.#unfurlMedia,
-      blocks: this.#blocks.map((block) => block.serialize()),
-    }
+  serializeBlocks() {
+    return this.#blocks.map((block) => block.serialize())
+  }
+}
 
-    if (this.#threadTs) body.thread_ts = this.#threadTs
+/**
+ * Blocks shown under a message with a colored bar on their left.
+ */
+export class SlackAttachment extends SlackBlocks {
+  #color?: HexadecimalColor
+  #fallback?: string
 
-    return { ...super.serialize(), body }
+  /**
+   * Sets the color of the bar on the left of the attachment. Accepts a hexadecimal color code.
+   */
+  setColor(color: HexadecimalColor) {
+    this.#color = color
+    return this
+  }
+
+  /**
+   * Sets the plain text shown in notifications and by clients that cannot show blocks.
+   */
+  setFallback(fallback: string) {
+    this.#fallback = fallback
+    return this
+  }
+
+  serialize() {
+    return { color: this.#color, fallback: this.#fallback, blocks: this.serializeBlocks() }
   }
 }
 
