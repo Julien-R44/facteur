@@ -1,5 +1,13 @@
 # @facteurjs/adonisjs
 
+## 2.1.1
+
+### Patch Changes
+
+- Updated dependencies [8193263]
+- Updated dependencies [8dc7f55]
+  - @facteurjs/core@2.3.0
+
 ## 2.1.0
 
 ### Minor Changes

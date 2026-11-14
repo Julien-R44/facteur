@@ -1,5 +1,14 @@
 # @facteurjs/core
 
+## 2.3.0
+
+### Minor Changes
+
+- 8193263: Add `SlackMessage.addAttachment()`, to send blocks under a colored bar, and `DiscordMessage.addLinkButton()`, to send link buttons from a Discord webhook.
+- 8dc7f55: Update dependencies and add support for Expo Server SDK 8 and Web Push 4. Web Push 3 remains supported.
+
+  Keep Ky 1 to preserve existing client hook signatures and HTTP error response bodies.
+
 ## 2.2.0
 
 ### Minor Changes
@@ -57,19 +66,19 @@
 
   ```ts
   // Global — disable email for everything
-  await client.preferences.update({ preferences: { email: false } });
+  await client.preferences.update({ preferences: { email: false } })
 
   // Per-notification
   await client.preferences.update({
     preferences: { email: false },
-    notificationName: "invoice-paid",
-  });
+    notificationName: 'invoice-paid',
+  })
 
   // Per-category — disable SMS for all billing notifications
   await client.preferences.update({
     preferences: { sms: false },
-    category: "billing",
-  });
+    category: 'billing',
+  })
   ```
 
   Also fixes `notificationName` handling in database adapters for NULL values and corrects identifier resolution priority in the notification discoverer.
@@ -105,19 +114,19 @@
 
   ```ts
   // Global — disable email for everything
-  await client.preferences.update({ preferences: { email: false } });
+  await client.preferences.update({ preferences: { email: false } })
 
   // Per-notification
   await client.preferences.update({
     preferences: { email: false },
-    notificationName: "invoice-paid",
-  });
+    notificationName: 'invoice-paid',
+  })
 
   // Per-category — disable SMS for all billing notifications
   await client.preferences.update({
     preferences: { sms: false },
-    category: "billing",
-  });
+    category: 'billing',
+  })
   ```
 
   Also fixes `notificationName` handling in database adapters for NULL values and corrects identifier resolution priority in the notification discoverer.
